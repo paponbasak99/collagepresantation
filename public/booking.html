@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout & Confirm Appointment — DocBook</title>
   <meta name="description" content="Complete outpatient booking with atomic 5-minute hold, patient details, and verified payment via bKash, Nagad, or clinic desk.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/3d.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/js/tailwind-config.js"></script>
-  <style>
+  <link rel="stylesheet" href="/css/components.css">  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">  <style>
     .checkout-layout-grid {
       display: grid;
       grid-template-columns: 1.4fr 1fr;
@@ -91,7 +89,7 @@
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0;">
-          <div data-scene="timer" style="width: 32px; height: 32px; position: relative;"></div>
+          
           <span style="font-size: 0.8125rem; color: var(--color-ink-600); font-weight: 600;" data-i18n="remaining_time">Remaining:</span>
           <span id="hold-countdown" class="hold-timer-text">05:00</span>
         </div>
@@ -184,21 +182,21 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-3);">
               <label class="payment-tile selected" id="tile-bkash">
                 <input type="radio" name="payment_mode" value="BKASH" checked style="display: none;">
-                <span class="payment-tile-badge">✓</span>
+                <span class="payment-tile-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                 <div style="font-weight: 800; color: #d12053; font-size: 1.0625rem; font-family: var(--font-display);">bKash</div>
                 <div style="font-size: 0.6875rem; color: var(--color-ink-500);">Instant MFS Wallet</div>
               </label>
 
               <label class="payment-tile" id="tile-nagad">
                 <input type="radio" name="payment_mode" value="NAGAD" style="display: none;">
-                <span class="payment-tile-badge">✓</span>
+                <span class="payment-tile-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                 <div style="font-weight: 800; color: #ea580c; font-size: 1.0625rem; font-family: var(--font-display);">Nagad</div>
                 <div style="font-size: 0.6875rem; color: var(--color-ink-500);">Instant Post-Office MFS</div>
               </label>
 
               <label class="payment-tile" id="tile-clinic">
                 <input type="radio" name="payment_mode" value="CASH_AT_CLINIC" style="display: none;">
-                <span class="payment-tile-badge">✓</span>
+                <span class="payment-tile-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                 <div style="font-weight: 800; color: var(--color-teal-800); font-size: 1.0625rem; font-family: var(--font-display);">Pay at Clinic</div>
                 <div style="font-size: 0.6875rem; color: var(--color-ink-500);">Front desk cash receipt</div>
               </label>
@@ -210,7 +208,7 @@
             <span>Confirm & Pay ৳ <span id="btn-fee-val">0</span></span>
           </button>
           <div style="text-align: center; margin-top: 0.5rem; font-size: 0.75rem; color: var(--color-ink-500); display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
-            <span>🔒 256-Bit SSL Encrypted Verification • Instant Serial Token</span>
+            <span>256-Bit SSL Encrypted Verification • Instant Serial Token</span>
           </div>
         </form>
       </main>
@@ -265,15 +263,15 @@
           <!-- Trust Guarantees -->
           <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--color-border); font-size: 0.75rem; color: var(--color-ink-600); display: flex; flex-direction: column; gap: var(--space-2);">
             <div style="display: flex; align-items: center; gap: 0.35rem;">
-              <span style="color: var(--color-teal-700);">✓</span>
+              <span style="color: var(--color-brand, #00984a); font-weight: bold;">✓</span>
               <span>100% BMDC Certified Medical Practitioner</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.35rem;">
-              <span style="color: var(--color-teal-700);">✓</span>
+              <span style="color: var(--color-brand, #00984a); font-weight: bold;">✓</span>
               <span>Full Refund for Cancellations &gt;24h before Chamber</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.35rem;">
-              <span style="color: var(--color-teal-700);">✓</span>
+              <span style="color: var(--color-brand, #00984a); font-weight: bold;">✓</span>
               <span>Instant QR Verifiable Appointment Token</span>
             </div>
           </div>
@@ -600,7 +598,5 @@
     }
 
     initCheckout();
-  </script>
-  <script type="module" src="/js/3d/core.js"></script>
-</body>
+  </script></body>
 </html>

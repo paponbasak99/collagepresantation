@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Account Sign In & Registration — DocBook</title>
   <meta name="description" content="Sign in to your DocBook account or register as a patient or doctor with instant phone OTP verification.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/3d.css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/js/tailwind-config.js"></script>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/components.css">  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
   <style>
     .auth-split-layout {
       display: grid;
@@ -101,15 +100,15 @@
 
           <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: 0.8125rem; color: #e2e8f0;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="color: var(--color-teal-300);">✓</span>
+              <span style="color: var(--color-brand, #00984a); font-weight: bold;">✓</span>
               <span>100% BMDC Verified Practitioners</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="color: var(--color-teal-300);">✓</span>
+              <span style="color: var(--color-brand, #00984a); font-weight: bold;">✓</span>
               <span>Atomic 5-Minute Double-Booking Prevention</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="color: var(--color-teal-300);">✓</span>
+              <span style="color: var(--color-brand, #00984a); font-weight: bold;">✓</span>
               <span>Live Queue Tracking & Digital Prescriptions</span>
             </div>
           </div>
@@ -484,7 +483,5 @@
       registerForm.style.display = 'block';
       document.getElementById('register-submit-btn').disabled = false;
     });
-  </script>
-  <script type="module" src="/js/3d/core.js"></script>
-</body>
+  </script></body>
 </html>

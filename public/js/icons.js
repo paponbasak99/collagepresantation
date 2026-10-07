@@ -266,14 +266,14 @@ export function renderDoctorAvatar(name, id, size = 64, isVerified = true, avata
   return `
     <div class="doctor-avatar-wrap" style="width: ${size}px; height: ${size}px; position: relative; flex-shrink: 0; user-select: none;">
       <img src="${photoUrl}" alt="${name || 'Doctor'}" 
-        style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md); border: 2px solid var(--color-teal-200); box-shadow: var(--shadow-sm); display: block;" 
+        style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-lg); border: 1.5px solid var(--color-border-subtle); box-shadow: var(--shadow-1); display: block;" 
         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
         loading="lazy" />
-      <div class="doctor-monogram-avatar" style="display: none; width: 100%; height: 100%; border-radius: var(--radius-md); background: ${palette.bg}; color: ${palette.color}; border: 1.5px solid ${palette.border}; font-size: ${fontSize}px; font-weight: 700; align-items: center; justify-content: center;">
+      <div class="doctor-monogram-avatar" style="display: none; width: 100%; height: 100%; border-radius: var(--radius-lg); background: ${palette.bg}; color: ${palette.color}; border: 1.5px solid ${palette.border}; font-size: ${fontSize}px; font-weight: 700; align-items: center; justify-content: center;">
         <span>${monogram}</span>
       </div>
       ${isVerified ? `
-        <span class="avatar-verified-badge" title="BMDC Verified Practitioner" style="position: absolute; bottom: -3px; right: -3px; background: linear-gradient(135deg, #0d9488, #0f766e); color: white; width: ${badgeSize}px; height: ${badgeSize}px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--color-surface); box-shadow: 0 2px 5px rgba(0,0,0,0.25);">
+        <span class="avatar-verified-badge" title="BMDC Verified Practitioner" style="position: absolute; bottom: -3px; right: -3px; background: var(--color-brand-strong); color: var(--color-text-on-brand); width: ${badgeSize}px; height: ${badgeSize}px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--color-surface-card); box-shadow: var(--shadow-4);">
           ${icons.check(badgeSize * 0.62)}
         </span>
       ` : ''}

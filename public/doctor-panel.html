@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Doctor Clinical Workspace & Chamber OPD — DocBook</title>
   <meta name="description" content="Clinical consultation workspace: OPD queue management, digital e-prescription builder, weekly chamber scheduling, and revenue analytics.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/js/tailwind-config.js"></script>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/components.css">  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
   <style>
     .queue-grid {
       display: grid;
@@ -118,7 +118,7 @@
         Consultation Earnings & Reports
       </button>
       <button id="tab-lab-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
-        🔬 Diagnostic Lab Vault
+        Diagnostic Lab Vault
       </button>
     </div>
 
@@ -317,7 +317,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
               <label class="form-label" style="margin-bottom: 0; font-weight: 700; font-size: 0.9375rem; text-transform: uppercase; letter-spacing: 0.04em;">Diagnostic Lab Tests (Optional)</label>
               <div style="display: flex; gap: var(--space-2);">
-                <button type="button" id="rx-view-patient-labs-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">🔬 Patient Lab History</button>
+                <button type="button" id="rx-view-patient-labs-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Patient Lab History</button>
                 <button type="button" id="add-test-row-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">+ Add Investigation</button>
               </div>
             </div>
@@ -659,7 +659,7 @@
       alertsMount.innerHTML = `
         <div style="background: rgba(220, 38, 38, 0.08); border: 1.5px solid #ef4444; border-radius: var(--radius-sm); padding: var(--space-3); color: #991b1b;">
           <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.8125rem; margin-bottom: 0.25rem;">
-            <span>⚠️ Clinical Drug Safety Alert (${alerts.length})</span>
+            <span>Clinical Drug Safety Alert (${alerts.length})</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.75rem;">
             ${alerts.map(a => `

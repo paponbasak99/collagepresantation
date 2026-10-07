@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Find Specialists & Book Outpatient Slots — DocBook</title>
   <meta name="description" content="Explore BMDC certified doctors, compare consultation fees, view hospital chambers across Dinajpur, and book your verified appointment slot.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/3d.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/js/tailwind-config.js"></script>
-  <style>
+  <link rel="stylesheet" href="/css/components.css">  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">  <style>
     .doctors-layout-grid {
       display: grid;
       grid-template-columns: 290px 1fr;
@@ -460,7 +458,7 @@
         pill.style.display = 'inline-flex';
         pill.style.alignItems = 'center';
         pill.style.gap = '0.4rem';
-        pill.innerHTML = `<span>${t.label}</span> <span style="font-weight: 800; opacity: 0.8; display: flex;">✕</span>`;
+        pill.innerHTML = `<span>${t.label}</span> <span style="font-weight: 800; opacity: 0.8; display: flex;">&times;</span>`;
         pill.title = 'Click to remove filter';
         pill.addEventListener('click', () => {
           t.clear();
@@ -764,7 +762,5 @@
     });
 
     initFilters();
-  </script>
-  <script type="module" src="/js/3d/core.js"></script>
-</body>
+  </script></body>
 </html>

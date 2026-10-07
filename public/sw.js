@@ -1,4 +1,4 @@
-const CACHE_NAME = 'docbook-v1.2.0';
+const CACHE_NAME = 'docbook-v2.1.0';
 
 const PRECACHE_ASSETS = [
   '/',
@@ -7,12 +7,15 @@ const PRECACHE_ASSETS = [
   '/appointment-slip.html',
   '/prescription-slip.html',
   '/tv-display.html',
+  '/css/tokens.css',
   '/css/main.css',
   '/css/components.css',
   '/js/api.js',
   '/js/navbar.js',
   '/js/theme.js',
   '/js/toast.js',
+  '/js/icons.js',
+  '/js/animations.js',
   '/js/i18n.js',
   '/images/docbook-logo.svg',
   '/manifest.json'

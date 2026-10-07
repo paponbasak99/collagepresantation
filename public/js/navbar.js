@@ -127,37 +127,9 @@ export function renderNavbar() {
             <span id="current-lang-text" style="font-weight: 700;">${lang === 'en' ? 'বাং' : 'EN'}</span>
           </button>
 
-          <!-- Dynamic Color Palette Picker -->
-          <div class="theme-picker-container">
-            <button id="palette-dropdown-btn" class="btn btn-secondary btn-sm" aria-label="Select Color Palette" title="Select Color Theme" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.375rem 0.65rem;">
-              <span id="active-palette-dot" class="palette-color-preview" style="background: linear-gradient(135deg, ${currentPaletteObj.primary}, ${currentPaletteObj.accent});"></span>
-              <span style="font-size: 0.8rem; line-height: 1;">${currentPaletteObj.emoji}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div id="palette-dropdown-menu" class="theme-picker-menu">
-              <div style="font-size: 0.6875rem; font-weight: 700; color: var(--color-ink-500); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.25rem 0.5rem 0.15rem;">
-                Select Color Palette
-              </div>
-              ${PALETTES.map(p => `
-                <button type="button" class="palette-option-btn ${p.id === currentPalette ? 'active' : ''}" data-palette-id="${p.id}">
-                  <span style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1rem;">${p.emoji}</span>
-                    <span style="font-size: 0.8125rem;">${lang === 'bn' ? p.labelBn : p.name}</span>
-                  </span>
-                  <span class="palette-color-preview" style="background: linear-gradient(135deg, ${p.primary}, ${p.accent});"></span>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- Theme Dark/Light Toggle -->
-          <button id="theme-toggle-btn" class="btn btn-secondary btn-sm" aria-label="Toggle Dark Mode" title="Toggle Theme">
-            <span class="theme-toggle-icon">${theme === 'dark' ? icons.sun(16) : icons.moon(16)}</span>
-          </button>
-
-          <!-- Reduce 3D Effects Toggle -->
-          <button id="reduce-effects-btn" class="btn btn-secondary btn-sm" aria-label="Toggle 3D Effects" title="Toggle 3D & Motion Effects" style="font-size: 0.75rem; padding: 0.35rem 0.55rem; font-weight: 700;">
-            <span>${localStorage.getItem('docbook_reduce_motion') === 'true' ? '⚡ Flat' : '✨ 3D'}</span>
+          <!-- Reduce Motion & Effects Toggle -->
+          <button id="reduce-effects-btn" class="btn btn-secondary btn-sm" aria-label="Toggle Motion Effects" title="Toggle Motion Effects">
+            <span>${localStorage.getItem('docbook_reduce_motion') === 'true' ? '⚡ Motion Off' : '✨ Motion On'}</span>
           </button>
 
           <!-- User Menu -->
@@ -214,26 +186,26 @@ export function renderNavbar() {
         ${mobileRoleLinks}
       </div>
 
-      <!-- Mobile Theme Palette Selector -->
-      <div style="margin: 1.25rem 0 0.5rem; padding: 0.85rem; background: var(--color-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
-        <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-ink-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
-          Theme Palette
+      <!-- Mobile Accessibility & Preferences -->
+      <div style="margin: 1.25rem 0 0.5rem; padding: 0.85rem; background: var(--color-surface-elevated); border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle);">
+        <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--color-text-muted-on-dark); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+          Accessibility
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;">
-          ${PALETTES.map(p => `
-            <button type="button" class="btn btn-secondary btn-sm mobile-palette-btn" data-palette-id="${p.id}" style="font-size: 0.75rem; padding: 0.4rem 0.55rem; justify-content: flex-start; gap: 0.4rem; ${p.id === currentPalette ? 'border-color: var(--color-teal-700); font-weight: 700; background: var(--color-surface);' : ''}">
-              <span>${p.emoji}</span>
-              <span>${lang === 'bn' ? p.labelBn : p.name.split(' ')[0]}</span>
-            </button>
-          `).join('')}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
+          <button type="button" id="mobile-font-btn" class="btn btn-secondary btn-sm" style="justify-content: center;">
+            Text Size (A+)
+          </button>
+          <button type="button" id="mobile-motion-btn" class="btn btn-secondary btn-sm" style="justify-content: center;">
+            ${localStorage.getItem('docbook_reduce_motion') === 'true' ? '⚡ Motion Off' : '✨ Motion On'}
+          </button>
         </div>
       </div>
 
-      <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--color-border);">
+      <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--color-border-subtle);">
         ${user ? `
           <div style="margin-bottom: 1rem;">
-            <div style="font-weight: 700; color: var(--color-ink-950);">${user.name}</div>
-            <div style="font-size: 0.8rem; color: var(--color-ink-500);">${user.phone} (${user.role})</div>
+            <div style="font-weight: 700; color: var(--color-text-primary);">${user.name}</div>
+            <div style="font-size: var(--font-size-xs); color: var(--color-text-muted-on-dark);">${user.phone} (${user.role})</div>
           </div>
           <button id="mobile-logout-btn" class="btn btn-danger-outline btn-block btn-sm">Sign Out</button>
         ` : `
@@ -250,7 +222,7 @@ export function renderNavbar() {
             <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
               ${icons.sparkles(20)} AI Clinical Specialist Triage
             </h3>
-            <p style="font-size: 0.85rem; color: var(--color-ink-500); margin: 0.25rem 0 0;">
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-muted-on-dark); margin: 0.25rem 0 0;">
               Type symptoms in English or বাংলা to find recommended specialties and active practitioners.
             </p>
           </div>
@@ -265,8 +237,8 @@ export function renderNavbar() {
             </div>
 
             <!-- Quick Suggestion Chips -->
-            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
-              <span style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 600; align-self: center;">Examples:</span>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-5);">
+              <span style="font-size: var(--font-size-xs); color: var(--color-text-muted-on-dark); font-weight: 600; align-self: center;">Examples:</span>
               <button type="button" class="badge badge-neutral ai-chip" data-text="Chest pain, breathlessness and palpitations">Chest Pain</button>
               <button type="button" class="badge badge-neutral ai-chip" data-text="Severe skin itching, red rashes and acne">Skin Rash</button>
               <button type="button" class="badge badge-neutral ai-chip" data-text="Knee pain and difficulty walking for 2 weeks">Joint Pain</button>
@@ -279,7 +251,7 @@ export function renderNavbar() {
           </form>
 
           <!-- Results Section -->
-          <div id="ai-results-box" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--color-border); padding-top: 1.25rem;">
+          <div id="ai-results-box" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--color-border-subtle); padding-top: 1.25rem;">
             <!-- Injected dynamically -->
           </div>
         </div>
@@ -293,6 +265,11 @@ export function renderNavbar() {
     showToast(`Text size: ${newSize}`, 'info');
   });
 
+  document.getElementById('mobile-font-btn')?.addEventListener('click', () => {
+    const newSize = toggleFontSize();
+    showToast(`Text size: ${newSize}`, 'info');
+  });
+
   document.getElementById('lang-toggle-btn')?.addEventListener('click', () => {
     const nextLang = getLang() === 'en' ? 'bn' : 'en';
     setLang(nextLang);
@@ -300,65 +277,23 @@ export function renderNavbar() {
     applyTranslations();
   });
 
-  document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
-    toggleTheme();
-    renderNavbar();
-  });
-
-  document.getElementById('reduce-effects-btn')?.addEventListener('click', () => {
+  const toggleMotionHandler = () => {
     const isReduced = localStorage.getItem('docbook_reduce_motion') === 'true';
     const nextState = !isReduced;
     localStorage.setItem('docbook_reduce_motion', nextState ? 'true' : 'false');
     if (nextState) {
       document.documentElement.classList.add('reduce-effects');
-      showToast('3D effects reduced for performance/comfort.', 'info');
+      showToast('Motion effects reduced.', 'info');
     } else {
       document.documentElement.classList.remove('reduce-effects');
-      showToast('Full 3D effects enabled.', 'success');
+      showToast('Motion effects enabled.', 'success');
     }
     renderNavbar();
     window.dispatchEvent(new CustomEvent('docbook:reduce-effects-changed', { detail: { enabled: nextState } }));
-  });
+  };
 
-  // Desktop Palette Dropdown Handlers
-  const paletteBtn = document.getElementById('palette-dropdown-btn');
-  const paletteMenu = document.getElementById('palette-dropdown-menu');
-  if (paletteBtn && paletteMenu) {
-    paletteBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      paletteMenu.classList.toggle('show');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!paletteMenu.contains(e.target) && e.target !== paletteBtn) {
-        paletteMenu.classList.remove('show');
-      }
-    });
-
-    paletteMenu.querySelectorAll('.palette-option-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = btn.getAttribute('data-palette-id');
-        setPalette(id);
-        paletteMenu.classList.remove('show');
-        renderNavbar();
-        const selectedObj = PALETTES.find(p => p.id === id);
-        showToast(`Theme changed to ${selectedObj ? selectedObj.name : id}`, 'success');
-      });
-    });
-  }
-
-  // Mobile Palette Switcher Buttons
-  document.querySelectorAll('.mobile-palette-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute('data-palette-id');
-      setPalette(id);
-      renderNavbar();
-      const selectedObj = PALETTES.find(p => p.id === id);
-      showToast(`Theme changed to ${selectedObj ? selectedObj.name : id}`, 'success');
-    });
-  });
+  document.getElementById('reduce-effects-btn')?.addEventListener('click', toggleMotionHandler);
+  document.getElementById('mobile-motion-btn')?.addEventListener('click', toggleMotionHandler);
 
   const userMenuBtn = document.getElementById('user-menu-btn');
   const userDropdown = document.getElementById('user-dropdown-menu');
@@ -715,36 +650,36 @@ export function showPwaInstallBanner() {
   banner.id = 'pwa-install-banner';
   banner.style.cssText = `
     position: fixed;
-    bottom: 24px;
-    left: 20px;
-    right: 20px;
+    bottom: var(--space-6);
+    left: var(--space-5);
+    right: var(--space-5);
     max-width: 440px;
     margin: 0 auto;
-    background: var(--color-surface, #ffffff);
-    color: var(--color-ink-950, #0f172a);
-    border: 1.5px solid var(--color-teal-700, #0d9488);
-    border-radius: var(--radius-md, 12px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.22);
-    padding: 12px 16px;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-primary);
+    border: 1.5px solid var(--color-brand);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-deep);
+    padding: var(--space-3) var(--space-4);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    z-index: 9998;
+    gap: var(--space-3);
+    z-index: var(--z-toast);
     backdrop-filter: blur(12px);
   `;
 
   banner.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--color-teal-50, #f0fdfa); border: 1px solid var(--color-teal-200, #99f6e4); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
-        🩺
+    <div style="display: flex; align-items: center; gap: var(--space-3);">
+      <div style="width: 38px; height: 38px; border-radius: var(--radius-md); background: var(--color-brand-soft); border: 1px solid var(--color-brand-line); display: flex; align-items: center; justify-content: center; color: var(--color-brand-bright);">
+        ${icons.stethoscope(20)}
       </div>
       <div>
-        <div style="font-size: 0.8125rem; font-weight: 700; color: var(--color-ink-950, #0f172a); line-height: 1.2;">Install DocBook App</div>
-        <div style="font-size: 0.72rem; color: var(--color-ink-600, #64748b);">Instant chamber queue tokens & offline prescriptions</div>
+        <div style="font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text-primary); line-height: 1.2;">Install DocBook App</div>
+        <div style="font-size: var(--font-size-xs); color: var(--color-text-muted-on-dark);">Instant chamber queue tokens & offline prescriptions</div>
       </div>
     </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
+    <div style="display: flex; align-items: center; gap: var(--space-2);">
       <button id="pwa-install-action-btn" class="btn btn-primary btn-sm" style="font-size: 0.75rem; padding: 5px 12px; white-space: nowrap;">
         Install
       </button>

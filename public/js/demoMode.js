@@ -120,54 +120,59 @@ const WALKTHROUGH_STEPS = [
 ];
 
 export function renderDemoBar() {
+  if (typeof window === 'undefined') return;
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('demo') === '1') {
+    localStorage.setItem('docbook_demo', 'true');
+  } else if (urlParams.get('demo') === '0') {
+    localStorage.removeItem('docbook_demo');
+  }
+  const enabled = localStorage.getItem('docbook_demo') === 'true';
+  if (!enabled) return;
   if (document.getElementById('demo-suite-root')) return;
 
   const root = document.createElement('div');
   root.id = 'demo-suite-root';
   root.innerHTML = `
     <!-- Floating Demo Toggle Pill -->
-    <div id="demo-floating-trigger" style="position: fixed; bottom: 24px; left: 24px; z-index: 9999; display: flex; align-items: center; gap: 8px;">
-      <button id="demo-pill-btn" style="background: linear-gradient(135deg, #0d7a71, #0f766e); color: white; border: 1.5px solid rgba(255, 255, 255, 0.4); border-radius: 9999px; padding: 8px 16px; font-weight: 700; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 10px 25px -4px rgba(13, 122, 113, 0.5), inset 0 1px 0 rgba(255,255,255,0.4); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
-        <span style="display: inline-block; animation: demo-pulse 2s infinite;">🎓</span>
-        <span>Viva Demo Mode</span>
-        <span style="font-size: 0.6875rem; background: rgba(255,255,255,0.22); padding: 1px 6px; border-radius: 999px;">Quick Switch</span>
+    <div id="demo-floating-trigger" style="position: fixed; bottom: var(--space-6); left: var(--space-6); z-index: var(--z-toast); display: flex; align-items: center; gap: var(--space-3);">
+      <button id="demo-pill-btn" class="btn btn-primary btn-sm btn-pill" style="box-shadow: var(--shadow-3);">
+        <span>Demo Personas</span>
       </button>
 
-      <button id="walkthrough-btn" title="6-Step Presentation Walkthrough" style="background: var(--color-surface); color: var(--color-ink-900); border: 1px solid var(--color-border); border-radius: 9999px; padding: 8px 12px; font-weight: 700; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.2s ease;">
-        <span>🎬</span>
-        <span>Guided Tour</span>
+      <button id="walkthrough-btn" title="Presentation Walkthrough" class="btn btn-secondary btn-sm btn-pill">
+        <span>Tour</span>
       </button>
     </div>
 
     <!-- Demo Persona Modal -->
     <div id="demo-persona-modal" class="modal-backdrop">
       <div class="modal-box" style="max-width: 520px; padding: 0; overflow: hidden;">
-        <div style="background: linear-gradient(135deg, #0d7a71, #0a5c55); color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: var(--color-surface-elevated); border-bottom: 1px solid var(--color-border-subtle); padding: var(--space-5) var(--space-6); display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.08em; opacity: 0.85;">College Presentation Toolkit</div>
-            <h3 style="margin: 4px 0 0; font-size: 1.2rem; font-weight: 800; color: white;">1-Click Persona Switcher</h3>
+            <div style="font-size: var(--font-size-xs); text-transform: uppercase; font-weight: var(--font-weight-bold); letter-spacing: 0.08em; color: var(--color-brand-bright);">Presentation Toolkit</div>
+            <h3 style="margin: 2px 0 0; font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-text-primary);">Role Switcher</h3>
           </div>
-          <button id="demo-modal-close" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; opacity: 0.8;">&times;</button>
+          <button id="demo-modal-close" class="modal-close" aria-label="Close modal">&times;</button>
         </div>
 
-        <div style="padding: 20px 24px; background: var(--color-canvas);">
-          <p style="font-size: 0.8125rem; color: var(--color-ink-600); margin: 0 0 16px; line-height: 1.45;">
-            Switch user roles instantly without typing passwords or logging out. Ideal for showing different privileges to evaluators:
+        <div style="padding: var(--space-6); background: var(--color-surface-card);">
+          <p style="font-size: var(--font-size-xs); color: var(--color-text-muted-on-dark); margin: 0 0 var(--space-5); line-height: 1.5;">
+            Switch roles without logging out. Shows different permissions immediately:
           </p>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
             ${DEMO_PERSONAS.map(p => `
-              <div class="demo-card-btn" data-role="${p.role}" style="background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; justify-content: space-between;">
+              <div class="demo-card-btn" data-role="${p.role}" style="background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); padding: var(--space-4); cursor: pointer; transition: all var(--motion-instant) var(--ease-out); display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 1.35rem;">${p.emoji}</span>
-                    <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 999px; background: var(--color-teal-50); color: var(--color-teal-700);">${p.badge}</span>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+                    <span class="badge badge-primary" style="font-size: 0.65rem;">${p.badge}</span>
                   </div>
-                  <div style="font-weight: 700; font-size: 0.875rem; color: var(--color-ink-950); margin-bottom: 2px;">${p.name}</div>
-                  <div style="font-size: 0.72rem; color: var(--color-ink-500);">${p.meta}</div>
+                  <div style="font-weight: var(--font-weight-semibold); font-size: var(--font-size-sm); color: var(--color-text-primary); margin-bottom: 2px;">${p.name}</div>
+                  <div style="font-size: var(--font-size-xs); color: var(--color-text-muted-on-dark);">${p.meta}</div>
                 </div>
-                <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; font-weight: 700; color: var(--color-teal-700);">
-                  <span>Switch Role</span>
-                  <span>→</span>
+                <div style="margin-top: var(--space-3); padding-top: var(--space-2); border-top: 1px solid var(--color-border-faint); display: flex; justify-content: space-between; align-items: center; font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-brand-bright);">
+                  <span>Switch</span>
+                  <span>&rarr;</span>
                 </div>
               </div>
             `).join('')}

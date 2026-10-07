@@ -1,0 +1,310 @@
+/* ==========================================================================
+   DocBook Design Tokens (tokens.css)
+   Dark Clinical Green — single source of truth.
+   RULE: raw color / size values live ONLY in this file. Components use var().
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* ------------------------------------------------------------------
+     1. SPEC PRIMITIVES (as supplied in the design brief)
+     ------------------------------------------------------------------ */
+  --color-surface-base:   #000000;
+  --color-surface-raised: #00984a;   /* primary brand green */
+  --color-text-primary:   #ffffff;
+  --color-text-accent:    #006642;   /* deep green — glow/fill only, NEVER text on dark (3.0:1) */
+  --color-text-muted:     #4b5563;   /* light surfaces only (2.8:1 on black) */
+  --color-border-default: #e5e7eb;
+
+  /* ------------------------------------------------------------------
+     2. DERIVED SURFACES
+     ------------------------------------------------------------------ */
+  --color-surface-card:     #0a0a0a;
+  --color-surface-elevated: #111312;
+  --color-surface-inset:    #161917;
+  --color-surface-hover:    #1b1f1c;
+  --color-surface-overlay:  rgba(0, 0, 0, 0.72);
+  --color-surface-glass:    rgba(10, 10, 10, 0.72);
+  --color-surface-paper:    #ffffff;  /* printable slips only */
+
+  /* ------------------------------------------------------------------
+     3. DERIVED BRAND (contrast-checked)
+     ------------------------------------------------------------------ */
+  --color-brand:        var(--color-surface-raised); /* #00984a — 5.6:1 as text on black */
+  --color-brand-strong: #007a3d;  /* button fill — white text 5.4:1 */
+  --color-brand-deep:   var(--color-text-accent);    /* #006642 — pressed fill, white 7.1:1 */
+  --color-brand-bright: #1ec46b;  /* hover text / focus ring on dark — 9.4:1 */
+  --color-brand-tint:   #8ff0bb;  /* highlights on dark */
+  --color-brand-soft:   rgba(0, 152, 74, 0.12);
+  --color-brand-soft-2: rgba(0, 152, 74, 0.2);
+  --color-brand-line:   rgba(0, 152, 74, 0.42);
+  --color-brand-glow:   rgba(0, 102, 66, 0.3);
+
+  /* ------------------------------------------------------------------
+     4. DERIVED TEXT (all ≥ 4.5:1 on --color-surface-card)
+     ------------------------------------------------------------------ */
+  --color-text-secondary:     #d1d5db;  /* 14.0:1 */
+  --color-text-muted-on-dark: #9ca3af;  /*  7.6:1 */
+  --color-text-subtle:        #868e99;  /*  5.9:1 — placeholders, meta */
+  --color-text-on-brand:      #ffffff;
+  --color-text-on-paper:      #111827;
+  --color-text-muted-on-paper: var(--color-text-muted);
+
+  /* ------------------------------------------------------------------
+     5. BORDERS (border-default at low opacity on dark)
+     ------------------------------------------------------------------ */
+  --color-border-faint:  rgba(229, 231, 235, 0.06);
+  --color-border-subtle: rgba(229, 231, 235, 0.1);
+  --color-border-medium: rgba(229, 231, 235, 0.16);
+  --color-border-strong: rgba(229, 231, 235, 0.28);
+  --color-border-paper:  var(--color-border-default);
+  --color-focus-ring:    var(--color-brand-bright);
+
+  /* ------------------------------------------------------------------
+     6. STATUS (dark-tuned, text variants ≥ 4.5:1)
+     ------------------------------------------------------------------ */
+  --color-danger:        #f87171;
+  --color-danger-strong: #b91c1c;   /* fill — white 6.5:1 */
+  --color-danger-soft:   rgba(239, 68, 68, 0.12);
+  --color-danger-line:   rgba(239, 68, 68, 0.38);
+  --color-danger-ink:    #fca5a5;
+
+  --color-warning:       #fbbf24;
+  --color-warning-soft:  rgba(245, 158, 11, 0.12);
+  --color-warning-line:  rgba(245, 158, 11, 0.38);
+  --color-warning-ink:   #fcd34d;
+
+  --color-success:       #34d399;
+  --color-success-soft:  rgba(16, 185, 129, 0.12);
+  --color-success-line:  rgba(16, 185, 129, 0.38);
+  --color-success-ink:   #6ee7b7;
+
+  --color-info:          #7dd3fc;
+  --color-info-soft:     rgba(125, 211, 252, 0.1);
+  --color-info-line:     rgba(125, 211, 252, 0.32);
+  --color-info-ink:      #bae6fd;
+
+  /* Payment brands (allowed: real third-party marks) */
+  --color-bkash: #d12053;
+  --color-bkash-deep: #a8173f;
+  --color-nagad: #c2410c;
+  --color-nagad-deep: #9a3412;
+
+  /* Avatar hues (muted, dark-safe, white initials ≥ 4.5:1) */
+  --avatar-1: #0b5d3b;
+  --avatar-2: #334155;
+  --avatar-3: #7c4a12;
+  --avatar-4: #3f3a8a;
+  --avatar-5: #14532d;
+  --avatar-6: #6b2160;
+
+  /* ------------------------------------------------------------------
+     7. TYPOGRAPHY
+     ------------------------------------------------------------------ */
+  --font-family-base:   'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-family-bangla: 'Hind Siliguri', 'Poppins', sans-serif;
+  --font-family-mono:   ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* rem = spec px at the 16px root, so the A+ text-size control still scales */
+  --font-size-xs:  0.75rem;   /* 12px */
+  --font-size-sm:  0.875rem;  /* 14px */
+  --font-size-md:  1rem;      /* 16px */
+  --font-size-lg:  1.125rem;  /* 18px */
+  --font-size-xl:  1.875rem;  /* 30px */
+  --font-size-2xl: 2.25rem;   /* 36px */
+  --font-size-display: clamp(2.25rem, 6vw, 3.5rem); /* hero H1 only */
+
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --line-height-base:  1.5;   /* 24px at 16px */
+  --line-height-tight: 1.2;
+  --line-height-snug:  1.35;
+
+  /* ------------------------------------------------------------------
+     8. SPACING (spec scale) + layout rhythm
+     ------------------------------------------------------------------ */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 10px;
+  --space-5: 12px;
+  --space-6: 16px;
+  --space-7: 20px;
+  --space-8: 24px;
+  /* Section rhythm (multiples of the spec scale) */
+  --space-section-sm: 32px;
+  --space-section:    48px;
+  --space-section-lg: 80px;
+
+  /* ------------------------------------------------------------------
+     9. RADIUS
+     ------------------------------------------------------------------ */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-2xl:  24px;
+  --radius-pill: 9999px;
+
+  /* ------------------------------------------------------------------
+     10. SHADOWS
+     ------------------------------------------------------------------ */
+  --shadow-1: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  --shadow-2: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-3: 0 0 20px rgba(0, 102, 66, 0.3), 0 0 40px rgba(0, 102, 66, 0.2);
+  --shadow-4: 0 4px 20px rgba(0, 102, 66, 0.27);
+  --shadow-glass: 0 4px 12px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-deep: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+
+  /* ------------------------------------------------------------------
+     11. MOTION
+     ------------------------------------------------------------------ */
+  --motion-instant: 150ms;
+  --motion-fast:    200ms;
+  --motion-normal:  300ms;
+  --motion-slow:    600ms;  /* reveal choreography only */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ------------------------------------------------------------------
+     12. LAYOUT
+     ------------------------------------------------------------------ */
+  --container-max: 1200px;
+  --container-wide: 1360px;
+  --container-narrow: 760px;
+  --nav-height: 68px;
+  --touch-target: 44px;
+  --z-nav: 900;
+  --z-drawer: 1000;
+  --z-modal: 1100;
+  --z-toast: 1200;
+
+  /* ==================================================================
+     13. LEGACY ALIASES
+     Existing markup references these names (≈1,300 inline styles).
+     They now resolve to the dark clinical green system.
+     ================================================================== */
+  --color-teal-50:  var(--color-brand-soft);
+  --color-teal-100: var(--color-brand-soft-2);
+  --color-teal-200: var(--color-brand-line);
+  --color-teal-400: var(--color-brand-bright);
+  --color-teal-500: var(--color-brand-bright);
+  --color-teal-600: var(--color-brand);
+  --color-teal-700: var(--color-brand);
+  --color-teal-800: var(--color-brand-bright);
+  --color-teal-900: var(--color-brand-tint);
+  --color-cyan-400: var(--color-brand-bright);
+  --color-cyan-500: var(--color-brand);
+
+  --color-canvas:         var(--color-surface-base);
+  --color-surface:        var(--color-surface-card);
+  --color-surface-subtle: var(--color-surface-elevated);
+  --color-muted:          var(--color-surface-inset);
+  --color-header-bg:      var(--color-surface-glass);
+
+  --color-ink-950: var(--color-text-primary);
+  --color-ink-900: var(--color-text-primary);
+  --color-ink-700: var(--color-text-secondary);
+  --color-ink-600: var(--color-text-muted-on-dark);
+  --color-ink-500: var(--color-text-muted-on-dark);
+  --color-ink-400: var(--color-text-subtle);
+
+  --color-border:       var(--color-border-subtle);
+  --color-border-focus: var(--color-focus-ring);
+
+  --color-danger-subtle:  var(--color-danger-soft);
+  --color-danger-border:  var(--color-danger-line);
+  --color-danger-text:    var(--color-danger-ink);
+  --color-warning-subtle: var(--color-warning-soft);
+  --color-warning-border: var(--color-warning-line);
+  --color-warning-text:   var(--color-warning-ink);
+  --color-success-subtle: var(--color-success-soft);
+  --color-success-border: var(--color-success-line);
+  --color-success-text:   var(--color-success-ink);
+  --color-info-subtle:    var(--color-info-soft);
+  --color-info-border:    var(--color-info-line);
+  --color-info-text:      var(--color-info-ink);
+
+  --avatar-teal:   var(--avatar-1);
+  --avatar-slate:  var(--avatar-2);
+  --avatar-amber:  var(--avatar-3);
+  --avatar-indigo: var(--avatar-4);
+  --avatar-pine:   var(--avatar-5);
+  --avatar-plum:   var(--avatar-6);
+
+  --font-display: var(--font-family-base);
+  --font-sans:    var(--font-family-base);
+  --font-bangla:  var(--font-family-bangla);
+  --font-mono:    var(--font-family-mono);
+  --font-en:      var(--font-family-base);
+  --font-bn:      var(--font-family-bangla);
+
+  --space-10: var(--space-section-sm);
+  --space-12: var(--space-section);
+  --space-16: var(--space-section);
+  --space-20: var(--space-section-lg);
+
+  --radius-full: var(--radius-pill);
+
+  --shadow-xs:       var(--shadow-inset);
+  --shadow-sm:       var(--shadow-1);
+  --shadow-md:       var(--shadow-1);
+  --shadow-lg:       var(--shadow-2);
+  --shadow-floating: var(--shadow-deep);
+  --shadow-glow:     var(--shadow-3);
+
+  --duration-instant: var(--motion-instant);
+  --duration-fast:    var(--motion-fast);
+  --duration-base:    var(--motion-normal);
+  --duration-slow:    var(--motion-slow);
+  --ease-in-out:      var(--ease-out);
+
+  --primary-50:  var(--color-brand-soft);
+  --primary-100: var(--color-brand-soft-2);
+  --primary-200: var(--color-brand-line);
+  --primary-500: var(--color-brand);
+  --primary-600: var(--color-brand);
+  --primary-700: var(--color-brand-strong);
+  --primary-800: var(--color-brand-deep);
+  --primary-900: var(--color-brand-deep);
+
+  --bg-app:     var(--color-surface-base);
+  --bg-surface: var(--color-surface-card);
+  --bg-muted:   var(--color-surface-elevated);
+  --bg-header:  var(--color-surface-glass);
+  --text-main:   var(--color-text-primary);
+  --text-muted:  var(--color-text-muted-on-dark);
+  --text-subtle: var(--color-text-subtle);
+  --border:       var(--color-border-subtle);
+  --border-light: var(--color-border-subtle);
+  --border-focus: var(--color-focus-ring);
+  --danger:       var(--color-danger);
+  --danger-bg:    var(--color-danger-soft);
+  --danger-text:  var(--color-danger-ink);
+  --warning:      var(--color-warning);
+  --warning-bg:   var(--color-warning-soft);
+  --warning-text: var(--color-warning-ink);
+  --success:      var(--color-success);
+  --success-bg:   var(--color-success-soft);
+  --success-text: var(--color-success-ink);
+  --info:         var(--color-info);
+  --info-bg:      var(--color-info-soft);
+  --info-text:    var(--color-info-ink);
+}
+
+/* High-contrast accessibility mode (toggled by accessibility.js) */
+html.high-contrast {
+  --color-border-subtle: rgba(255, 255, 255, 0.6);
+  --color-border-medium: rgba(255, 255, 255, 0.75);
+  --color-text-secondary: #ffffff;
+  --color-text-muted-on-dark: #e5e7eb;
+  --color-text-subtle: #d1d5db;
+  --color-surface-card: #000000;
+}
