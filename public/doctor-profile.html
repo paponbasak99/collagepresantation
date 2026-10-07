@@ -27,7 +27,7 @@
       align-items: center;
       padding: var(--space-3) var(--space-4);
       min-width: 82px;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-border-subtle);
       background: var(--color-surface);
       border-radius: var(--radius-sm);
       cursor: pointer;
@@ -52,13 +52,13 @@
       align-items: center;
       gap: var(--space-2);
       font-size: 0.75rem;
-      color: var(--color-ink-600);
+      color: var(--color-text-muted-on-dark);
       margin-bottom: var(--space-2);
     }
     .rating-bar-track {
       flex: 1;
       height: 6px;
-      background: var(--color-border);
+      background: var(--color-border-subtle);
       border-radius: var(--radius-full);
       overflow: hidden;
     }
@@ -75,9 +75,9 @@
   <div class="container" style="padding: var(--space-8) var(--space-4);">
     <!-- Breadcrumb -->
     <div style="display: flex; align-items: center; gap: var(--space-2); font-size: 0.8125rem; color: var(--color-ink-500); margin-bottom: var(--space-4);">
-      <a href="/" style="color: var(--color-ink-600); text-decoration: none;">Home</a>
+      <a href="/" style="color: var(--color-text-muted-on-dark); text-decoration: none;">Home</a>
       <span>/</span>
-      <a href="/doctors.html" style="color: var(--color-ink-600); text-decoration: none;">Specialists</a>
+      <a href="/doctors.html" style="color: var(--color-text-muted-on-dark); text-decoration: none;">Specialists</a>
       <span>/</span>
       <span style="color: var(--color-teal-700); font-weight: 600;" id="breadcrumb-doc-name">Doctor Profile</span>
     </div>
@@ -91,11 +91,11 @@
     <div class="doctor-profile-grid">
       <!-- Left: Interactive Slot Booking Calendar -->
       <section id="schedule-section" class="card" style="padding: var(--space-6);">
-        <div style="border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+        <div style="border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-2);">
             <div>
-              <h2 style="font-family: var(--font-display); font-size: 1.375rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">Select Consultation Slot</h2>
-              <p style="font-size: 0.875rem; color: var(--color-ink-600); margin: 0;">
+              <h2 style="font-family: var(--font-display); font-size: 1.375rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-1);">Select Consultation Slot</h2>
+              <p style="font-size: 0.875rem; color: var(--color-text-muted-on-dark); margin: 0;">
                 Choose an available slot. It is held atomically for 5 minutes during checkout to guarantee your spot.
               </p>
             </div>
@@ -123,12 +123,12 @@
       <aside style="position: sticky; top: 5.5rem;">
         <!-- Chamber Info Card with Map-Style Aesthetic -->
         <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-5);">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-subtle);">
             <div style="display: flex; align-items: center; gap: var(--space-2);">
               <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--color-teal-50); color: var(--color-teal-700); display: flex; align-items: center; justify-content: center;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v4"/><path d="M14 8h-4"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/><path d="M18 14h4v8h-4"/><path d="M2 22h4v-8H2"/></svg>
               </div>
-              <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Chamber Location</h3>
+              <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-text-primary); margin: 0;">Chamber Location</h3>
             </div>
             <span class="badge badge-info">Verified Clinic</span>
           </div>
@@ -140,13 +140,13 @@
 
         <!-- Reviews & Rating Distribution Card -->
         <div class="card" style="padding: var(--space-5);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
-            <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Patient Feedback</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-subtle);">
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-text-primary); margin: 0;">Patient Feedback</h3>
             <span id="review-stat-badge" class="badge badge-primary">4.9 Rating</span>
           </div>
 
           <!-- Rating Distribution Bars -->
-          <div id="rating-distribution" style="margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+          <div id="rating-distribution" style="margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border-subtle);">
             <div class="rating-bar-row">
               <span style="width: 44px; font-weight: 600;">5 Star</span>
               <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 88%;"></div></div>
@@ -233,7 +233,7 @@
                 <span class="badge badge-success">BMDC Reg: ${doctorData.bmdc_reg_no}</span>
                 <span class="badge badge-info" style="font-feature-settings: 'tnum';">${doctorData.experience_years} Years Clinical Experience</span>
               </div>
-              <h1 style="font-family: var(--font-display); font-size: 1.875rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">${doctorData.name}</h1>
+              <h1 style="font-family: var(--font-display); font-size: 1.875rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-1);">${doctorData.name}</h1>
               <div style="color: var(--color-teal-700); font-weight: 600; font-size: 1rem; margin-bottom: var(--space-1);">
                 ${lang === 'bn' ? doctorData.specialty_name_bn : doctorData.specialty_name_en}
               </div>
@@ -245,7 +245,7 @@
               </p>
             </div>
 
-            <div style="background: var(--color-surface-subtle); padding: var(--space-5); border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-border); min-width: 190px;">
+            <div style="background: var(--color-surface-subtle); padding: var(--space-5); border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-border-subtle); min-width: 190px;">
               <div style="font-size: 0.75rem; color: var(--color-ink-500); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem;">Consultation Fee</div>
               <div class="doctor-fee-tag" style="font-size: 1.875rem; margin-bottom: var(--space-2); font-feature-settings: 'tnum';">৳ ${doctorData.consultation_fee}</div>
               <div style="font-size: 0.75rem; color: var(--color-ink-500); font-feature-settings: 'tnum';">
@@ -262,10 +262,10 @@
             <div style="display: flex; align-items: flex-start; gap: 0.4rem;">
               <span style="color: var(--color-teal-700); margin-top: 1px;">${icons.hospital(16)}</span>
               <div>
-                <strong style="color: var(--color-ink-950);">${lang === 'bn' ? doctorData.hospital_name_bn : doctorData.hospital_name_en}</strong>
+                <strong style="color: var(--color-text-primary);">${lang === 'bn' ? doctorData.hospital_name_bn : doctorData.hospital_name_en}</strong>
               </div>
             </div>
-            <div style="display: flex; align-items: flex-start; gap: 0.4rem; color: var(--color-ink-600);">
+            <div style="display: flex; align-items: flex-start; gap: 0.4rem; color: var(--color-text-muted-on-dark);">
               <span style="color: var(--color-teal-700); margin-top: 1px;">${icons.mapPin(16)}</span>
               <span>${doctorData.chamber_address}</span>
             </div>
@@ -273,7 +273,7 @@
               <span style="color: var(--color-teal-700);">${icons.phone(16)}</span>
               <strong style="font-feature-settings: 'tnum';">${doctorData.hospital_phone || '+880 1700-000000'}</strong>
             </div>
-            <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-3); font-size: 0.75rem; color: var(--color-ink-500); display: flex; align-items: center; gap: 0.35rem;">
+            <div style="border-top: 1px solid var(--color-border-subtle); padding-top: var(--space-3); font-size: 0.75rem; color: var(--color-ink-500); display: flex; align-items: center; gap: 0.35rem;">
               <span style="color: var(--color-teal-700);">${icons.clock(14)}</span>
               <span>Chamber Sessions: <strong>${doctorData.schedules.length} days / week</strong></span>
             </div>
@@ -291,7 +291,7 @@
           reviewsEl.innerHTML = '';
           doctorData.recentReviews.forEach(r => {
             const item = document.createElement('div');
-            item.style.borderBottom = '1px solid var(--color-border)';
+            item.style.borderBottom = '1px solid var(--color-border-subtle)';
             item.style.paddingBottom = 'var(--space-3)';
             item.innerHTML = `
               <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; font-weight: 700; margin-bottom: 0.2rem;">
@@ -300,7 +300,7 @@
                   ${icons.starFilled(13)} ${r.rating}.0
                 </span>
               </div>
-              <div style="font-size: 0.8125rem; color: var(--color-ink-600); line-height: 1.5;">
+              <div style="font-size: 0.8125rem; color: var(--color-text-muted-on-dark); line-height: 1.5;">
                 ${r.comment || 'Consultation went smoothly and on time.'}
               </div>
             `;
@@ -373,7 +373,7 @@
 
         if (noSchedule || slots.length === 0) {
           container.innerHTML = `
-            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-8); border-radius: var(--radius-sm); text-align: center; color: var(--color-ink-600);">
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border-subtle); padding: var(--space-8); border-radius: var(--radius-sm); text-align: center; color: var(--color-text-muted-on-dark);">
               <strong style="font-size: 0.9375rem; display: block; margin-bottom: 0.25rem;">No scheduled chamber session on this day.</strong>
               <span style="font-size: 0.8125rem; color: var(--color-ink-500);">Please select another date from the calendar pills above.</span>
             </div>
@@ -396,7 +396,7 @@
             <div style="background: var(--color-warning-subtle); border: 1px solid var(--color-warning-border); border-radius: var(--radius-sm); padding: var(--space-4); margin-bottom: var(--space-4); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
               <div>
                 <strong style="color: var(--color-warning-text); display: block; font-size: 0.875rem;">All consultation slots for this date are reserved.</strong>
-                <span style="font-size: 0.75rem; color: var(--color-ink-600);">Join the cancellation waitlist to receive instant notification if a patient reschedules.</span>
+                <span style="font-size: 0.75rem; color: var(--color-text-muted-on-dark);">Join the cancellation waitlist to receive instant notification if a patient reschedules.</span>
               </div>
               <button id="join-waitlist-btn" class="btn btn-warning btn-sm" style="font-size: 0.75rem;">Join Waitlist</button>
             </div>
@@ -407,13 +407,13 @@
           ${waitlistBanner}
           <div style="display: flex; gap: var(--space-4); font-size: 0.75rem; margin-bottom: var(--space-4); align-items: center; flex-wrap: wrap;">
             <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-700);">
-              <span style="width: 12px; height: 12px; background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: 2px;"></span> Available
+              <span style="width: 12px; height: 12px; background: var(--color-surface); border: 1.5px solid var(--color-border-subtle); border-radius: 2px;"></span> Available
             </span>
             <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-700);">
               <span style="width: 12px; height: 12px; background: #fef3c7; border: 1.5px solid #d97706; border-radius: 2px;"></span> Held (5m Hold)
             </span>
             <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-700);">
-              <span style="width: 12px; height: 12px; background: var(--color-surface-subtle); border: 1.5px solid var(--color-border); border-radius: 2px;"></span> Booked
+              <span style="width: 12px; height: 12px; background: var(--color-surface-subtle); border: 1.5px solid var(--color-border-subtle); border-radius: 2px;"></span> Booked
             </span>
           </div>
         `;

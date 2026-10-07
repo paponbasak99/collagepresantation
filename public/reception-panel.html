@@ -13,7 +13,7 @@
   <style>
     .doctor-status-card {
       background: var(--color-surface);
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-sm);
       padding: var(--space-4);
       display: flex;
@@ -49,16 +49,16 @@
 
   <div class="container" style="padding: var(--space-8) var(--space-4);">
     <!-- Top Header -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-5);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-5);">
       <div>
         <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
           <span class="status-dot-live"></span>
           <span class="badge badge-info">FRONT DESK LIVE OPD BOARD</span>
         </div>
-        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-1);">
           Reception & Chamber Check-In
         </h1>
-        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem;">
+        <p style="color: var(--color-text-muted-on-dark); margin: 0; font-size: 0.9375rem;">
           Track live doctor chamber occupancy, register arriving patients, collect cash payments, and issue instantaneous walk-in tokens.
         </p>
       </div>
@@ -78,7 +78,7 @@
     <!-- Active Practicing Doctors Today -->
     <div style="margin-bottom: var(--space-8);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
-        <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Practicing Specialists Today</h2>
+        <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin: 0;">Practicing Specialists Today</h2>
         <span style="font-size: 0.8125rem; color: var(--color-ink-500);">Live Chamber Occupancy</span>
       </div>
       <div id="doctors-today-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
@@ -90,7 +90,7 @@
     <div class="card" style="padding: var(--space-6);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-4);">
         <div>
-          <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">Clinic Outpatient Queue</h2>
+          <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 0.15rem;">Clinic Outpatient Queue</h2>
           <p style="color: var(--color-ink-500); font-size: 0.8125rem; margin: 0;">All appointments scheduled for today's clinical sessions.</p>
         </div>
 
@@ -189,7 +189,7 @@
             <input type="text" id="walkin-reason" class="form-control" placeholder="e.g. Severe chest pain, skin rash, asthma flare" required>
           </div>
 
-          <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-sm); margin-bottom: var(--space-5);">
+          <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border-subtle); padding: var(--space-3); border-radius: var(--radius-sm); margin-bottom: var(--space-5);">
             <label style="display: flex; align-items: center; gap: var(--space-2); font-weight: 600; cursor: pointer; font-size: 0.8125rem; color: var(--color-ink-900);">
               <input type="checkbox" id="walkin-collect-cash" checked>
               <span>Collect consultation cash payment right now at front desk</span>
@@ -220,10 +220,10 @@
       <div style="background: var(--color-surface-subtle); border: 1px dashed var(--color-teal-400); border-radius: var(--radius-sm); padding: var(--space-4); margin-bottom: var(--space-4);">
         <div id="ticket-serial-badge" style="font-size: 2.25rem; font-weight: 800; color: var(--color-teal-800); font-family: var(--font-display); line-height: 1;">SL - 00</div>
         <div id="ticket-apt-num" style="font-size: 0.8125rem; color: var(--color-ink-500); font-family: var(--font-mono); margin: var(--space-2) 0;">APT-0000</div>
-        <div id="ticket-doctor-name" style="font-weight: 700; font-size: 1rem; color: var(--color-ink-950);">Doctor Name</div>
-        <div id="ticket-patient-details" style="font-size: 0.8125rem; color: var(--color-ink-600); margin-top: 0.25rem;">Patient Details</div>
+        <div id="ticket-doctor-name" style="font-weight: 700; font-size: 1rem; color: var(--color-text-primary);">Doctor Name</div>
+        <div id="ticket-patient-details" style="font-size: 0.8125rem; color: var(--color-text-muted-on-dark); margin-top: 0.25rem;">Patient Details</div>
         <div id="ticket-qr-box" style="margin-top: var(--space-3);">
-          <img id="ticket-qr-img" src="" alt="Verification QR Code" style="width: 120px; height: 120px; margin: 0 auto; display: block; border-radius: 4px; border: 1px solid var(--color-border); background: white; padding: 3px;">
+          <img id="ticket-qr-img" src="" alt="Verification QR Code" style="width: 120px; height: 120px; margin: 0 auto; display: block; border-radius: 4px; border: 1px solid var(--color-border-subtle); background: white; padding: 3px;">
         </div>
       </div>
 
@@ -292,7 +292,7 @@
                 <div style="display: flex; gap: var(--space-3); align-items: center;">
                   ${renderDoctorAvatar(doc.doctor_name, doc.doctor_id, 48, true, doc.avatar_url)}
                   <div>
-                    <h3 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">${doc.doctor_name}</h3>
+                    <h3 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-text-primary); margin: 0;">${doc.doctor_name}</h3>
                     <div style="font-size: 0.75rem; color: var(--color-teal-700); font-weight: 600;">${doc.specialty}</div>
                   </div>
                 </div>
@@ -303,7 +303,7 @@
               </div>
             </div>
 
-            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border-subtle); padding: var(--space-2) var(--space-3); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center;">
               <div>
                 <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block; text-transform: uppercase;">Lobby Waiting</span>
                 <strong style="font-size: 1rem; color: #b45309; font-feature-settings: 'tnum';">${doc.waiting_count} patient(s)</strong>

@@ -17,8 +17,8 @@
       gap: var(--space-4);
     }
     .queue-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-sm);
       padding: var(--space-4);
       display: flex;
@@ -27,25 +27,25 @@
       transition: all var(--duration-fast) var(--ease-out);
     }
     .queue-card.active-patient {
-      border: 1.5px solid var(--color-teal-700);
-      background: var(--color-surface);
-      box-shadow: 0 0 0 3px rgba(13, 122, 113, 0.12);
+      border: 1.5px solid var(--color-brand);
+      background: var(--color-surface-card);
+      box-shadow: 0 0 0 3px var(--color-brand-soft);
     }
     .serial-tag {
       font-size: 0.9375rem;
       font-weight: 800;
       font-family: var(--font-mono);
-      color: var(--color-teal-800);
-      background: var(--color-teal-50);
-      border: 1px solid var(--color-teal-200);
+      color: var(--color-brand-bright);
+      background: var(--color-brand-soft);
+      border: 1px solid var(--color-brand-line);
       padding: 0.2rem 0.5rem;
       border-radius: var(--radius-xs);
       display: inline-block;
     }
     [data-theme="dark"] .serial-tag {
-      background: rgba(45, 212, 191, 0.1);
-      color: var(--color-teal-300);
-      border-color: rgba(45, 212, 191, 0.25);
+      background: var(--color-brand-soft);
+      color: var(--color-brand-bright);
+      border-color: var(--color-brand-line);
     }
     .med-row {
       display: grid;
@@ -68,10 +68,10 @@
       font-family: var(--font-mono);
       font-size: 0.6875rem;
       background: var(--color-surface-subtle);
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-border-subtle);
       padding: 0.1rem 0.35rem;
       border-radius: 3px;
-      color: var(--color-ink-600);
+      color: var(--color-text-muted-on-dark);
     }
   </style>
 </head>
@@ -80,24 +80,24 @@
 
   <div class="container" style="padding: var(--space-8) var(--space-4);">
     <!-- Top Header -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-5);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-5);">
       <div>
         <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
           <span class="status-dot-live"></span>
           <span id="doctor-status-badge" class="badge badge-success">ACTIVE CLINICAL CHAMBER</span>
           <span class="shortcut-tag">[Alt+R] Refresh</span>
         </div>
-        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-1);">
           Doctor Clinical Workspace
         </h1>
-        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem;">
+        <p style="color: var(--color-text-muted-on-dark); margin: 0; font-size: 0.9375rem;">
           Real-time outpatient queue control, digital e-prescriptions with diagnostic lab routing, and weekly schedule editor.
         </p>
       </div>
 
       <!-- Date Selector for OPD Queue -->
       <div style="display: flex; align-items: center; gap: var(--space-2);">
-        <label for="queue-date" style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-600); white-space: nowrap;">Session Date:</label>
+        <label for="queue-date" style="font-size: 0.8125rem; font-weight: 600; color: var(--color-text-muted-on-dark); white-space: nowrap;">Session Date:</label>
         <input type="date" id="queue-date" class="form-control" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8125rem;">
         <button id="refresh-queue-btn" class="btn btn-secondary btn-sm" title="Refresh Queue" style="display: inline-flex; align-items: center; gap: 0.3rem;">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
@@ -107,7 +107,7 @@
     </div>
 
     <!-- Navigation Tabs -->
-    <div style="display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-6); overflow-x: auto;">
+    <div style="display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border-subtle); margin-bottom: var(--space-6); overflow-x: auto;">
       <button id="tab-queue-btn" class="btn btn-sm btn-primary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
         Today's OPD Queue (<span id="total-queue-count" style="font-feature-settings: 'tnum';">0</span>)
       </button>
@@ -128,7 +128,7 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-5);">
         <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-ink-400);">
           <div style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Waiting in Queue</div>
-          <div id="stat-waiting" style="font-size: 1.875rem; font-weight: 800; color: var(--color-ink-950); font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
+          <div id="stat-waiting" style="font-size: 1.875rem; font-weight: 800; color: var(--color-text-primary); font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
         </div>
 
         <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-warning);">
@@ -136,9 +136,9 @@
           <div id="stat-arrived" style="font-size: 1.875rem; font-weight: 800; color: #b45309; font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
         </div>
 
-        <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-teal-700);">
+        <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-brand);">
           <div style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">In Chamber Consultation</div>
-          <div id="stat-in-consult" style="font-size: 1.875rem; font-weight: 800; color: var(--color-teal-800); font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
+          <div id="stat-in-consult" style="font-size: 1.875rem; font-weight: 800; color: var(--color-brand-bright); font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
         </div>
 
         <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-success);">
@@ -169,8 +169,8 @@
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6);">
         <!-- Weekly Regular Schedule -->
         <div class="card" style="padding: var(--space-6);">
-          <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">Weekly Chamber Schedule</h2>
-          <p style="color: var(--color-ink-600); font-size: 0.875rem; margin: 0 0 var(--space-5);">
+          <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-1);">Weekly Chamber Schedule</h2>
+          <p style="color: var(--color-text-muted-on-dark); font-size: 0.875rem; margin: 0 0 var(--space-5);">
             Set consultation hours, slot duration, and lunch/prayer breaks for each day of the week.
           </p>
 
@@ -188,8 +188,8 @@
         <!-- Doctor Planned Leaves -->
         <div>
           <div class="card" style="padding: var(--space-5); margin-bottom: var(--space-6);">
-            <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">Schedule Leave Day</h2>
-            <p style="color: var(--color-ink-600); font-size: 0.8125rem; margin: 0 0 var(--space-4);">
+            <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-1);">Schedule Leave Day</h2>
+            <p style="color: var(--color-text-muted-on-dark); font-size: 0.8125rem; margin: 0 0 var(--space-4);">
               Mark days you won't be available at the chamber. Patient slot bookings are automatically blocked.
             </p>
 
@@ -209,7 +209,7 @@
           </div>
 
           <div class="card" style="padding: var(--space-5);">
-            <h3 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-3);">Upcoming Chamber Leaves</h3>
+            <h3 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-3);">Upcoming Chamber Leaves</h3>
             <div id="leaves-list-container">
               <div style="font-size: 0.8125rem; color: var(--color-ink-500);">Loading leaves...</div>
             </div>
@@ -224,26 +224,26 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
         <div class="card" style="padding: var(--space-5);">
           <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Today's Revenue</div>
-          <div id="earnings-today-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-teal-700); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
+          <div id="earnings-today-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-brand); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
           <div style="font-size: 0.8125rem; color: var(--color-ink-500);"><span id="earnings-today-pts">0</span> consultations completed</div>
         </div>
 
         <div class="card" style="padding: var(--space-5);">
           <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Last 30 Days</div>
-          <div id="earnings-month-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-ink-950); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
+          <div id="earnings-month-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-text-primary); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
           <div style="font-size: 0.8125rem; color: var(--color-ink-500);"><span id="earnings-month-pts">0</span> consultations completed</div>
         </div>
 
         <div class="card" style="padding: var(--space-5);">
           <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Career All-Time Total</div>
-          <div id="earnings-all-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-ink-950); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
+          <div id="earnings-all-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-text-primary); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
           <div style="font-size: 0.8125rem; color: var(--color-ink-500);"><span id="earnings-all-pts">0</span> lifetime consultations</div>
         </div>
       </div>
 
       <!-- Past 7 Days Table -->
       <div class="card" style="padding: var(--space-6);">
-        <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-4);">Past 7 Days Consultation & Earnings Breakdown</h2>
+        <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-4);">Past 7 Days Consultation & Earnings Breakdown</h2>
         <div class="table-container">
           <table style="font-size: 0.875rem;">
             <thead>
@@ -273,7 +273,7 @@
       <div class="modal-header">
         <div>
           <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-teal-700);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h3a2 2 0 0 0 0-4H9v7"/><path d="m11 13 3 3"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-brand);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h3a2 2 0 0 0 0-4H9v7"/><path d="m11 13 3 3"/></svg>
             <h3 class="modal-title" style="font-size: 1.125rem; margin: 0;">Author Digital Prescription</h3>
           </div>
           <p id="rx-patient-header" style="font-size: 0.8125rem; color: var(--color-ink-500); margin: 0.25rem 0 0;"></p>
@@ -339,7 +339,7 @@
             </div>
           </div>
 
-          <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.8125rem; color: var(--color-ink-600); margin-bottom: var(--space-5);">
+          <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border-subtle); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.8125rem; color: var(--color-text-muted-on-dark); margin-bottom: var(--space-5);">
             Submitting this prescription concludes the patient consultation and marks the appointment as <strong>COMPLETED</strong> in records.
           </div>
 
@@ -450,7 +450,7 @@
             <div style="font-size: 2rem; margin-bottom: var(--space-2); color: var(--color-ink-400);">
               <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3v5a4.5 4.5 0 0 0 9 0V3"/><path d="M9 3v2"/><path d="M4.5 3H3"/><path d="M15 3h-1.5"/><path d="M9 12.5v2a3.5 3.5 0 0 0 7 0v-1"/><circle cx="18" cy="10" r="3"/><circle cx="18" cy="10" r="1"/></svg>
             </div>
-            <h3 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; margin: 0 0 var(--space-1); color: var(--color-ink-950);">No Patients in Filter</h3>
+            <h3 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; margin: 0 0 var(--space-1); color: var(--color-text-primary);">No Patients in Filter</h3>
             <p style="color: var(--color-ink-500); font-size: 0.875rem; margin: 0;">No consultations match this filter for the selected date.</p>
           </div>
         `;
@@ -478,12 +478,12 @@
               ${statusBadge}
             </div>
 
-            <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.2rem;">${apt.patient_name}</h3>
+            <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 0.2rem;">${apt.patient_name}</h3>
             <div style="font-size: 0.8125rem; color: var(--color-ink-500); margin-bottom: var(--space-3);">
               ${apt.patient_age} yrs • ${apt.patient_gender} • ${apt.patient_phone}
             </div>
 
-            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-xs); font-size: 0.8125rem; margin-bottom: var(--space-3);">
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border-subtle); padding: var(--space-3); border-radius: var(--radius-xs); font-size: 0.8125rem; margin-bottom: var(--space-3);">
               <strong style="color: var(--color-ink-900);">Chief Complaint:</strong> ${apt.reason_for_visit || 'General Outpatient Consultation'}
             </div>
 
@@ -493,7 +493,7 @@
             </div>
           </div>
 
-          <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-3); display: flex; gap: var(--space-2); flex-wrap: wrap;">
+          <div style="border-top: 1px solid var(--color-border-subtle); padding-top: var(--space-3); display: flex; gap: var(--space-2); flex-wrap: wrap;">
             ${apt.status !== 'IN_CONSULTATION' && apt.status !== 'COMPLETED' ? `
               <button class="btn btn-primary btn-sm call-in-btn" data-apt-id="${apt.id}" style="flex: 1;">
                 Call In
@@ -687,7 +687,7 @@
         <input type="text" class="form-control med-inst" placeholder="Instruction" value="${instruction}" required style="font-size: 0.8125rem;">
         <div style="display: flex; gap: 4px; align-items: center;">
           <input type="text" class="form-control med-dur" placeholder="7 days" value="${duration}" required style="font-size: 0.8125rem; min-width: 65px;">
-          <span class="dose-calc-badge" style="font-size: 0.6875rem; color: var(--color-teal-700); font-weight: 700; white-space: nowrap; background: var(--color-teal-50); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--color-teal-200);">--</span>
+          <span class="dose-calc-badge" style="font-size: 0.6875rem; color: var(--color-brand); font-weight: 700; white-space: nowrap; background: var(--color-brand-soft); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--color-brand-line);">--</span>
         </div>
         <button type="button" class="btn btn-secondary btn-sm remove-med-btn" style="color: var(--color-danger); padding: 0.25rem 0.5rem;">&times;</button>
       `;
@@ -830,7 +830,7 @@
 
           const row = document.createElement('div');
           row.style.background = 'var(--color-surface-subtle)';
-          row.style.border = '1px solid var(--color-border)';
+          row.style.border = '1px solid var(--color-border-subtle)';
           row.style.padding = 'var(--space-3) var(--space-4)';
           row.style.borderRadius = 'var(--radius-sm)';
           row.style.display = 'grid';
@@ -840,8 +840,8 @@
 
           row.innerHTML = `
             <div>
-              <strong style="font-size: 0.875rem; color: var(--color-ink-950);">${dayNames[day]}</strong>
-              <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; margin-top: 0.15rem; color: var(--color-ink-600);">
+              <strong style="font-size: 0.875rem; color: var(--color-text-primary);">${dayNames[day]}</strong>
+              <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; margin-top: 0.15rem; color: var(--color-text-muted-on-dark);">
                 <input type="checkbox" class="day-active" data-day="${day}" ${s.is_active ? 'checked' : ''}> Open
               </label>
             </div>
@@ -891,7 +891,7 @@
         item.style.justifyContent = 'space-between';
         item.style.alignItems = 'center';
         item.style.padding = 'var(--space-2) 0';
-        item.style.borderBottom = '1px solid var(--color-border)';
+        item.style.borderBottom = '1px solid var(--color-border-subtle)';
         item.innerHTML = `
           <div>
             <strong style="font-size: 0.875rem; color: var(--color-ink-900); font-feature-settings: 'tnum';">${l.leave_date}</strong>
@@ -984,7 +984,7 @@
           tr.innerHTML = `
             <td><strong style="font-feature-settings: 'tnum';">${row.date}</strong></td>
             <td style="font-feature-settings: 'tnum';">${row.patients_count} patient(s)</td>
-            <td><strong style="color: var(--color-teal-800); font-feature-settings: 'tnum';">৳ ${row.daily_revenue.toLocaleString()}</strong></td>
+            <td><strong style="color: var(--color-brand-bright); font-feature-settings: 'tnum';">৳ ${row.daily_revenue.toLocaleString()}</strong></td>
           `;
           tbody.appendChild(tr);
         });

@@ -34,9 +34,9 @@
         max-height: 82vh !important;
         overflow-y: auto !important;
         z-index: 1050 !important;
-        background: var(--color-surface) !important;
+        background: var(--color-surface-card) !important;
         border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
-        border: 1px solid var(--color-border) !important;
+        border: 1px solid var(--color-border-subtle) !important;
         border-bottom: none !important;
         box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35) !important;
         backdrop-filter: blur(20px) saturate(160%) !important;
@@ -51,13 +51,13 @@
       to { transform: translateY(0); }
     }
     [data-theme="dark"] .filter-sidebar-mobile-hide.mobile-open {
-      background: rgba(14, 20, 34, 0.98) !important;
+      background: var(--color-surface-card) !important;
       box-shadow: 0 -12px 45px rgba(0, 0, 0, 0.8) !important;
     }
     .view-toggle-btn {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      color: var(--color-ink-600);
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      color: var(--color-text-muted-on-dark);
       padding: 0.35rem 0.5rem;
       border-radius: var(--radius-xs);
       cursor: pointer;
@@ -67,14 +67,14 @@
       transition: all var(--duration-fast) var(--ease-out);
     }
     .view-toggle-btn.active {
-      background: var(--color-teal-50);
-      color: var(--color-teal-800);
-      border-color: var(--color-teal-300);
+      background: var(--color-brand-soft);
+      color: var(--color-brand-bright);
+      border-color: var(--color-brand-bright);
     }
     [data-theme="dark"] .view-toggle-btn.active {
-      background: rgba(45, 212, 191, 0.12);
-      color: var(--color-teal-300);
-      border-color: rgba(45, 212, 191, 0.3);
+      background: var(--color-brand-soft);
+      color: var(--color-brand-bright);
+      border-color: var(--color-brand-line);
     }
     .doctors-list-grid-view {
       display: grid !important;
@@ -109,7 +109,7 @@
 
   <div class="container" style="padding: var(--space-8) var(--space-4);">
     <!-- Page Header with Editorial Hierarchy -->
-    <div style="margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-6);">
+    <div style="margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-6);">
       <div>
         <div class="live-status-strip" style="margin-bottom: var(--space-2);">
           <span class="status-dot-live"></span>
@@ -118,7 +118,7 @@
         <h1 style="font-family: var(--font-display); font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1); letter-spacing: -0.02em;">
           Specialist Directory & Chambers
         </h1>
-        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem; max-width: 640px;">
+        <p style="color: var(--color-text-muted-on-dark); margin: 0; font-size: 0.9375rem; max-width: 640px;">
           Filter certified practitioners by clinical discipline, hospital chambers, consultation fees, and real-time appointment availability.
         </p>
       </div>
@@ -134,7 +134,7 @@
     <div class="doctors-layout-grid">
       <!-- Filter Sidebar -->
       <aside id="filter-sidebar" class="card filter-sidebar-mobile-hide" style="position: sticky; top: 5.5rem; padding: var(--space-5);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-subtle);">
           <div style="display: flex; align-items: center; gap: var(--space-2);">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-teal-700);"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Filters</h3>
@@ -226,14 +226,14 @@
         <div id="active-filter-tags" style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-4); align-items: center; min-height: 28px;"></div>
 
         <!-- Results Header & Controls -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-subtle);">
           <div id="results-count" style="font-weight: 700; color: var(--color-ink-950); font-size: 0.9375rem; font-feature-settings: 'tnum';">
             Loading doctors...
           </div>
 
           <div style="display: flex; align-items: center; gap: var(--space-3);">
             <!-- View Layout Toggle -->
-            <div style="display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 2px; background: var(--color-surface);">
+            <div style="display: inline-flex; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); padding: 2px; background: var(--color-surface-card);">
               <button id="view-mode-list-btn" class="view-toggle-btn active" title="List View" aria-label="List View">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
               </button>
@@ -264,11 +264,11 @@
 
         <!-- Empty State -->
         <div id="empty-state" class="card" style="display: none; text-align: center; padding: var(--space-12) var(--space-6);">
-          <div style="width: 56px; height: 56px; border-radius: var(--radius-full); background: var(--color-teal-50); color: var(--color-teal-700); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-4); border: 1px solid var(--color-teal-200);">
+          <div style="width: 56px; height: 56px; border-radius: var(--radius-full); background: var(--color-brand-soft); color: var(--color-teal-700); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-4); border: 1px solid var(--color-teal-200);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           </div>
           <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-2);">No Specialists Match Your Criteria</h3>
-          <p style="color: var(--color-ink-600); max-width: 420px; margin: 0 auto var(--space-6); font-size: 0.875rem; line-height: 1.5;">
+          <p style="color: var(--color-text-muted-on-dark); max-width: 420px; margin: 0 auto var(--space-6); font-size: 0.875rem; line-height: 1.5;">
             We couldn't find any certified doctors matching this combination of filters. Try clearing specific constraints or searching by broad medical specialty.
           </p>
           <button id="empty-reset-btn" class="btn btn-primary">Reset All Filters</button>
@@ -562,22 +562,22 @@
                 </h3>
                 <div class="doctor-degrees" style="margin-bottom: var(--space-2); font-weight: 500;">${d.qualifications}</div>
                 
-                <div style="font-size: 0.8125rem; color: var(--color-ink-600); display: flex; align-items: flex-start; gap: 0.4rem; background: var(--color-surface-subtle); padding: 0.45rem 0.65rem; border-radius: var(--radius-xs); border: 1px solid var(--color-border); max-width: 580px;">
+                <div style="font-size: 0.8125rem; color: var(--color-text-muted-on-dark); display: flex; align-items: flex-start; gap: 0.4rem; background: var(--color-surface-subtle); padding: 0.45rem 0.65rem; border-radius: var(--radius-xs); border: 1px solid var(--color-border-subtle); max-width: 580px;">
                   <span style="color: var(--color-teal-700); margin-top: 1px; flex-shrink: 0;">${icons.mapPin(15)}</span>
                   <span><strong style="color: var(--color-ink-900);">${lang === 'bn' ? d.hospital_name_bn : d.hospital_name_en}</strong> — ${d.chamber_address}</span>
                 </div>
               </div>
 
-              <div class="doctor-card-actions" style="text-align: right; min-width: 185px; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2); border-left: 1px solid var(--color-border); padding-left: var(--space-5);">
+              <div class="doctor-card-actions" style="text-align: right; min-width: 185px; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2); border-left: 1px solid var(--color-border-subtle); padding-left: var(--space-5);">
                 <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.875rem; background: var(--color-warning-subtle); padding: 0.2rem 0.5rem; border-radius: var(--radius-xs); border: 1px solid var(--color-warning-border);">
                   <span style="color: #b45309; display: flex;">${icons.starFilled(14)}</span>
                   <strong style="color: var(--color-ink-950); font-feature-settings: 'tnum';">${d.rating_avg.toFixed(1)}</strong>
-                  <span style="color: var(--color-ink-600); font-size: 0.75rem;">(${d.rating_count} reviews)</span>
+                  <span style="color: var(--color-text-muted-on-dark); font-size: 0.75rem;">(${d.rating_count} reviews)</span>
                 </div>
 
                 <div>
                   <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block; text-transform: uppercase; letter-spacing: 0.04em;">Consultation Fee</span>
-                  <span class="doctor-fee-tag" style="font-size: 1.375rem; font-feature-settings: 'tnum'; color: var(--color-teal-800);">৳ ${d.consultation_fee}</span>
+                  <span class="doctor-fee-tag" style="font-size: 1.375rem; font-feature-settings: 'tnum'; color: var(--color-brand-bright);">৳ ${d.consultation_fee}</span>
                   <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block;">Follow-up: ৳${d.follow_up_fee}</span>
                 </div>
 
@@ -595,7 +595,7 @@
           } else {
             // Grid layout
             card.innerHTML = `
-              <div class="doctor-card-header" style="align-items: center; gap: var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3);">
+              <div class="doctor-card-header" style="align-items: center; gap: var(--space-3); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-3);">
                 ${renderDoctorAvatar(d.name, d.id, 62, true, d.avatar_url)}
                 <div class="doctor-meta" style="flex: 1; min-width: 0;">
                   <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
@@ -611,7 +611,7 @@
                 </div>
               </div>
 
-              <div style="font-size: 0.8125rem; color: var(--color-ink-600); line-height: 1.4; display: flex; align-items: flex-start; gap: 0.4rem; padding: var(--space-2) 0;">
+              <div style="font-size: 0.8125rem; color: var(--color-text-muted-on-dark); line-height: 1.4; display: flex; align-items: flex-start; gap: 0.4rem; padding: var(--space-2) 0;">
                 <span style="color: var(--color-teal-700); margin-top: 2px; flex-shrink: 0;">${icons.mapPin(15)}</span>
                 <div>
                   <strong style="color: var(--color-ink-900); font-size: 0.8125rem;">${lang === 'bn' ? d.hospital_name_bn : d.hospital_name_en}</strong><br>
@@ -634,7 +634,7 @@
               <div class="doctor-card-footer" style="padding-top: var(--space-2);">
                 <div>
                   <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block; text-transform: uppercase;">Fee</span>
-                  <span class="doctor-fee-tag" style="font-feature-settings: 'tnum'; font-size: 1.1875rem; color: var(--color-teal-800);">৳ ${d.consultation_fee}</span>
+                  <span class="doctor-fee-tag" style="font-feature-settings: 'tnum'; font-size: 1.1875rem; color: var(--color-brand-bright);">৳ ${d.consultation_fee}</span>
                 </div>
                 <a href="/doctor-profile.html?id=${d.id}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
                   <span>Book</span>

@@ -2,6 +2,23 @@
 
 All notable changes to the DocBook application are documented below.
 
+## [2.2.0] - 2026-10-07
+
+### 💎 Professional CSS Architecture & Unification
+- **Specular Top Bevels & Depth**: Added machined specular top-edge highlights (`--specular-card`, `--specular-elevated`, `--specular-brand`) providing crisp Apple/Linear-grade optical depth to all cards, modals, and buttons.
+- **Surface Elevation Gradients**: Introduced subtle optical depth gradients (`--gradient-card`, `--gradient-elevated`, `--gradient-brand-subtle`) eliminating flat, washed-out dark mode surfaces.
+- **Unified Master Component Library**: Consolidated 8 new clinical component sections into [`public/css/components.css`](file:///c:/Users/basak/Downloads/Doctor%20Appointment%20Booking%20System/public/css/components.css):
+  - Section 18: KPI Stat Cards & Analytics Metrics Suite (`.kpi-grid`, `.kpi-card`, `.kpi-val`, `.kpi-sub-title`)
+  - Section 19: Tab Navigation & Segmented Badges (`.admin-tab-nav`, `.admin-tab-btn`, `.tab-badge`)
+  - Section 20: Clinical Queue Workspace & Prescription Authoring Pad (`.queue-card`, `.serial-tag`, `.med-row`, `.shortcut-tag`)
+  - Section 21: Specialist Directory & Filter Drawer Layout (`.doctors-layout-grid`, `.filter-sidebar`, `.view-toggle-btn`)
+  - Section 22: Authentication Split Layout & Role Quick-Fill Badges (`.auth-split-layout`, `.auth-brand-side`, `.demo-role-pill`)
+  - Section 23: Telemedicine Video Console & Floating Dock (`.telemed-header`, `.video-viewport`, `.controls-bar`, `.ctrl-btn`, `.call-timer`)
+  - Section 24: TV Waiting Lounge Live Queue Display (`.tv-header`, `.tv-hero-card`, `.tv-token-number`, `.tv-queue-card`, `.tv-ticker-tag`)
+  - Section 25: Clinical Utilities & Live Signals (`.status-dot-live`, `.live-status-strip`, `.glass-panel`)
+- **Inline Style Purge & Clean Alignment**: Refactored over 15 HTML pages to replace legacy cyan/navy colors with design token variables (`var(--color-brand)`, `var(--color-surface-card)`, `var(--color-text-primary)`).
+- **Zero Loss Verification**: Verified 0 lost IDs or i18n keys across all 16 pages; 100% test pass rate across all 45 integration tests.
+
 ## [2.1.0] - 2026-10-07
 
 ### 🎨 Dark Clinical Green Design System

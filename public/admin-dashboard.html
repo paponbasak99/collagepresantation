@@ -11,15 +11,15 @@
   <link rel="stylesheet" href="/css/components.css">  
   <style>
     .admin-hero {
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border);
+      background: var(--color-surface-card);
+      border-bottom: 1px solid var(--color-border-subtle);
       padding: 2.25rem 0 1.75rem;
       margin-bottom: 2rem;
     }
     .admin-tab-nav {
       display: flex;
       gap: 0.5rem;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--color-border-subtle);
       margin-bottom: 2rem;
       overflow-x: auto;
       scrollbar-width: none;
@@ -33,7 +33,7 @@
       padding: 0.75rem 1.25rem;
       font-size: 0.875rem;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--color-text-muted-on-dark);
       background: transparent;
       border: none;
       border-bottom: 2px solid transparent;
@@ -43,17 +43,17 @@
       transition: all var(--motion-fast) var(--ease-out);
     }
     .admin-tab-btn:hover {
-      color: var(--text-main);
-      background: var(--bg-muted);
+      color: var(--color-text-primary);
+      background: var(--color-surface-elevated);
     }
     .admin-tab-btn.active {
-      color: var(--primary-700);
-      border-bottom-color: var(--primary-600);
+      color: var(--color-brand-strong);
+      border-bottom-color: var(--color-brand);
       background: transparent;
     }
     [data-theme="dark"] .admin-tab-btn.active {
-      color: var(--primary-400);
-      border-bottom-color: var(--primary-400);
+      color: var(--color-brand-bright);
+      border-bottom-color: var(--color-brand-bright);
     }
 
     .kpi-grid {
@@ -63,8 +63,8 @@
       margin-bottom: 2rem;
     }
     .kpi-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md);
       padding: 1.35rem 1.25rem;
       position: relative;
@@ -76,8 +76,8 @@
     }
     .kpi-card:hover {
       transform: translateY(-4px);
-      border-color: rgba(45, 212, 191, 0.45);
-      box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 0 16px rgba(20, 184, 166, 0.18);
+      border-color: var(--color-brand-line);
+      box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 0 16px var(--color-brand-soft-2);
     }
     .kpi-card::before {
       content: '';
@@ -86,7 +86,7 @@
       left: 0;
       width: 4px;
       height: 100%;
-      background: var(--primary-600);
+      background: var(--color-brand);
     }
     .kpi-card.warning::before { background: #f59e0b; }
     .kpi-card.danger::before { background: var(--danger); }
@@ -97,7 +97,7 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--color-text-muted-on-dark);
       margin-bottom: 0.35rem;
     }
     .kpi-val {
@@ -105,19 +105,19 @@
       font-size: 2.15rem;
       font-weight: 700;
       line-height: 1.1;
-      color: var(--text-main);
+      color: var(--color-text-primary);
       margin: 0.35rem 0 0.45rem;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.02em;
     }
     .kpi-sub-detail {
       font-size: 0.8rem;
-      color: var(--text-muted);
+      color: var(--color-text-muted-on-dark);
     }
 
     .chart-panel {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md);
       padding: 1.5rem;
       box-shadow: var(--shadow-sm);
@@ -127,16 +127,16 @@
       transition: fill var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
     }
     .svg-bar:hover {
-      fill: var(--primary-700);
+      fill: var(--color-brand-strong);
       cursor: pointer;
     }
     [data-theme="dark"] .svg-bar:hover {
-      fill: var(--primary-400);
+      fill: var(--color-brand-bright);
     }
 
     .data-table-wrapper {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -149,20 +149,20 @@
       font-size: 0.875rem;
     }
     .data-table th {
-      background: var(--bg-muted);
+      background: var(--color-surface-elevated);
       padding: 0.85rem 1.15rem;
       font-weight: 600;
       font-size: 0.75rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
+      color: var(--color-text-muted-on-dark);
+      border-bottom: 1px solid var(--color-border-subtle);
       white-space: nowrap;
     }
     .data-table td {
       padding: 0.95rem 1.15rem;
       border-bottom: 1px solid var(--border-light);
-      color: var(--text-main);
+      color: var(--color-text-primary);
       vertical-align: middle;
     }
     .data-table tbody tr:hover {
@@ -247,15 +247,15 @@
         <div>
           <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
             <span class="badge" style="background: var(--primary-100); color: var(--primary-800); border: 1px solid var(--primary-300); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.05em;">
-              <span class="live-dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--primary-600); margin-right: 4px;"></span>
+              <span class="live-dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--color-brand); margin-right: 4px;"></span>
               CLINICAL GOVERNANCE & OPERATIONS
             </span>
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-variant-numeric: tabular-nums;" id="live-clock-timestamp">DHAKA HUB</span>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted-on-dark); font-variant-numeric: tabular-nums;" id="live-clock-timestamp">DHAKA HUB</span>
           </div>
-          <h1 style="font-family: var(--font-display); font-size: 2.15rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: var(--text-main);">
+          <h1 style="font-family: var(--font-display); font-size: 2.15rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; color: var(--color-text-primary);">
             Executive Operations Console
           </h1>
-          <p style="color: var(--text-muted); font-size: 0.925rem; margin: 0.35rem 0 0; max-width: 650px;">
+          <p style="color: var(--color-text-muted-on-dark); font-size: 0.925rem; margin: 0.35rem 0 0; max-width: 650px;">
             Real-time outpatient telemetry, BMDC licensing approvals, financial reconciliation, and tamper-evident audit logs.
           </p>
         </div>
@@ -356,15 +356,15 @@
         <div class="chart-panel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main);">Daily Consultation Volume (Past 14 Days)</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Total booked consultations across all hospital chambers</p>
+              <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">Daily Consultation Volume (Past 14 Days)</h3>
+              <p style="font-size: 0.8rem; color: var(--color-text-muted-on-dark); margin: 0.2rem 0 0;">Total booked consultations across all hospital chambers</p>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <div style="display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; font-size: 0.75rem;">
+              <div style="display: inline-flex; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-sm); overflow: hidden; font-size: 0.75rem;">
                 <button type="button" id="chart-mode-2d-btn" class="btn btn-sm btn-primary" style="padding: 0.25rem 0.6rem; border-radius: 0; font-size: 0.75rem;">2D View</button>
                 
               </div>
-              <span class="badge" style="background: var(--bg-muted); color: var(--text-muted); font-size: 0.75rem; font-weight: 600;">Analytics</span>
+              <span class="badge" style="background: var(--color-surface-elevated); color: var(--color-text-muted-on-dark); font-size: 0.75rem; font-weight: 600;">Analytics</span>
             </div>
           </div>
           <div id="daily-chart-mount" style="width: 100%; height: 230px; position: relative;">
@@ -376,8 +376,8 @@
         <!-- Revenue by Payment Method -->
         <div class="chart-panel">
           <div style="margin-bottom: 1.25rem;">
-            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main);">Revenue by Gateway</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Distribution across MFS and hospital desks</p>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">Revenue by Gateway</h3>
+            <p style="font-size: 0.8rem; color: var(--color-text-muted-on-dark); margin: 0.2rem 0 0;">Distribution across MFS and hospital desks</p>
           </div>
           <div id="revenue-method-list" style="display: flex; flex-direction: column; gap: 1.15rem;">
             <!-- Injected dynamically -->
@@ -390,8 +390,8 @@
         <!-- Top Doctors Table -->
         <div class="chart-panel">
           <div style="margin-bottom: 1rem;">
-            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main);">Top Specialists by Volume</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Ranking based on verified completed consultations</p>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">Top Specialists by Volume</h3>
+            <p style="font-size: 0.8rem; color: var(--color-text-muted-on-dark); margin: 0.2rem 0 0;">Ranking based on verified completed consultations</p>
           </div>
           <div class="data-table-wrapper">
             <table class="data-table">
@@ -414,8 +414,8 @@
         <!-- Peak Hours Meter -->
         <div class="chart-panel">
           <div style="margin-bottom: 1rem;">
-            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main);">Peak Chamber Distribution</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Busiest OPD hourly bands for staffing planning</p>
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">Peak Chamber Distribution</h3>
+            <p style="font-size: 0.8rem; color: var(--color-text-muted-on-dark); margin: 0.2rem 0 0;">Busiest OPD hourly bands for staffing planning</p>
           </div>
           <div id="peak-hours-chart" style="display: flex; flex-direction: column; gap: 0.75rem;">
             <!-- Injected dynamically -->
@@ -429,10 +429,10 @@
       <div class="chart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; margin: 0; color: var(--text-main);">
+            <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">
               Practitioner Licensing Verification Queue
             </h2>
-            <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.35rem 0 0;">
+            <p style="color: var(--color-text-muted-on-dark); font-size: 0.875rem; margin: 0.35rem 0 0;">
               Every doctor practicing on DocBook must undergo verification against the Bangladesh Medical & Dental Council (BMDC) register.
             </p>
           </div>
@@ -454,7 +454,7 @@
             </thead>
             <tbody id="pending-doctors-tbody">
               <tr>
-                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem;">Checking BMDC verification queue...</td>
+                <td colspan="7" style="text-align: center; color: var(--color-text-muted-on-dark); padding: 3rem;">Checking BMDC verification queue...</td>
               </tr>
             </tbody>
           </table>
@@ -467,16 +467,16 @@
       <div class="chart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; margin: 0; color: var(--text-main);">
+            <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">
               System User Accounts Directory
             </h2>
-            <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.35rem 0 0;">
+            <p style="color: var(--color-text-muted-on-dark); font-size: 0.875rem; margin: 0.35rem 0 0;">
               Manage platform access rights, roles, and suspension states across all entities.
             </p>
           </div>
 
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <label for="user-role-filter" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Filter by Role:</label>
+            <label for="user-role-filter" style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted-on-dark);">Filter by Role:</label>
             <select id="user-role-filter" class="form-control" style="width: auto; padding: 0.45rem 1rem;">
               <option value="">All Account Roles</option>
               <option value="patient">Patients</option>
@@ -502,7 +502,7 @@
             </thead>
             <tbody id="users-tbody">
               <tr>
-                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">Loading user directory...</td>
+                <td colspan="7" style="text-align: center; color: var(--color-text-muted-on-dark); padding: 2.5rem;">Loading user directory...</td>
               </tr>
             </tbody>
           </table>
@@ -517,8 +517,8 @@
         <div class="chart-panel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
             <div>
-              <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text-main);">Clinical Specialties</h2>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Categories mapped to doctor profiles</p>
+              <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">Clinical Specialties</h2>
+              <p style="font-size: 0.8rem; color: var(--color-text-muted-on-dark); margin: 0.2rem 0 0;">Categories mapped to doctor profiles</p>
             </div>
             <button id="add-specialty-btn" class="btn btn-primary btn-sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -547,8 +547,8 @@
         <div class="chart-panel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
             <div>
-              <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text-main);">Partner Hospitals & Chambers</h2>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Affiliated clinics and diagnostic hubs</p>
+              <h2 style="font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">Partner Hospitals & Chambers</h2>
+              <p style="font-size: 0.8rem; color: var(--color-text-muted-on-dark); margin: 0.2rem 0 0;">Affiliated clinics and diagnostic hubs</p>
             </div>
             <button id="add-hospital-btn" class="btn btn-primary btn-sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -580,10 +580,10 @@
       <div class="chart-panel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; margin: 0; color: var(--text-main);">
+            <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; margin: 0; color: var(--color-text-primary);">
               Security & Operational Audit Trail
             </h2>
-            <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.35rem 0 0;">
+            <p style="color: var(--color-text-muted-on-dark); font-size: 0.875rem; margin: 0.35rem 0 0;">
               Cryptographically signed activity trail with user IDs, actor IP addresses, and state changes.
             </p>
           </div>
@@ -607,7 +607,7 @@
             </thead>
             <tbody id="audit-tbody">
               <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">Streaming audit trail...</td>
+                <td colspan="6" style="text-align: center; color: var(--color-text-muted-on-dark); padding: 3rem;">Streaming audit trail...</td>
               </tr>
             </tbody>
           </table>
@@ -711,7 +711,7 @@
   <!-- MODAL: BMDC REGISTRY VERIFICATION -->
   <div id="bmdc-modal" class="modal-backdrop">
     <div class="modal-box" style="max-width: 640px;">
-      <div class="modal-header" style="background: var(--primary-700); color: white; padding: 1.25rem 1.5rem; border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md);">
+      <div class="modal-header" style="background: var(--color-brand-strong); color: white; padding: 1.25rem 1.5rem; border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md);">
         <h3 class="modal-title" style="color: white; font-size: 1.1rem; display: flex; align-items: center; gap: 0.6rem;">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
           BMDC Official Registry Clearance
@@ -857,7 +857,7 @@
     function renderDailyChart(days) {
       const mount = document.getElementById('daily-chart-mount');
       if (days.length === 0) {
-        mount.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 0.9rem;">No consultation activity recorded in past 14 days.</div>';
+        mount.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--color-text-muted-on-dark); font-size: 0.9rem;">No consultation activity recorded in past 14 days.</div>';
         return;
       }
 
@@ -875,8 +875,8 @@
         const y = height - padding - (i / 4) * (height - padding * 2);
         const val = Math.round((i / 4) * maxVal);
         svgHtml += `
-          <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="var(--border)" stroke-dasharray="3,3" stroke-width="1" />
-          <text x="${padding - 8}" y="${y + 3.5}" fill="var(--text-muted)" font-size="10" font-family="var(--font-mono, monospace)" text-anchor="end">${val}</text>
+          <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="var(--color-border-subtle)" stroke-dasharray="3,3" stroke-width="1" />
+          <text x="${padding - 8}" y="${y + 3.5}" fill="var(--color-text-muted-on-dark)" font-size="10" font-family="var(--font-mono, monospace)" text-anchor="end">${val}</text>
         `;
       }
 
@@ -888,10 +888,10 @@
         const dateShort = day.date.slice(5);
 
         svgHtml += `
-          <rect class="svg-bar" x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="4" fill="var(--primary-600)">
+          <rect class="svg-bar" x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="4" fill="var(--color-brand)">
             <title>${day.date}: ${day.total_appointments} total (${day.completed} completed, ${day.cancelled} cancelled)</title>
           </rect>
-          <text x="${x + barWidth / 2}" y="${height - 8}" fill="var(--text-muted)" font-size="9.5" font-family="var(--font-sans)" text-anchor="middle">${dateShort}</text>
+          <text x="${x + barWidth / 2}" y="${height - 8}" fill="var(--color-text-muted-on-dark)" font-size="9.5" font-family="var(--font-sans)" text-anchor="middle">${dateShort}</text>
         `;
       });
 
@@ -905,7 +905,7 @@
     function renderRevenueByMethod(methods) {
       const container = document.getElementById('revenue-method-list');
       if (methods.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.875rem;">No payment transactions recorded.</div>';
+        container.innerHTML = '<div style="color: var(--color-text-muted-on-dark); font-size: 0.875rem;">No payment transactions recorded.</div>';
         return;
       }
 
@@ -915,18 +915,18 @@
       methods.forEach(m => {
         const percent = totalRevenue > 0 ? Math.round((m.total_amount / totalRevenue) * 100) : 0;
         const formattedMethod = m.method === 'clinic' ? 'Hospital Front Desk' : m.method.toUpperCase();
-        const brandColor = m.method === 'bkash' ? '#d82a65' : (m.method === 'nagad' ? '#f59e0b' : 'var(--primary-600)');
+        const brandColor = m.method === 'bkash' ? '#d82a65' : (m.method === 'nagad' ? '#f59e0b' : 'var(--color-brand)');
 
         const item = document.createElement('div');
         item.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; margin-bottom: 0.35rem;">
-            <span style="font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+            <span style="font-weight: 600; color: var(--color-text-primary); display: flex; align-items: center; gap: 0.4rem;">
               <span style="width: 8px; height: 8px; border-radius: 50%; background: ${brandColor}; display: inline-block;"></span>
               ${formattedMethod}
             </span>
-            <span><strong style="font-variant-numeric: tabular-nums;">৳ ${m.total_amount.toLocaleString()}</strong> <small style="color: var(--text-muted);">(${percent}%)</small></span>
+            <span><strong style="font-variant-numeric: tabular-nums;">৳ ${m.total_amount.toLocaleString()}</strong> <small style="color: var(--color-text-muted-on-dark);">(${percent}%)</small></span>
           </div>
-          <div style="background: var(--bg-muted); height: 7px; border-radius: 4px; overflow: hidden;">
+          <div style="background: var(--color-surface-elevated); height: 7px; border-radius: 4px; overflow: hidden;">
             <div style="background: ${brandColor}; height: 100%; width: ${percent}%; border-radius: 4px;"></div>
           </div>
         `;
@@ -937,7 +937,7 @@
     function renderTopDoctors(docs) {
       const tbody = document.getElementById('top-doctors-tbody');
       if (docs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No consultations completed yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--color-text-muted-on-dark); padding: 2rem;">No consultations completed yet.</td></tr>';
         return;
       }
 
@@ -947,22 +947,22 @@
         tr.innerHTML = `
           <td>
             <div style="display: flex; align-items: center; gap: 0.65rem;">
-              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-100); color: var(--primary-700); font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-100); color: var(--color-brand-strong); font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                 ${d.doctor_name.replace('Dr. ', '').split(' ').map(w => w[0]).join('').slice(0, 2)}
               </div>
               <strong style="font-size: 0.875rem;">${d.doctor_name}</strong>
             </div>
           </td>
-          <td><span class="badge" style="background: var(--bg-muted); color: var(--text-muted); font-size: 0.75rem;">${d.specialty}</span></td>
+          <td><span class="badge" style="background: var(--color-surface-elevated); color: var(--color-text-muted-on-dark); font-size: 0.75rem;">${d.specialty}</span></td>
           <td style="text-align: center; font-weight: 700; font-variant-numeric: tabular-nums;">${d.completed_consultations}</td>
           <td>
             <div style="display: flex; align-items: center; gap: 0.25rem;">
               ${icons.starFilled(13, 'text-amber-500')}
               <strong style="font-size: 0.85rem; font-variant-numeric: tabular-nums;">${d.rating_avg.toFixed(1)}</strong>
-              <small style="color: var(--text-muted);">(${d.rating_count})</small>
+              <small style="color: var(--color-text-muted-on-dark);">(${d.rating_count})</small>
             </div>
           </td>
-          <td style="text-align: right; font-weight: 700; color: var(--primary-700); font-variant-numeric: tabular-nums;">
+          <td style="text-align: right; font-weight: 700; color: var(--color-brand-strong); font-variant-numeric: tabular-nums;">
             ৳ ${d.generated_revenue.toLocaleString()}
           </td>
         `;
@@ -973,7 +973,7 @@
     function renderPeakHours(hours) {
       const container = document.getElementById('peak-hours-chart');
       if (hours.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.875rem;">No historical booking traffic.</div>';
+        container.innerHTML = '<div style="color: var(--color-text-muted-on-dark); font-size: 0.875rem;">No historical booking traffic.</div>';
         return;
       }
 
@@ -988,11 +988,11 @@
         item.style.gap = '0.85rem';
         item.style.alignItems = 'center';
         item.innerHTML = `
-          <span style="font-size: 0.8rem; font-weight: 600; font-family: var(--font-mono, monospace); color: var(--text-muted);">${h.hour_slot}</span>
-          <div style="background: var(--bg-muted); height: 8px; border-radius: 4px; overflow: hidden;">
-            <div style="background: var(--primary-600); height: 100%; width: ${percent}%; border-radius: 4px;"></div>
+          <span style="font-size: 0.8rem; font-weight: 600; font-family: var(--font-mono, monospace); color: var(--color-text-muted-on-dark);">${h.hour_slot}</span>
+          <div style="background: var(--color-surface-elevated); height: 8px; border-radius: 4px; overflow: hidden;">
+            <div style="background: var(--color-brand); height: 100%; width: ${percent}%; border-radius: 4px;"></div>
           </div>
-          <span style="font-size: 0.8rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-main);">${h.booking_count}</span>
+          <span style="font-size: 0.8rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; color: var(--color-text-primary);">${h.booking_count}</span>
         `;
         container.appendChild(item);
       });
@@ -1007,7 +1007,7 @@
         document.getElementById('badge-pending-doc-count').textContent = list.length;
 
         if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem;"><div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;"><span style="color: var(--success);">' + icons.shieldCheck(32) + '</span><strong>All practitioner applications verified</strong><span style="font-size: 0.85rem;">Zero pending registrations awaiting council review.</span></div></td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted-on-dark); padding: 3rem;"><div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;"><span style="color: var(--success);">' + icons.shieldCheck(32) + '</span><strong>All practitioner applications verified</strong><span style="font-size: 0.85rem;">Zero pending registrations awaiting council review.</span></div></td></tr>';
           return;
         }
 
@@ -1021,20 +1021,20 @@
                   ${doc.name.replace('Dr. ', '').split(' ').map(w => w[0]).join('').slice(0, 2)}
                 </div>
                 <div>
-                  <strong style="font-size: 0.9rem; color: var(--text-main);">${doc.name}</strong>
-                  <div style="font-size: 0.775rem; color: var(--text-muted);">${doc.phone} • ${doc.email || 'No email'}</div>
+                  <strong style="font-size: 0.9rem; color: var(--color-text-primary);">${doc.name}</strong>
+                  <div style="font-size: 0.775rem; color: var(--color-text-muted-on-dark);">${doc.phone} • ${doc.email || 'No email'}</div>
                 </div>
               </div>
             </td>
             <td><span class="bmdc-badge">${doc.bmdc_reg_no}</span></td>
             <td>
               <span style="font-size: 0.85rem; font-weight: 600;">${doc.qualifications}</span>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">${doc.experience_years} years clinical exp.</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-muted-on-dark);">${doc.experience_years} years clinical exp.</div>
             </td>
-            <td><span class="badge" style="background: var(--bg-muted); color: var(--text-muted); font-size: 0.75rem;">${doc.specialty_name}</span></td>
+            <td><span class="badge" style="background: var(--color-surface-elevated); color: var(--color-text-muted-on-dark); font-size: 0.75rem;">${doc.specialty_name}</span></td>
             <td>
               <div style="font-weight: 600; font-size: 0.85rem;">${doc.hospital_name}</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">${doc.chamber_address}</div>
+              <div style="font-size: 0.75rem; color: var(--color-text-muted-on-dark);">${doc.chamber_address}</div>
             </td>
             <td><strong style="font-variant-numeric: tabular-nums;">৳ ${doc.consultation_fee}</strong></td>
             <td style="text-align: right; white-space: nowrap;">
@@ -1095,7 +1095,7 @@
 
     async function openBmdcModal(doctorId) {
       const content = document.getElementById('bmdc-modal-content');
-      content.innerHTML = '<div style="text-align:center; padding: 2.5rem; color: var(--text-muted);"><div class="spinner" style="margin: 0 auto 0.75rem;"></div><p style="font-size: 0.9rem;">Connecting to BMDC Official Registry Server...</p></div>';
+      content.innerHTML = '<div style="text-align:center; padding: 2.5rem; color: var(--color-text-muted-on-dark);"><div class="spinner" style="margin: 0 auto 0.75rem;"></div><p style="font-size: 0.9rem;">Connecting to BMDC Official Registry Server...</p></div>';
       bmdcModal.classList.add('active');
 
       try {
@@ -1112,7 +1112,7 @@
                 </div>
                 <div>
                   <h4 style="margin: 0; font-weight: 800; font-size: 1rem; color: ${isValid ? '#065f46' : '#991b1b'};">${v.councilStatusText}</h4>
-                  <span style="font-size: 0.775rem; color: var(--text-muted);">${v.accreditationCouncil}</span>
+                  <span style="font-size: 0.775rem; color: var(--color-text-muted-on-dark);">${v.accreditationCouncil}</span>
                 </div>
               </div>
               <span class="badge ${isValid ? 'badge-success' : 'badge-danger'}" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; font-weight: 700;">${v.status}</span>
@@ -1120,33 +1120,33 @@
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; font-size: 0.875rem;">
-            <div style="background: var(--bg-muted); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
-              <span style="display:block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Doctor Name</span>
-              <strong style="color: var(--text-main); font-size: 0.95rem;">${v.doctorName}</strong>
+            <div style="background: var(--color-surface-elevated); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+              <span style="display:block; font-size: 0.7rem; color: var(--color-text-muted-on-dark); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Doctor Name</span>
+              <strong style="color: var(--color-text-primary); font-size: 0.95rem;">${v.doctorName}</strong>
             </div>
-            <div style="background: var(--bg-muted); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
-              <span style="display:block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">BMDC Registration No.</span>
-              <strong style="color: var(--primary-700); font-family: var(--font-mono, monospace); font-size: 0.95rem;">${v.bmdcRegNo}</strong>
+            <div style="background: var(--color-surface-elevated); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+              <span style="display:block; font-size: 0.7rem; color: var(--color-text-muted-on-dark); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">BMDC Registration No.</span>
+              <strong style="color: var(--color-brand-strong); font-family: var(--font-mono, monospace); font-size: 0.95rem;">${v.bmdcRegNo}</strong>
             </div>
-            <div style="background: var(--bg-muted); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
-              <span style="display:block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Registration Type</span>
+            <div style="background: var(--color-surface-elevated); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+              <span style="display:block; font-size: 0.7rem; color: var(--color-text-muted-on-dark); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Registration Type</span>
               <span style="font-weight: 600;">${v.registrationType}</span>
             </div>
-            <div style="background: var(--bg-muted); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
-              <span style="display:block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Council Specialty</span>
+            <div style="background: var(--color-surface-elevated); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+              <span style="display:block; font-size: 0.7rem; color: var(--color-text-muted-on-dark); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Council Specialty</span>
               <span style="font-weight: 600;">${v.specialty}</span>
             </div>
-            <div style="background: var(--bg-muted); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
-              <span style="display:block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Accredited Degree</span>
+            <div style="background: var(--color-surface-elevated); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+              <span style="display:block; font-size: 0.7rem; color: var(--color-text-muted-on-dark); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Accredited Degree</span>
               <span style="font-weight: 600;">${v.degree}</span>
             </div>
-            <div style="background: var(--bg-muted); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
-              <span style="display:block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Disciplinary Standing</span>
+            <div style="background: var(--color-surface-elevated); padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+              <span style="display:block; font-size: 0.7rem; color: var(--color-text-muted-on-dark); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Disciplinary Standing</span>
               <span style="color: var(--success); font-weight: 700;">${v.disciplinaryActions}</span>
             </div>
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 1.25rem;">
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--color-border-subtle); padding-top: 1.25rem;">
             <button type="button" class="btn btn-secondary" onclick="document.getElementById('bmdc-modal').classList.remove('active')">Dismiss</button>
             <button type="button" class="btn btn-primary" id="confirm-bmdc-approve-btn">
               ${icons.check(14)} Certify & Approve Doctor
@@ -1183,7 +1183,7 @@
         const users = res.data;
 
         if (users.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No user accounts found matching selected role.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted-on-dark); padding: 2rem;">No user accounts found matching selected role.</td></tr>';
           return;
         }
 
@@ -1195,13 +1195,13 @@
             : `<span class="status-pill suspended"><span style="width: 5px; height: 5px; border-radius: 50%; background: #dc2626;"></span> Suspended</span>`;
 
           tr.innerHTML = `
-            <td><code style="font-size: 0.8rem; color: var(--text-muted);">#${u.id}</code></td>
+            <td><code style="font-size: 0.8rem; color: var(--color-text-muted-on-dark);">#${u.id}</code></td>
             <td>
-              <div style="font-weight: 700; color: var(--text-main);">${u.name}</div>
+              <div style="font-weight: 700; color: var(--color-text-primary);">${u.name}</div>
             </td>
             <td><span style="font-family: var(--font-mono, monospace); font-size: 0.85rem;">${u.phone}</span></td>
-            <td><span style="font-size: 0.85rem; color: var(--text-muted);">${u.email || '—'}</span></td>
-            <td><span class="badge" style="background: var(--bg-muted); color: var(--text-main); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">${u.role}</span></td>
+            <td><span style="font-size: 0.85rem; color: var(--color-text-muted-on-dark);">${u.email || '—'}</span></td>
+            <td><span class="badge" style="background: var(--color-surface-elevated); color: var(--color-text-primary); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">${u.role}</span></td>
             <td>${statusBadge}</td>
             <td style="text-align: right;">
               <button class="btn btn-secondary btn-sm toggle-user-btn" data-id="${u.id}" data-active="${u.is_active}">
@@ -1251,7 +1251,7 @@
           const specialtyIcon = icons.specialty(s.slug, 18, 'text-primary-600') || icons.stethoscope(18);
           tr.innerHTML = `
             <td style="width: 48px;">
-              <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--bg-muted); display: flex; align-items: center; justify-content: center;">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--color-surface-elevated); display: flex; align-items: center; justify-content: center;">
                 ${specialtyIcon}
               </div>
             </td>
@@ -1297,9 +1297,9 @@
           tr.innerHTML = `
             <td>
               <strong>${h.name_en}</strong>
-              <div style="font-size: 0.775rem; color: var(--text-muted); font-family: var(--font-bn);">${h.name_bn}</div>
+              <div style="font-size: 0.775rem; color: var(--color-text-muted-on-dark); font-family: var(--font-bn);">${h.name_bn}</div>
             </td>
-            <td><span class="badge" style="background: var(--bg-muted); font-size: 0.75rem;">${h.city}</span></td>
+            <td><span class="badge" style="background: var(--color-surface-elevated); font-size: 0.75rem;">${h.city}</span></td>
             <td><span style="font-family: var(--font-mono, monospace); font-size: 0.85rem;">${h.phone || '—'}</span></td>
             <td style="text-align: right;">
               <button class="btn btn-ghost btn-sm delete-hosp-btn" data-id="${h.id}" style="color: var(--danger);" title="Delete hospital">
@@ -1392,7 +1392,7 @@
         const logs = res.data;
 
         if (logs.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">No security audit events recorded yet.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-text-muted-on-dark); padding: 3rem;">No security audit events recorded yet.</td></tr>';
           return;
         }
 
@@ -1400,18 +1400,18 @@
         logs.forEach(l => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><small style="color: var(--text-muted); font-family: var(--font-mono, monospace); font-size: 0.775rem;">${l.created_at}</small></td>
+            <td><small style="color: var(--color-text-muted-on-dark); font-family: var(--font-mono, monospace); font-size: 0.775rem;">${l.created_at}</small></td>
             <td>
               <strong style="font-size: 0.875rem;">${l.user_name || 'System Operator'}</strong>
-              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">${l.user_role || 'ANON'}</div>
+              <div style="font-size: 0.72rem; color: var(--color-text-muted-on-dark); text-transform: uppercase; font-weight: 700;">${l.user_role || 'ANON'}</div>
             </td>
-            <td><code style="font-weight: 700; color: var(--primary-700); font-size: 0.8rem; background: var(--bg-muted); padding: 0.2rem 0.45rem; border-radius: 4px;">${l.action}</code></td>
-            <td><span style="font-weight: 600; font-size: 0.85rem;">${l.entity}</span> ${l.entity_id ? `<small style="color: var(--text-muted);">(#${l.entity_id})</small>` : ''}</td>
-            <td><small style="font-family: var(--font-mono, monospace); font-size: 0.8rem; color: var(--text-muted);">${l.ip_address || '127.0.0.1'}</small></td>
+            <td><code style="font-weight: 700; color: var(--color-brand-strong); font-size: 0.8rem; background: var(--color-surface-elevated); padding: 0.2rem 0.45rem; border-radius: 4px;">${l.action}</code></td>
+            <td><span style="font-weight: 600; font-size: 0.85rem;">${l.entity}</span> ${l.entity_id ? `<small style="color: var(--color-text-muted-on-dark);">(#${l.entity_id})</small>` : ''}</td>
+            <td><small style="font-family: var(--font-mono, monospace); font-size: 0.8rem; color: var(--color-text-muted-on-dark);">${l.ip_address || '127.0.0.1'}</small></td>
             <td>
               <details style="font-size: 0.75rem; max-width: 250px;">
-                <summary style="cursor: pointer; color: var(--primary-600); font-weight: 600;">Inspect JSON</summary>
-                <pre style="background: var(--bg-muted); padding: 0.4rem; border-radius: 4px; overflow-x: auto; margin-top: 0.25rem; font-family: var(--font-mono, monospace); font-size: 0.7rem;">${l.new_values || l.old_values || '{}'}</pre>
+                <summary style="cursor: pointer; color: var(--color-brand); font-weight: 600;">Inspect JSON</summary>
+                <pre style="background: var(--color-surface-elevated); padding: 0.4rem; border-radius: 4px; overflow-x: auto; margin-top: 0.25rem; font-family: var(--font-mono, monospace); font-size: 0.7rem;">${l.new_values || l.old_values || '{}'}</pre>
               </details>
             </td>
           `;

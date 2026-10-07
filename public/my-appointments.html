@@ -13,7 +13,7 @@
   <style>
     .appointment-card {
       background: var(--color-surface);
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md);
       padding: var(--space-5);
       display: grid;
@@ -42,7 +42,7 @@
       border-radius: var(--radius-full);
       overflow: hidden;
       margin-bottom: var(--space-2);
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-border-subtle);
     }
     .refund-segment {
       height: 100%;
@@ -55,7 +55,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.6875rem;
-      color: var(--color-ink-500);
+      color: var(--color-text-subtle);
       font-weight: 600;
     }
   </style>
@@ -65,16 +65,16 @@
 
   <div class="container" style="padding: var(--space-8) var(--space-4);">
     <!-- Page Header -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-5);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-5);">
       <div>
         <div class="live-status-strip" style="margin-bottom: var(--space-2);">
           <span class="status-dot-live"></span>
           <span>Patient Portal & Outpatient Journey</span>
         </div>
-        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-1);">
           My Appointments & Records
         </h1>
-        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem;">
+        <p style="color: var(--color-text-muted-on-dark); margin: 0; font-size: 0.9375rem;">
           Track live chamber queue positions, print verification slips, read digital prescriptions, or manage reschedule requests.
         </p>
       </div>
@@ -88,7 +88,7 @@
     <div id="live-queue-highlight" style="display: none; margin-bottom: var(--space-6);"></div>
 
     <!-- Tabs Navigation -->
-    <div style="display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-6); overflow-x: auto;">
+    <div style="display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border-subtle); margin-bottom: var(--space-6); overflow-x: auto;">
       <button id="tab-upcoming-btn" class="btn btn-sm btn-primary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
         Upcoming Visits (<span id="count-upcoming">0</span>)
       </button>
@@ -105,7 +105,7 @@
 
     <!-- Appointments Container -->
     <div id="appointments-container" style="display: flex; flex-direction: column; gap: var(--space-4);">
-      <div style="text-align: center; padding: var(--space-10); color: var(--color-ink-500);">Loading your appointments...</div>
+      <div style="text-align: center; padding: var(--space-10); color: var(--color-text-subtle);">Loading your appointments...</div>
     </div>
 
     <!-- Lab Reports Vault Container -->
@@ -120,7 +120,7 @@
         <button id="cancel-modal-close" class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
-        <div id="cancel-info-banner" style="background: var(--color-surface-subtle); padding: var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border); margin-bottom: var(--space-4); font-size: 0.875rem;">
+        <div id="cancel-info-banner" style="background: var(--color-surface-subtle); padding: var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border-subtle); margin-bottom: var(--space-4); font-size: 0.875rem;">
           <!-- Injected dynamically -->
         </div>
 
@@ -167,7 +167,7 @@
         <button id="reschedule-modal-close" class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
-        <p style="font-size: 0.8125rem; color: var(--color-ink-600); margin: 0 0 var(--space-4);">
+        <p style="font-size: 0.8125rem; color: var(--color-text-muted-on-dark); margin: 0 0 var(--space-4);">
           Select a new chamber date and open slot. Rescheduling is complimentary up to 6 hours before the booked consultation.
         </p>
 
@@ -177,7 +177,7 @@
         </div>
 
         <div id="reschedule-slots-container">
-          <div style="text-align: center; padding: var(--space-6); color: var(--color-ink-500); font-size: 0.875rem;">
+          <div style="text-align: center; padding: var(--space-6); color: var(--color-text-subtle); font-size: 0.875rem;">
             Select a date above to view open slots.
           </div>
         </div>
@@ -222,7 +222,7 @@
       </div>
       <div class="modal-body">
         <div style="text-align: center; margin-bottom: var(--space-4);">
-          <div style="font-size: 0.8125rem; color: var(--color-ink-500); margin-bottom: var(--space-2);">Your clinical experience rating:</div>
+          <div style="font-size: 0.8125rem; color: var(--color-text-subtle); margin-bottom: var(--space-2);">Your clinical experience rating:</div>
           <div id="star-rating-box" style="font-size: 2rem; cursor: pointer; color: #cbd5e1; user-select: none; display: flex; justify-content: center; gap: 0.35rem;">
             <span data-star="1">★</span>
             <span data-star="2">★</span>
@@ -396,8 +396,8 @@
             <div style="width: 52px; height: 52px; border-radius: var(--radius-full); background: var(--color-teal-50); color: var(--color-teal-700); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-3); border: 1px solid var(--color-teal-200);">
               ${icons.calendar(24)}
             </div>
-            <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-2);">No ${activeTab} visits found</h3>
-            <p style="color: var(--color-ink-600); max-width: 420px; margin: 0 auto var(--space-5); font-size: 0.875rem;">
+            <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 var(--space-2);">No ${activeTab} visits found</h3>
+            <p style="color: var(--color-text-muted-on-dark); max-width: 420px; margin: 0 auto var(--space-5); font-size: 0.875rem;">
               You do not have any ${activeTab} clinical appointments scheduled.
             </p>
             <a href="/doctors.html" class="btn btn-primary">Find a Doctor</a>
@@ -437,12 +437,12 @@
                 </span>
               </div>
 
-              <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">${apt.doctor_name}</h3>
+              <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 0.15rem;">${apt.doctor_name}</h3>
               <div style="color: var(--color-teal-700); font-weight: 600; font-size: 0.875rem;">
                 ${apt.specialty_name_en} — ${apt.hospital_name_en}
               </div>
 
-              <div style="display: flex; gap: var(--space-4); margin-top: var(--space-3); font-size: 0.8125rem; color: var(--color-ink-600); flex-wrap: wrap;">
+              <div style="display: flex; gap: var(--space-4); margin-top: var(--space-3); font-size: 0.8125rem; color: var(--color-text-muted-on-dark); flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 0.3rem;">
                   <span style="color: var(--color-teal-700);">${icons.calendar(14)}</span>
                   <span style="font-feature-settings: 'tnum';"><strong>${apt.date}</strong> at <strong>${apt.time}</strong></span>
@@ -457,14 +457,14 @@
                 </div>
               </div>
 
-              ${apt.reason_for_visit ? `<div style="font-size: 0.8125rem; color: var(--color-ink-500); margin-top: var(--space-2);">Reason: ${apt.reason_for_visit}</div>` : ''}
+              ${apt.reason_for_visit ? `<div style="font-size: 0.8125rem; color: var(--color-text-subtle); margin-top: var(--space-2);">Reason: ${apt.reason_for_visit}</div>` : ''}
 
               ${isUpcoming ? `
                 <!-- Live Queue Position Box -->
                 <div id="queue-box-${apt.id}" style="margin-top: var(--space-3); background: var(--color-surface-subtle); border: 1px dashed var(--color-teal-400); border-radius: var(--radius-sm); padding: var(--space-3); max-width: 520px;">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                      <span style="font-size: 0.6875rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase;">Live Chamber Queue</span>
+                      <span style="font-size: 0.6875rem; color: var(--color-text-subtle); font-weight: 700; text-transform: uppercase;">Live Chamber Queue</span>
                       <div id="queue-status-${apt.id}" style="font-size: 0.875rem; font-weight: 700; color: var(--color-teal-800); margin-top: 0.15rem;">
                         Checking queue position...
                       </div>
@@ -608,7 +608,7 @@
         const q = res.data;
         statusEl.innerHTML = `
           <span>${q.statusMessage}</span>
-          <span style="font-size: 0.75rem; color: var(--color-ink-500); display: block; margin-top: 0.15rem;">
+          <span style="font-size: 0.75rem; color: var(--color-text-subtle); display: block; margin-top: 0.15rem;">
             Serving: <strong>${q.currentServingSerial}</strong> • Your Serial: <strong>${q.serialBadge}</strong>
           </span>
         `;
@@ -695,14 +695,14 @@
 
     async function loadRescheduleSlots(dateStr) {
       const container = document.getElementById('reschedule-slots-container');
-      container.innerHTML = '<div style="text-align: center; padding: var(--space-4); color: var(--color-ink-500);">Loading available slots...</div>';
+      container.innerHTML = '<div style="text-align: center; padding: var(--space-4); color: var(--color-text-subtle);">Loading available slots...</div>';
 
       try {
         const res = await api.get(`/doctors/${activeReschedDocId}/slots?date=${dateStr}`);
         const availSlots = res.data.filter(s => s.effective_status === 'AVAILABLE');
 
         if (availSlots.length === 0) {
-          container.innerHTML = '<div style="text-align: center; padding: var(--space-6); color: var(--color-ink-500);">No available slots on this date.</div>';
+          container.innerHTML = '<div style="text-align: center; padding: var(--space-6); color: var(--color-text-subtle);">No available slots on this date.</div>';
           return;
         }
 
@@ -746,7 +746,7 @@
     async function openPrescriptionModal(aptId) {
       const modal = document.getElementById('prescription-modal');
       const body = document.getElementById('rx-modal-body');
-      body.innerHTML = '<div style="text-align: center; padding: var(--space-8); color: var(--color-ink-500);">Loading prescription...</div>';
+      body.innerHTML = '<div style="text-align: center; padding: var(--space-8); color: var(--color-text-subtle);">Loading prescription...</div>';
       modal.classList.add('show');
 
       try {
@@ -754,34 +754,34 @@
         const rx = res.data;
 
         body.innerHTML = `
-          <div style="border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-4); margin-bottom: var(--space-4);">
+          <div style="border-bottom: 1px solid var(--color-border-subtle); padding-bottom: var(--space-4); margin-bottom: var(--space-4);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
-                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">${rx.doctor_name}</h3>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin: 0 0 0.15rem;">${rx.doctor_name}</h3>
                 <div style="color: var(--color-teal-700); font-weight: 600; font-size: 0.875rem;">${rx.specialty_name_en}</div>
-                <div style="font-size: 0.8125rem; color: var(--color-ink-500);">${rx.doctor_qualifications} • BMDC: ${rx.bmdc_reg_no}</div>
+                <div style="font-size: 0.8125rem; color: var(--color-text-subtle);">${rx.doctor_qualifications} • BMDC: ${rx.bmdc_reg_no}</div>
               </div>
               <div style="text-align: right; font-size: 0.8125rem;">
                 <strong style="color: var(--color-ink-900);">${rx.hospital_name_en}</strong>
-                <div style="color: var(--color-ink-500); font-feature-settings: 'tnum';">${rx.appointment_date}</div>
+                <div style="color: var(--color-text-subtle); font-feature-settings: 'tnum';">${rx.appointment_date}</div>
               </div>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); font-size: 0.8125rem; background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); margin-bottom: var(--space-4); border: 1px solid var(--color-border);">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); font-size: 0.8125rem; background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); margin-bottom: var(--space-4); border: 1px solid var(--color-border-subtle);">
             <div>Patient: <strong style="color: var(--color-ink-900);">${rx.patient_name}</strong> (${rx.patient_gender}, ${rx.patient_age} yrs)</div>
             <div>Token Ref: <strong style="font-family: var(--font-mono);">${rx.appointment_number}</strong></div>
           </div>
 
           <div style="margin-bottom: var(--space-4);">
-            <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase;">Clinical Diagnosis:</div>
+            <div style="font-size: 0.75rem; color: var(--color-text-subtle); font-weight: 700; text-transform: uppercase;">Clinical Diagnosis:</div>
             <div style="font-size: 1rem; font-weight: 700; color: var(--color-teal-800);">${rx.diagnosis}</div>
-            ${rx.symptoms ? `<div style="font-size: 0.8125rem; color: var(--color-ink-600); margin-top: 0.25rem;">Symptoms: ${rx.symptoms}</div>` : ''}
+            ${rx.symptoms ? `<div style="font-size: 0.8125rem; color: var(--color-text-muted-on-dark); margin-top: 0.25rem;">Symptoms: ${rx.symptoms}</div>` : ''}
           </div>
 
           <!-- Rx Medication Table -->
           <div style="margin-bottom: var(--space-4);">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--color-ink-950); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.04em;">Medications Prescribed</div>
+            <div style="font-size: 0.875rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.04em;">Medications Prescribed</div>
             <div class="table-container">
               <table style="font-size: 0.8125rem;">
                 <thead>
@@ -809,7 +809,7 @@
           <!-- Diagnostic Tests -->
           ${rx.tests && rx.tests.length > 0 ? `
             <div style="margin-bottom: var(--space-4);">
-              <div style="font-size: 0.875rem; font-weight: 700; color: var(--color-ink-950); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.04em;">Diagnostic Investigations</div>
+              <div style="font-size: 0.875rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.04em;">Diagnostic Investigations</div>
               <ul style="padding-left: 1.25rem; font-size: 0.8125rem; color: var(--color-ink-700); margin: 0;">
                 ${rx.tests.map(t => `<li><strong>${t.test_name}</strong> ${t.notes ? `(${t.notes})` : ''}</li>`).join('')}
               </ul>
@@ -818,14 +818,14 @@
 
           <!-- Advice -->
           ${rx.advice ? `
-            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.8125rem; margin-bottom: var(--space-3);">
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border-subtle); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.8125rem; margin-bottom: var(--space-3);">
               <strong style="color: var(--color-ink-900);">Clinical Advice:</strong><br>
               <span style="color: var(--color-ink-700);">${rx.advice}</span>
             </div>
           ` : ''}
 
           ${rx.follow_up_date ? `
-            <div style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-600);">
+            <div style="font-size: 0.8125rem; font-weight: 600; color: var(--color-text-muted-on-dark);">
               Next Consultation Date: <strong style="color: var(--color-teal-800);">${rx.follow_up_date}</strong>
             </div>
           ` : ''}

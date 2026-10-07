@@ -22,7 +22,7 @@
       }
     }
     .payment-tile {
-      border: 1.5px solid var(--color-border);
+      border: 1.5px solid var(--color-border-subtle);
       border-radius: var(--radius-sm);
       padding: var(--space-4);
       background: var(--color-surface);
@@ -38,7 +38,7 @@
       background: var(--color-surface-subtle);
     }
     .payment-tile.selected {
-      border-color: var(--color-teal-700);
+      border-color: var(--color-brand);
       background: var(--color-surface);
       box-shadow: 0 0 0 2px rgba(13, 122, 113, 0.15);
     }
@@ -50,7 +50,7 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--color-teal-700);
+      background: var(--color-brand);
     }
   </style>
 </head>
@@ -80,7 +80,7 @@
     <div id="hold-banner" class="hold-banner" style="display: flex; flex-direction: column; gap: var(--space-2);">
       <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: var(--space-3);">
         <div style="display: flex; align-items: center; gap: var(--space-3);">
-          <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--color-teal-50); color: var(--color-teal-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--color-teal-50); color: var(--color-brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div>
@@ -106,7 +106,7 @@
 
         <form id="booking-form">
           <!-- Self vs Family Toggle -->
-          <div style="display: flex; gap: var(--space-6); margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+          <div style="display: flex; gap: var(--space-6); margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border-subtle);">
             <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-weight: 600; font-size: 0.875rem;">
               <input type="radio" name="patient_type" value="SELF" checked>
               <span data-i18n="book_for_self">Consulting For Myself</span>
@@ -216,7 +216,7 @@
       <!-- Right: Persistent Summary Card -->
       <aside style="position: sticky; top: 5.5rem;">
         <div class="card" style="padding: var(--space-5);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-subtle);">
             <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Consultation Summary</h3>
             <span class="badge badge-primary">Held Slot</span>
           </div>
@@ -227,12 +227,12 @@
               <div id="doc-summary-avatar"></div>
               <div>
                 <h4 id="doc-summary-name" style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">Loading Doctor...</h4>
-                <div id="doc-summary-specialty" style="color: var(--color-teal-700); font-weight: 600; font-size: 0.8125rem;">Specialist</div>
+                <div id="doc-summary-specialty" style="color: var(--color-brand); font-weight: 600; font-size: 0.8125rem;">Specialist</div>
                 <div id="doc-summary-chamber" style="font-size: 0.75rem; color: var(--color-ink-500); margin-top: 0.25rem;">Chamber</div>
               </div>
             </div>
 
-            <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--color-border-subtle); display: flex; justify-content: space-between; align-items: center;">
               <div>
                 <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 600; display: block;">Date</span>
                 <span id="slot-summary-date" style="font-weight: 700; font-size: 0.875rem; color: var(--color-ink-950); font-feature-settings: 'tnum';">Date</span>
@@ -245,7 +245,7 @@
           </div>
 
           <!-- Fee Breakdown Table -->
-          <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-3); margin-bottom: var(--space-4);">
+          <div style="border-top: 1px solid var(--color-border-subtle); padding-top: var(--space-3); margin-bottom: var(--space-4);">
             <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2); font-size: 0.8125rem;">
               <span style="color: var(--color-ink-600);" data-i18n="consultation_fee">Consultation Fee</span>
               <span id="breakdown-fee" style="font-weight: 600; font-feature-settings: 'tnum';">৳ 0</span>
@@ -254,14 +254,14 @@
               <span style="color: var(--color-ink-500);" data-i18n="vat_platform_fee">Platform Booking Fee</span>
               <span style="color: var(--color-success); font-weight: 600;">FREE (৳ 0)</span>
             </div>
-            <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--color-border); padding-top: var(--space-3); font-weight: 800; font-size: 1.125rem; color: var(--color-ink-950);">
+            <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--color-border-subtle); padding-top: var(--space-3); font-weight: 800; font-size: 1.125rem; color: var(--color-ink-950);">
               <span data-i18n="total_payable">Total Amount</span>
-              <span id="breakdown-total" style="color: var(--color-teal-700); font-feature-settings: 'tnum';">৳ 0</span>
+              <span id="breakdown-total" style="color: var(--color-brand); font-feature-settings: 'tnum';">৳ 0</span>
             </div>
           </div>
 
           <!-- Trust Guarantees -->
-          <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--color-border); font-size: 0.75rem; color: var(--color-ink-600); display: flex; flex-direction: column; gap: var(--space-2);">
+          <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--color-border-subtle); font-size: 0.75rem; color: var(--color-ink-600); display: flex; flex-direction: column; gap: var(--space-2);">
             <div style="display: flex; align-items: center; gap: 0.35rem;">
               <span style="color: var(--color-brand, #00984a); font-weight: bold;">✓</span>
               <span>100% BMDC Certified Medical Practitioner</span>
@@ -295,7 +295,7 @@
             <label class="form-label" style="font-size: 0.8125rem;">Wallet Mobile Number</label>
             <input type="tel" id="mfs-wallet" class="form-control" value="01712345678" placeholder="017xxxxxxxx">
           </div>
-          <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.75rem; margin-bottom: var(--space-4); color: var(--color-ink-600); border: 1px solid var(--color-border);">
+          <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.75rem; margin-bottom: var(--space-4); color: var(--color-ink-600); border: 1px solid var(--color-border-subtle);">
             <strong>Demo Sandbox:</strong> Any 11-digit wallet number accepted. OTP is <strong>123456</strong>, PIN is <strong>12345</strong>.
           </div>
           <button id="mfs-next-btn" class="btn btn-primary btn-block">Confirm Wallet & Send OTP</button>
@@ -324,7 +324,7 @@
   <div class="mobile-sticky-action-bar" id="mobile-booking-action-bar">
     <div>
       <div style="font-size: 0.72rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Total Payable</div>
-      <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-teal-700); font-feature-settings: 'tnum';" id="mobile-booking-total">৳ 0</div>
+      <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-brand); font-feature-settings: 'tnum';" id="mobile-booking-total">৳ 0</div>
     </div>
     <button id="mobile-confirm-btn" class="btn btn-primary" style="font-weight: 700; padding: 0.65rem 1.5rem;">
       <span>Confirm Booking</span>
