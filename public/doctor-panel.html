@@ -117,6 +117,9 @@
       <button id="tab-earnings-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
         Consultation Earnings & Reports
       </button>
+      <button id="tab-lab-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        🔬 Diagnostic Lab Vault
+      </button>
     </div>
 
     <!-- TAB 1: OPD QUEUE VIEW -->
@@ -257,6 +260,11 @@
         </div>
       </div>
     </div>
+
+    <!-- TAB 4: DIAGNOSTIC LAB VAULT VIEW -->
+    <div id="tab-lab-view" style="display: none;">
+      <div id="doctor-lab-vault-mount"></div>
+    </div>
   </div>
 
   <!-- MODAL: WRITE PRESCRIPTION -->
@@ -308,7 +316,10 @@
           <div style="margin-bottom: var(--space-5);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
               <label class="form-label" style="margin-bottom: 0; font-weight: 700; font-size: 0.9375rem; text-transform: uppercase; letter-spacing: 0.04em;">Diagnostic Lab Tests (Optional)</label>
-              <button type="button" id="add-test-row-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">+ Add Investigation</button>
+              <div style="display: flex; gap: var(--space-2);">
+                <button type="button" id="rx-view-patient-labs-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">🔬 Patient Lab History</button>
+                <button type="button" id="add-test-row-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">+ Add Investigation</button>
+              </div>
             </div>
 
             <div id="rx-tests-list">
@@ -348,6 +359,8 @@
     import { renderNavbar, renderFooter } from '/js/navbar.js';
     import { showToast } from '/js/toast.js';
     import { checkPrescriptionSafety } from '/js/drugSafety.js';
+    import { attachIcd10Autocomplete, calculateDoseUnits } from '/js/icd10.js';
+    import { renderLabReportsTab, openLabReportModal, getReportsForPatient } from '/js/labReports.js';
 
     renderNavbar();
     renderFooter();
@@ -364,12 +377,14 @@
 
     let currentQueue = [];
     let activeFilterStatus = '';
+    let activePrescriptionPatient = null;
 
     // Tab switching
     const tabs = {
       queue: { btn: document.getElementById('tab-queue-btn'), view: document.getElementById('tab-queue-view') },
       schedule: { btn: document.getElementById('tab-schedule-btn'), view: document.getElementById('tab-schedule-view') },
-      earnings: { btn: document.getElementById('tab-earnings-btn'), view: document.getElementById('tab-earnings-view') }
+      earnings: { btn: document.getElementById('tab-earnings-btn'), view: document.getElementById('tab-earnings-view') },
+      lab: { btn: document.getElementById('tab-lab-btn'), view: document.getElementById('tab-lab-view') }
     };
 
     function switchTab(activeKey) {
@@ -385,11 +400,13 @@
 
       if (activeKey === 'schedule') loadScheduleData();
       if (activeKey === 'earnings') loadEarningsData();
+      if (activeKey === 'lab') renderLabReportsTab(document.getElementById('doctor-lab-vault-mount'), user);
     }
 
     tabs.queue.btn.addEventListener('click', () => switchTab('queue'));
     tabs.schedule.btn.addEventListener('click', () => switchTab('schedule'));
     tabs.earnings.btn.addEventListener('click', () => switchTab('earnings'));
+    tabs.lab.btn.addEventListener('click', () => switchTab('lab'));
 
     // --- TAB 1: QUEUE MANAGEMENT ---
     async function loadQueue() {
@@ -596,6 +613,7 @@
 
     // --- PRESCRIPTION WRITER MODAL ---
     function openPrescriptionModal(patient) {
+      activePrescriptionPatient = patient;
       document.getElementById('rx-appointment-id').value = patient.id;
       document.getElementById('rx-patient-header').textContent = `Patient: ${patient.name} (${patient.age} yrs, ${patient.gender}) • Chief Complaint: ${patient.complaint || 'N/A'}`;
       document.getElementById('rx-diagnosis').value = '';
@@ -613,6 +631,16 @@
 
       document.getElementById('prescription-modal').classList.add('show');
     }
+
+    document.getElementById('rx-view-patient-labs-btn')?.addEventListener('click', () => {
+      const phone = activePrescriptionPatient?.phone;
+      const reports = getReportsForPatient(phone);
+      if (reports.length > 0) {
+        openLabReportModal(reports[0].id);
+      } else {
+        showToast('No lab investigations on file for this patient.', 'info');
+      }
+    });
 
     function runSafetyAudit() {
       const medInputs = document.querySelectorAll('#rx-medicines-list .med-name');
@@ -648,13 +676,34 @@
       const list = document.getElementById('rx-medicines-list');
       const row = document.createElement('div');
       row.className = 'med-row';
+      row.style.display = 'grid';
+      row.style.gridTemplateColumns = '2fr 1.1fr 1.2fr 1.4fr auto';
+      row.style.gap = 'var(--space-2)';
+      row.style.marginBottom = 'var(--space-2)';
+      row.style.alignItems = 'center';
       row.innerHTML = `
         <input type="text" class="form-control med-name" placeholder="Medicine brand / generic" value="${name}" required style="font-size: 0.8125rem;">
         <input type="text" class="form-control med-dose" placeholder="1+0+1" value="${dosage}" required style="font-size: 0.8125rem;">
         <input type="text" class="form-control med-inst" placeholder="Instruction" value="${instruction}" required style="font-size: 0.8125rem;">
-        <input type="text" class="form-control med-dur" placeholder="Duration" value="${duration}" required style="font-size: 0.8125rem;">
+        <div style="display: flex; gap: 4px; align-items: center;">
+          <input type="text" class="form-control med-dur" placeholder="7 days" value="${duration}" required style="font-size: 0.8125rem; min-width: 65px;">
+          <span class="dose-calc-badge" style="font-size: 0.6875rem; color: var(--color-teal-700); font-weight: 700; white-space: nowrap; background: var(--color-teal-50); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--color-teal-200);">--</span>
+        </div>
         <button type="button" class="btn btn-secondary btn-sm remove-med-btn" style="color: var(--color-danger); padding: 0.25rem 0.5rem;">&times;</button>
       `;
+
+      const doseInp = row.querySelector('.med-dose');
+      const durInp = row.querySelector('.med-dur');
+      const badge = row.querySelector('.dose-calc-badge');
+
+      function updateCalc() {
+        const units = calculateDoseUnits(doseInp.value, durInp.value);
+        badge.textContent = units > 0 ? `${units} units` : '--';
+      }
+
+      doseInp.addEventListener('input', updateCalc);
+      durInp.addEventListener('input', updateCalc);
+      updateCalc();
 
       row.querySelector('.med-name').addEventListener('input', runSafetyAudit);
 
@@ -670,6 +719,9 @@
       list.appendChild(row);
       runSafetyAudit();
     }
+
+    // Attach ICD-10 diagnostic search autocomplete
+    attachIcd10Autocomplete(document.getElementById('rx-diagnosis'));
 
     function addTestRow(testName = '', notes = '') {
       const list = document.getElementById('rx-tests-list');

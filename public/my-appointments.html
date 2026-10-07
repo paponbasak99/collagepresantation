@@ -98,12 +98,18 @@
       <button id="tab-cancelled-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
         Cancelled Visits (<span id="count-cancelled">0</span>)
       </button>
+      <button id="tab-reports-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        🔬 Diagnostic Lab Vault (<span id="count-reports">0</span>)
+      </button>
     </div>
 
     <!-- Appointments Container -->
     <div id="appointments-container" style="display: flex; flex-direction: column; gap: var(--space-4);">
       <div style="text-align: center; padding: var(--space-10); color: var(--color-ink-500);">Loading your appointments...</div>
     </div>
+
+    <!-- Lab Reports Vault Container -->
+    <div id="lab-reports-container" style="display: none;"></div>
   </div>
 
   <!-- Cancellation Modal with Visual 3-Segment Refund Bar -->
@@ -244,6 +250,7 @@
     import { renderNavbar, renderFooter } from '/js/navbar.js';
     import { showToast } from '/js/toast.js';
     import { icons, renderDoctorAvatar } from '/js/icons.js';
+    import { renderLabReportsTab, getReportsForPatient } from '/js/labReports.js';
 
     renderNavbar();
     renderFooter();
@@ -269,6 +276,7 @@
         document.getElementById('count-upcoming').textContent = upcoming.length;
         document.getElementById('count-completed').textContent = completed.length;
         document.getElementById('count-cancelled').textContent = cancelled.length;
+        document.getElementById('count-reports').textContent = getReportsForPatient(user?.phone).length;
 
         // If today has active upcoming appointment, display live queue highlight widget
         renderLiveQueueHighlight(upcoming);
@@ -520,18 +528,29 @@
     document.getElementById('tab-upcoming-btn').addEventListener('click', () => switchTab('upcoming'));
     document.getElementById('tab-completed-btn').addEventListener('click', () => switchTab('completed'));
     document.getElementById('tab-cancelled-btn').addEventListener('click', () => switchTab('cancelled'));
+    document.getElementById('tab-reports-btn').addEventListener('click', () => switchTab('reports'));
 
     function switchTab(tab) {
       activeTab = tab;
-      ['upcoming', 'completed', 'cancelled'].forEach(t => {
+      ['upcoming', 'completed', 'cancelled', 'reports'].forEach(t => {
         const btn = document.getElementById(`tab-${t}-btn`);
-        if (t === tab) {
-          btn.className = 'btn btn-sm btn-primary';
-        } else {
-          btn.className = 'btn btn-sm btn-secondary';
+        if (btn) {
+          btn.className = (t === tab) ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
         }
       });
-      renderAppointmentsList();
+
+      const aptContainer = document.getElementById('appointments-container');
+      const repContainer = document.getElementById('lab-reports-container');
+
+      if (tab === 'reports') {
+        aptContainer.style.display = 'none';
+        repContainer.style.display = 'block';
+        renderLabReportsTab(repContainer, user);
+      } else {
+        repContainer.style.display = 'none';
+        aptContainer.style.display = 'flex';
+        renderAppointmentsList();
+      }
     }
 
     function attachActionHandlers() {

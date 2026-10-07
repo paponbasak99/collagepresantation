@@ -6,8 +6,10 @@ import { toggleFontSize } from './accessibility.js';
 import { showToast } from './toast.js';
 import { icons } from './icons.js';
 import { initAllAnimations, initScrollReveals } from './animations.js';
+import { renderDemoBar } from './demoMode.js';
 
 export function renderNavbar() {
+  renderDemoBar();
   const navContainer = document.getElementById('navbar-mount');
   if (!navContainer) return;
 
@@ -671,4 +673,82 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(link);
   }
 });
+
+// PWA Install Prompt Handler & Non-intrusive Banner
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showPwaInstallBanner();
+});
+
+export function showPwaInstallBanner() {
+  if (localStorage.getItem('docbook_pwa_dismissed') === 'true') return;
+  if (document.getElementById('pwa-install-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'pwa-install-banner';
+  banner.style.cssText = `
+    position: fixed;
+    bottom: 24px;
+    left: 20px;
+    right: 20px;
+    max-width: 440px;
+    margin: 0 auto;
+    background: var(--color-surface, #ffffff);
+    color: var(--color-ink-950, #0f172a);
+    border: 1.5px solid var(--color-teal-700, #0d9488);
+    border-radius: var(--radius-md, 12px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.22);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    z-index: 9998;
+    backdrop-filter: blur(12px);
+  `;
+
+  banner.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="width: 38px; height: 38px; border-radius: 10px; background: var(--color-teal-50, #f0fdfa); border: 1px solid var(--color-teal-200, #99f6e4); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        🩺
+      </div>
+      <div>
+        <div style="font-size: 0.8125rem; font-weight: 700; color: var(--color-ink-950, #0f172a); line-height: 1.2;">Install DocBook App</div>
+        <div style="font-size: 0.72rem; color: var(--color-ink-600, #64748b);">Instant chamber queue tokens & offline prescriptions</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <button id="pwa-install-action-btn" class="btn btn-primary btn-sm" style="font-size: 0.75rem; padding: 5px 12px; white-space: nowrap;">
+        Install
+      </button>
+      <button id="pwa-dismiss-action-btn" style="background: none; border: none; font-size: 1.25rem; color: var(--color-ink-400, #94a3b8); cursor: pointer; padding: 2px 6px;" title="Dismiss">
+        &times;
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(banner);
+
+  banner.querySelector('#pwa-install-action-btn')?.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice && choice.outcome === 'accepted') {
+        showToast('DocBook App successfully installed!', 'success');
+      }
+      deferredInstallPrompt = null;
+    } else {
+      showToast('DocBook App ready to add to your Home Screen!', 'info');
+    }
+    banner.remove();
+  });
+
+  banner.querySelector('#pwa-dismiss-action-btn')?.addEventListener('click', () => {
+    localStorage.setItem('docbook_pwa_dismissed', 'true');
+    banner.remove();
+  });
+}
 
