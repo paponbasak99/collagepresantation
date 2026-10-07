@@ -6,6 +6,7 @@
   <title>Admin Executive Dashboard & Operations — DocBook</title>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/3d.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/js/tailwind-config.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
@@ -354,16 +355,23 @@
       <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
         <!-- Daily Consultations Chart -->
         <div class="chart-panel">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
               <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-main);">Daily Consultation Volume (Past 14 Days)</h3>
               <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Total booked consultations across all hospital chambers</p>
             </div>
-            <span class="badge" style="background: var(--bg-muted); color: var(--text-muted); font-size: 0.75rem; font-weight: 600;">Interactive SVG</span>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; font-size: 0.75rem;">
+                <button type="button" id="chart-mode-2d-btn" class="btn btn-sm btn-primary" style="padding: 0.25rem 0.6rem; border-radius: 0; font-size: 0.75rem;">2D View</button>
+                <button type="button" id="chart-mode-3d-btn" class="btn btn-sm btn-secondary" style="padding: 0.25rem 0.6rem; border-radius: 0; font-size: 0.75rem;">✨ 3D Orbit</button>
+              </div>
+              <span class="badge" style="background: var(--bg-muted); color: var(--text-muted); font-size: 0.75rem; font-weight: 600;">Analytics</span>
+            </div>
           </div>
           <div id="daily-chart-mount" style="width: 100%; height: 230px; position: relative;">
             <!-- Rendered via JS SVG -->
           </div>
+          <div id="daily-chart-3d-mount" style="width: 100%; height: 230px; position: relative; display: none;"></div>
         </div>
 
         <!-- Revenue by Payment Method -->
@@ -890,6 +898,38 @@
 
       svgHtml += `</svg>`;
       mount.innerHTML = svgHtml;
+
+      // Wire 2D / 3D Chart Toggle
+      let admin3dCtx = null;
+      const btn2d = document.getElementById('chart-mode-2d-btn');
+      const btn3d = document.getElementById('chart-mode-3d-btn');
+      const mount2d = document.getElementById('daily-chart-mount');
+      const mount3d = document.getElementById('daily-chart-3d-mount');
+
+      if (btn2d && btn3d && !btn2d._wired) {
+        btn2d._wired = true;
+        btn2d.addEventListener('click', () => {
+          btn2d.className = 'btn btn-sm btn-primary';
+          btn3d.className = 'btn btn-sm btn-secondary';
+          mount3d.style.display = 'none';
+          mount2d.style.display = 'block';
+        });
+
+        btn3d.addEventListener('click', async () => {
+          btn3d.className = 'btn btn-sm btn-primary';
+          btn2d.className = 'btn btn-sm btn-secondary';
+          mount2d.style.display = 'none';
+          mount3d.style.display = 'block';
+          if (!admin3dCtx) {
+            try {
+              const { initAdmin3DChart } = await import('/js/3d/admin-scene.js');
+              admin3dCtx = await initAdmin3DChart(mount3d, days.map(d => ({ count: d.total_appointments })));
+            } catch (e) {
+              console.warn('Failed to initialize 3D admin chart:', e);
+            }
+          }
+        });
+      }
     }
 
     function renderRevenueByMethod(methods) {
@@ -1418,5 +1458,6 @@
     // Initial load
     loadDashboardData();
   </script>
+  <script type="module" src="/js/3d/core.js"></script>
 </body>
 </html>

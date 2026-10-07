@@ -7,6 +7,7 @@
   <meta name="description" content="View verified credentials, weekly chamber hours, patient reviews, and book an appointment slot with atomic 5-minute reservation.">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/3d.css">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/js/tailwind-config.js"></script>
@@ -459,6 +460,7 @@
         sectionsHtml += renderSection('Evening Shift', icons.moon(14, 'text-teal'), evening);
 
         container.innerHTML += sectionsHtml;
+        import('/js/3d/slot-scene.js').then(m => m.enhanceSlotsWith3DKeys(container)).catch(() => {});
 
         // Attach slot click listener to trigger atomic 5-minute hold!
         container.querySelectorAll('.slot-btn:not([disabled])').forEach(btn => {
@@ -531,5 +533,6 @@
 
     loadDoctorProfile();
   </script>
+  <script type="module" src="/js/3d/core.js"></script>
 </body>
 </html>

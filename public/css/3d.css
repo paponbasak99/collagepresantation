@@ -1,0 +1,278 @@
+/* ==========================================================================
+   DocBook 3D Clinical Design Tokens & CSS 3D Spatial Styles (3d.css)
+   Art Direction: "Apple product page meets modern medical-tech"
+   ========================================================================== */
+
+:root {
+  /* Z-Depth Spatial Tokens */
+  --depth-recessed: -20px;
+  --depth-surface: 0px;
+  --depth-low: 12px;
+  --depth-mid: 28px;
+  --depth-high: 56px;
+  --depth-floating: 80px;
+
+  /* Global Lighting Direction: Key light from Top-Left */
+  --light-azimuth: 135deg;
+  --shadow-key: 0 12px 32px -4px rgba(15, 23, 42, 0.08);
+  --shadow-contact: 0 4px 12px rgba(15, 23, 42, 0.04);
+  --specular-color: rgba(255, 255, 255, 0.45);
+
+  /* Camera Perspectives */
+  --perspective-default: 1200px;
+  --perspective-dramatic: 800px;
+}
+
+[data-theme="midnight"] {
+  --specular-color: rgba(45, 212, 191, 0.15);
+  --shadow-key: 0 16px 40px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Perspective & 3D Rendering Contexts */
+.perspective-container {
+  perspective: var(--perspective-default);
+  transform-style: preserve-3d;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* 3D Scrim Overlay to guarantee WCAG AA text contrast over WebGL canvases */
+.canvas-scrim-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 75% 40%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.85) 100%);
+  z-index: 1;
+}
+
+[data-theme="midnight"] .canvas-scrim-layer {
+  background: radial-gradient(circle at 75% 40%, rgba(7, 11, 20, 0) 30%, rgba(7, 11, 20, 0.88) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   1. CSS 3D Tilt Cards (Specialties & Doctor Cards)
+   -------------------------------------------------------------------------- */
+.tilt-card-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+.tilt-card-3d .tilt-layer-base {
+  transform: translateZ(var(--depth-surface));
+}
+
+.tilt-card-3d .tilt-layer-mid {
+  transform: translateZ(var(--depth-low));
+  transition: transform 0.2s ease;
+}
+
+.tilt-card-3d .tilt-layer-high {
+  transform: translateZ(var(--depth-mid));
+  transition: transform 0.25s ease;
+}
+
+.tilt-card-3d:hover {
+  box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.14),
+              0 0 0 1px rgba(13, 148, 136, 0.25);
+}
+
+.tilt-card-3d:hover .tilt-layer-mid {
+  transform: translateZ(calc(var(--depth-low) + 8px));
+}
+
+.tilt-card-3d:hover .tilt-layer-high {
+  transform: translateZ(calc(var(--depth-mid) + 16px));
+}
+
+/* Specular Light Glide Effect */
+.tilt-specular-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 260px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    var(--specular-color),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.tilt-card-3d:hover .tilt-specular-shine {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   2. Tactile 3D Slot Keycaps (Slot Picker)
+   -------------------------------------------------------------------------- */
+.slot-key-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.12s cubic-bezier(0.3, 0, 0, 1),
+              box-shadow 0.12s ease,
+              background-color 0.15s ease,
+              border-color 0.15s ease;
+  box-shadow: 0 4px 0 0 #cbd5e1, 0 6px 14px rgba(15, 23, 42, 0.08);
+  transform: translateY(0);
+  cursor: pointer;
+}
+
+[data-theme="midnight"] .slot-key-3d {
+  box-shadow: 0 4px 0 0 #1e293b, 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+.slot-key-3d:hover:not(.locked):not(.booked) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 #cbd5e1, 0 3px 8px rgba(15, 23, 42, 0.06);
+}
+
+.slot-key-3d.selected {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #0d9488, 0 2px 8px rgba(13, 148, 136, 0.35);
+  background-color: var(--color-teal-700) !important;
+  color: #ffffff !important;
+  border-color: var(--color-teal-800) !important;
+}
+
+.slot-key-3d.locked {
+  transform: rotateX(6deg) translateY(2px);
+  box-shadow: 0 2px 0 0 #f59e0b, 0 4px 10px rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b !important;
+}
+
+.slot-key-3d.booked {
+  transform: translateY(4px);
+  box-shadow: none !important;
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.85);
+}
+
+/* Slot cascade flip-up on date change */
+@keyframes slotKeyFlipUp {
+  0% {
+    opacity: 0;
+    transform: perspective(600px) rotateX(-35deg) translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(600px) rotateX(0deg) translateY(0);
+  }
+}
+
+.slot-cascade-enter {
+  animation: slotKeyFlipUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --------------------------------------------------------------------------
+   3. Physical Ticket Slide Reveal (Appointment Slip)
+   -------------------------------------------------------------------------- */
+@keyframes slipPhysicalDispense {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) translateY(-50px) rotateX(15deg) scale(0.96);
+  }
+  70% {
+    opacity: 1;
+    transform: perspective(1000px) translateY(8px) rotateX(-4deg) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) translateY(0) rotateX(0) scale(1);
+  }
+}
+
+.slip-3d-reveal {
+  animation: slipPhysicalDispense 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform-style: preserve-3d;
+}
+
+/* --------------------------------------------------------------------------
+   4. Tactile 3D Queue Token Stack (OPD Turn Badge)
+   -------------------------------------------------------------------------- */
+.queue-token-stack-3d {
+  position: relative;
+  display: inline-block;
+  transform-style: preserve-3d;
+}
+
+.queue-token-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+  transform: translateZ(var(--depth-surface));
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+   5. Verification 3D Stamp Press Impact
+   -------------------------------------------------------------------------- */
+@keyframes stamp3DPress {
+  0% {
+    opacity: 0;
+    transform: perspective(600px) scale(2.4) translateZ(80px) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: perspective(600px) scale(0.92) translateZ(0) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(600px) scale(1) translateZ(10px) rotate(0deg);
+  }
+}
+
+.stamp-3d-press {
+  animation: stamp3DPress 0.55s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  box-shadow: 0 12px 30px rgba(13, 148, 136, 0.28);
+}
+
+.stamp-3d-cracked {
+  animation: stamp3DPress 0.55s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.28);
+  filter: drop-shadow(0 4px 8px rgba(220, 38, 38, 0.3));
+}
+
+/* --------------------------------------------------------------------------
+   5. Reduced Effects & Accessibility Overrides
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .tilt-card-3d,
+  .slot-key-3d,
+  .slip-3d-reveal,
+  .slot-cascade-enter {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .canvas-scrim-layer {
+    display: none;
+  }
+}
+
+html.reduce-effects .tilt-card-3d,
+html.reduce-effects .slot-key-3d,
+html.reduce-effects .slip-3d-reveal,
+html.reduce-effects .slot-cascade-enter {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+html.reduce-effects canvas[data-canvas-3d] {
+  display: none !important;
+}
+
+html.reduce-effects .canvas-scrim-layer {
+  display: none !important;
+}

@@ -155,6 +155,11 @@ export function renderNavbar() {
             <span class="theme-toggle-icon">${theme === 'dark' ? icons.sun(16) : icons.moon(16)}</span>
           </button>
 
+          <!-- Reduce 3D Effects Toggle -->
+          <button id="reduce-effects-btn" class="btn btn-secondary btn-sm" aria-label="Toggle 3D Effects" title="Toggle 3D & Motion Effects" style="font-size: 0.75rem; padding: 0.35rem 0.55rem; font-weight: 700;">
+            <span>${localStorage.getItem('docbook_reduce_motion') === 'true' ? '⚡ Flat' : '✨ 3D'}</span>
+          </button>
+
           <!-- User Menu -->
           ${user ? `
             <div class="user-menu">
@@ -298,6 +303,21 @@ export function renderNavbar() {
   document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
     toggleTheme();
     renderNavbar();
+  });
+
+  document.getElementById('reduce-effects-btn')?.addEventListener('click', () => {
+    const isReduced = localStorage.getItem('docbook_reduce_motion') === 'true';
+    const nextState = !isReduced;
+    localStorage.setItem('docbook_reduce_motion', nextState ? 'true' : 'false');
+    if (nextState) {
+      document.documentElement.classList.add('reduce-effects');
+      showToast('3D effects reduced for performance/comfort.', 'info');
+    } else {
+      document.documentElement.classList.remove('reduce-effects');
+      showToast('Full 3D effects enabled.', 'success');
+    }
+    renderNavbar();
+    window.dispatchEvent(new CustomEvent('docbook:reduce-effects-changed', { detail: { enabled: nextState } }));
   });
 
   // Desktop Palette Dropdown Handlers
@@ -656,6 +676,10 @@ export function renderFooter() {
 
 // Auto render on load
 document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('docbook_reduce_motion') === 'true') {
+    document.documentElement.classList.add('reduce-effects');
+  }
+
   renderNavbar();
   renderFooter();
   initAllAnimations();

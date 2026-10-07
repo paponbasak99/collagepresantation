@@ -6,6 +6,7 @@
   <title>Verify Clinical Appointment Record — DocBook</title>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/3d.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/js/tailwind-config.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
@@ -277,17 +278,21 @@
           document.getElementById('v-payment').textContent = `${d.payment_status || 'UNPAID'} (৳${d.fee_amount})`;
 
           success.style.display = 'block';
+          success.querySelector('.shield-icon-wrap')?.classList.add('stamp-3d-press');
         } else {
           error.style.display = 'block';
+          error.querySelector('.shield-icon-wrap')?.classList.add('stamp-3d-cracked');
         }
       } catch (err) {
         loading.style.display = 'none';
         error.style.display = 'block';
+        error.querySelector('.shield-icon-wrap')?.classList.add('stamp-3d-cracked');
         document.getElementById('error-message').textContent = err.message || 'Appointment record verification failed.';
       }
     }
 
     verifySlip();
   </script>
+  <script type="module" src="/js/3d/core.js"></script>
 </body>
 </html>

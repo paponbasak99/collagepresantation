@@ -6,6 +6,7 @@
   <title>404 — Clinical Record Not Found — DocBook</title>
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/3d.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/js/tailwind-config.js"></script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
@@ -66,8 +67,19 @@
 
   <main class="not-found-wrap">
     <div class="not-found-card">
-      <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: var(--primary-50); color: var(--primary-700); margin-bottom: 1.25rem;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      <!-- 3D Cardiac Flatline Monitor Strip -->
+      <div style="width: 100%; max-width: 380px; height: 72px; margin: 0 auto 1.5rem; background: #070b14; border: 1.5px solid #1e293b; border-radius: 8px; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.35);">
+        <!-- ECG Grid Lines -->
+        <div style="position: absolute; inset: 0; background-size: 16px 16px; background-image: linear-gradient(to right, rgba(13, 148, 136, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(13, 148, 136, 0.08) 1px, transparent 1px);"></div>
+        <!-- Pulse to Flatline SVG Waveform -->
+        <svg viewBox="0 0 400 72" style="width: 100%; height: 100%; position: relative; z-index: 2;">
+          <path d="M 0 36 L 60 36 L 75 16 L 90 56 L 105 8 L 120 46 L 135 36 L 160 36 L 175 18 L 190 54 L 205 12 L 215 42 L 225 36 L 400 36" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="225" cy="36" r="4" fill="#ef4444">
+            <animate attributeName="cx" values="225;400" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="1;0.2" dur="2s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+        <span style="position: absolute; bottom: 4px; right: 8px; font-family: monospace; font-size: 0.65rem; color: #ef4444; font-weight: 700; z-index: 3;">⚡ ASYSTOLE / 0 BPM</span>
       </div>
 
       <div style="font-family: var(--font-mono, monospace); font-weight: 700; color: var(--primary-700); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem;">
