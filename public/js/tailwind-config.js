@@ -18,6 +18,17 @@ if (typeof tailwind !== 'undefined') {
             900: '#064e47',
             950: '#042f2c'
           },
+          primary: {
+            DEFAULT: 'var(--color-teal-700)',
+            50: 'var(--color-teal-50)',
+            100: 'var(--color-teal-100)',
+            200: 'var(--color-teal-200)',
+            500: 'var(--color-teal-500)',
+            600: 'var(--color-teal-600)',
+            700: 'var(--color-teal-700)',
+            800: 'var(--color-teal-800)',
+            900: 'var(--color-teal-900)'
+          },
           cyan: {
             50: '#f0f9ff',
             100: '#e0f2fe',

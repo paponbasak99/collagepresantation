@@ -11,13 +11,19 @@
 
 DocBook is redesigned to feel like an authoritative, funded, hand-crafted healthcare platform built specifically for Bangladesh. It departs completely from generic "startup-in-a-box" templates.
 
-### The Palette
-We anchor the brand in a disciplined triadic palette:
+### The Dynamic Palette System (Teal, Sapphire, Midnight, Violet)
+DocBook supports 4 distinct clinical color themes switchable at runtime via the navbar palette dropdown, plus bi-directional Light & Dark modes:
 1. **Primary Anchor (Clinical Deep Teal):**  
    - Light: `--color-teal-700` (`#0d7a71`) and `--color-teal-800` (`#0a5c55`)
    - Dark: `--color-teal-400` (`#2dd4bf`) and `--color-teal-500` (`#14b8a6`)
    Provides medical authority without feeling cold or clinical.
-2. **Atmospheric Canvas (Warm Off-White / Natural Stone):**  
+2. **Royal Sapphire Blue (`sapphire`):**
+   - High-trust institutional hospital blue (`#1d4ed8` / `#2563eb`) with ice sky accents (`#0284c7` / `#38bdf8`).
+3. **Neon Mint & Midnight (`midnight`):**
+   - Sleek dark-first health-tech with radiant emerald (`#047857` / `#059669`) and neon mint accents (`#10b981` / `#34d399`).
+4. **Violet Health-Tech (`violet`):**
+   - Deep indigo (`#4f46e5` / `#6366f1`) and cosmic violet (`#7c3aed` / `#9333ea`) for modern digital health and AI triage.
+5. **Atmospheric Canvas (Warm Off-White / Natural Stone):**  
    - Light: `--color-canvas` (`#faf8f5`), `--color-surface` (`#ffffff`), `--color-subtle` (`#f4f1ea`)
    - Dark: `--color-canvas-dark` (`#0e1217`), `--color-surface-dark` (`#151a22`), `--color-subtle-dark` (`#1c222c`)
    Replaces harsh blue-gray backgrounds with warm, tactile paper-like warmth that softens long clinical reading sessions.

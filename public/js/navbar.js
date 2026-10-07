@@ -1,7 +1,7 @@
 // DocBook Universal Header & Navbar Component — Redesign v2.0
 import { getCurrentUser, clearSession } from './api.js';
 import { getLang, setLang, t, applyTranslations } from './i18n.js';
-import { getTheme, toggleTheme } from './theme.js';
+import { getTheme, toggleTheme, getPalette, setPalette, PALETTES } from './theme.js';
 import { toggleFontSize } from './accessibility.js';
 import { showToast } from './toast.js';
 import { icons } from './icons.js';
@@ -14,6 +14,8 @@ export function renderNavbar() {
   const user = getCurrentUser();
   const lang = getLang();
   const theme = getTheme();
+  const currentPalette = getPalette();
+  const currentPaletteObj = PALETTES.find(p => p.id === currentPalette) || PALETTES[0];
 
   // Role specific links
   let roleLinks = '';
@@ -123,6 +125,29 @@ export function renderNavbar() {
             <span id="current-lang-text" style="font-weight: 700;">${lang === 'en' ? 'বাং' : 'EN'}</span>
           </button>
 
+          <!-- Dynamic Color Palette Picker -->
+          <div class="theme-picker-container">
+            <button id="palette-dropdown-btn" class="btn btn-secondary btn-sm" aria-label="Select Color Palette" title="Select Color Theme" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.375rem 0.65rem;">
+              <span id="active-palette-dot" class="palette-color-preview" style="background: linear-gradient(135deg, ${currentPaletteObj.primary}, ${currentPaletteObj.accent});"></span>
+              <span style="font-size: 0.8rem; line-height: 1;">${currentPaletteObj.emoji}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div id="palette-dropdown-menu" class="theme-picker-menu">
+              <div style="font-size: 0.6875rem; font-weight: 700; color: var(--color-ink-500); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.25rem 0.5rem 0.15rem;">
+                Select Color Palette
+              </div>
+              ${PALETTES.map(p => `
+                <button type="button" class="palette-option-btn ${p.id === currentPalette ? 'active' : ''}" data-palette-id="${p.id}">
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1rem;">${p.emoji}</span>
+                    <span style="font-size: 0.8125rem;">${lang === 'bn' ? p.labelBn : p.name}</span>
+                  </span>
+                  <span class="palette-color-preview" style="background: linear-gradient(135deg, ${p.primary}, ${p.accent});"></span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
           <!-- Theme Dark/Light Toggle -->
           <button id="theme-toggle-btn" class="btn btn-secondary btn-sm" aria-label="Toggle Dark Mode" title="Toggle Theme">
             <span class="theme-toggle-icon">${theme === 'dark' ? icons.sun(16) : icons.moon(16)}</span>
@@ -180,6 +205,21 @@ export function renderNavbar() {
           ${icons.sparkles(18)} AI Symptom Checker
         </button>
         ${mobileRoleLinks}
+      </div>
+
+      <!-- Mobile Theme Palette Selector -->
+      <div style="margin: 1.25rem 0 0.5rem; padding: 0.85rem; background: var(--color-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-ink-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+          Theme Palette
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;">
+          ${PALETTES.map(p => `
+            <button type="button" class="btn btn-secondary btn-sm mobile-palette-btn" data-palette-id="${p.id}" style="font-size: 0.75rem; padding: 0.4rem 0.55rem; justify-content: flex-start; gap: 0.4rem; ${p.id === currentPalette ? 'border-color: var(--color-teal-700); font-weight: 700; background: var(--color-surface);' : ''}">
+              <span>${p.emoji}</span>
+              <span>${lang === 'bn' ? p.labelBn : p.name.split(' ')[0]}</span>
+            </button>
+          `).join('')}
+        </div>
       </div>
 
       <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--color-border);">
@@ -256,6 +296,46 @@ export function renderNavbar() {
   document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
     toggleTheme();
     renderNavbar();
+  });
+
+  // Desktop Palette Dropdown Handlers
+  const paletteBtn = document.getElementById('palette-dropdown-btn');
+  const paletteMenu = document.getElementById('palette-dropdown-menu');
+  if (paletteBtn && paletteMenu) {
+    paletteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      paletteMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!paletteMenu.contains(e.target) && e.target !== paletteBtn) {
+        paletteMenu.classList.remove('show');
+      }
+    });
+
+    paletteMenu.querySelectorAll('.palette-option-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-palette-id');
+        setPalette(id);
+        paletteMenu.classList.remove('show');
+        renderNavbar();
+        const selectedObj = PALETTES.find(p => p.id === id);
+        showToast(`Theme changed to ${selectedObj ? selectedObj.name : id}`, 'success');
+      });
+    });
+  }
+
+  // Mobile Palette Switcher Buttons
+  document.querySelectorAll('.mobile-palette-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-palette-id');
+      setPalette(id);
+      renderNavbar();
+      const selectedObj = PALETTES.find(p => p.id === id);
+      showToast(`Theme changed to ${selectedObj ? selectedObj.name : id}`, 'success');
+    });
   });
 
   const userMenuBtn = document.getElementById('user-menu-btn');
