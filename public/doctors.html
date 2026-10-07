@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Specialists & Book Outpatient Slots — DocBook</title>
+  <meta name="description" content="Explore BMDC certified doctors, compare consultation fees, view hospital chambers across Dinajpur, and book your verified appointment slot.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <style>
+    .doctors-layout-grid {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .doctors-layout-grid {
+        grid-template-columns: 1fr;
+      }
+      .filter-sidebar-mobile-hide {
+        display: none;
+      }
+      .filter-sidebar-mobile-hide.mobile-open {
+        display: flex !important;
+        flex-direction: column;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        top: auto !important;
+        max-height: 82vh !important;
+        overflow-y: auto !important;
+        z-index: 1050 !important;
+        background: var(--color-surface) !important;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+        border: 1px solid var(--color-border) !important;
+        border-bottom: none !important;
+        box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35) !important;
+        backdrop-filter: blur(20px) saturate(160%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+        animation: bottomSheetSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        padding: var(--space-6) !important;
+        padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px)) !important;
+      }
+    }
+    @keyframes bottomSheetSlide {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    [data-theme="dark"] .filter-sidebar-mobile-hide.mobile-open {
+      background: rgba(14, 20, 34, 0.98) !important;
+      box-shadow: 0 -12px 45px rgba(0, 0, 0, 0.8) !important;
+    }
+    .view-toggle-btn {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-ink-600);
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--radius-xs);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .view-toggle-btn.active {
+      background: var(--color-teal-50);
+      color: var(--color-teal-800);
+      border-color: var(--color-teal-300);
+    }
+    [data-theme="dark"] .view-toggle-btn.active {
+      background: rgba(45, 212, 191, 0.12);
+      color: var(--color-teal-300);
+      border-color: rgba(45, 212, 191, 0.3);
+    }
+    .doctors-list-grid-view {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+      gap: var(--space-4) !important;
+    }
+    .doctors-list-list-view {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: var(--space-4) !important;
+    }
+    .doctor-card-list-layout {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: var(--space-6);
+      align-items: center;
+    }
+    @media (max-width: 680px) {
+      .doctor-card-list-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+      .doctor-card-list-layout .doctor-card-actions {
+        text-align: left;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <div class="container" style="padding: var(--space-8) var(--space-4);">
+    <!-- Page Header with Editorial Hierarchy -->
+    <div style="margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-6);">
+      <div>
+        <div class="live-status-strip" style="margin-bottom: var(--space-2);">
+          <span class="status-dot-live"></span>
+          <span>Dinajpur Outpatient Scheduling System</span>
+        </div>
+        <h1 style="font-family: var(--font-display); font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1); letter-spacing: -0.02em;">
+          Specialist Directory & Chambers
+        </h1>
+        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem; max-width: 640px;">
+          Filter certified practitioners by clinical discipline, hospital chambers, consultation fees, and real-time appointment availability.
+        </p>
+      </div>
+
+      <!-- Mobile Filters Trigger Button -->
+      <button id="filter-mobile-toggle-btn" class="btn btn-secondary filter-mobile-toggle-btn" style="display: none; align-items: center; gap: 0.5rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <span>Toggle Search & Filters</span>
+      </button>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="doctors-layout-grid">
+      <!-- Filter Sidebar -->
+      <aside id="filter-sidebar" class="card filter-sidebar-mobile-hide" style="position: sticky; top: 5.5rem; padding: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-teal-700);"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Filters</h3>
+          </div>
+          <button id="reset-filters-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Reset</button>
+        </div>
+
+        <!-- Keyword search -->
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <label class="form-label" style="font-size: 0.8125rem;">Doctor or Condition</label>
+          <div style="position: relative;">
+            <input type="text" id="filter-search" class="form-control" placeholder="Search by name, degrees..." style="padding-left: 2rem;">
+            <span style="position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--color-ink-400); pointer-events: none; display: flex;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Specialty Filter -->
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <label class="form-label" style="font-size: 0.8125rem;">Specialty (24 Disciplines)</label>
+          <select id="filter-specialty" class="form-control">
+            <option value="">All Specialties</option>
+          </select>
+        </div>
+
+        <!-- Hospital Filter -->
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <label class="form-label" style="font-size: 0.8125rem;">Medical Center (15 in Dinajpur)</label>
+          <select id="filter-hospital" class="form-control">
+            <option value="">All Hospitals & Clinics</option>
+          </select>
+        </div>
+
+        <!-- Max Fee Range Slider -->
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-1);">
+            <label class="form-label" style="font-size: 0.8125rem; margin: 0;">Max Consultation Fee</label>
+            <span id="fee-val-text" style="font-weight: 700; color: var(--color-teal-700); font-feature-settings: 'tnum'; font-size: 0.875rem;">৳ 2,500</span>
+          </div>
+          <input type="range" id="filter-fee" min="400" max="2500" step="100" value="2500" style="width: 100%; accent-color: var(--color-teal-700); cursor: pointer;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.6875rem; color: var(--color-ink-400); margin-top: 0.25rem;">
+            <span>৳400</span>
+            <span>৳1,500</span>
+            <span>৳2,500</span>
+          </div>
+        </div>
+
+        <!-- Minimum Rating -->
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <label class="form-label" style="font-size: 0.8125rem;">Patient Rating</label>
+          <select id="filter-rating" class="form-control">
+            <option value="">Any Rating</option>
+            <option value="4.8">4.8 & Above (Exceptional)</option>
+            <option value="4.5">4.5 & Above (Very Good)</option>
+            <option value="4.0">4.0 & Above (Recommended)</option>
+          </select>
+        </div>
+
+        <!-- Available Date -->
+        <div class="form-group" style="margin-bottom: var(--space-2);">
+          <label class="form-label" style="font-size: 0.8125rem;">Available On Date</label>
+          <input type="date" id="filter-date" class="form-control">
+        </div>
+      </aside>
+
+      <!-- Results Column -->
+      <main>
+        <!-- Horizontal Quick Filter Chips (No Emojis) -->
+        <div class="filter-chip-scroll" id="quick-filter-chips" style="display: flex; gap: var(--space-2); overflow-x: auto; padding-bottom: var(--space-3); margin-bottom: var(--space-3); -webkit-overflow-scrolling: touch;">
+          <button class="filter-chip active" data-filter="all">All Specialists</button>
+          <button class="filter-chip" data-filter="top-rated">Top Rated (4.8+)</button>
+          <button class="filter-chip" data-filter="budget">Budget (≤ ৳1,000)</button>
+          <button class="filter-chip" data-filter="spec-cardio">Cardiology</button>
+          <button class="filter-chip" data-filter="spec-medicine">Medicine</button>
+          <button class="filter-chip" data-filter="spec-gynae">Gynaecology</button>
+          <button class="filter-chip" data-filter="spec-pedia">Paediatrics</button>
+          <button class="filter-chip" data-filter="spec-derma">Dermatology</button>
+          <button class="filter-chip" data-filter="spec-ortho">Orthopedics</button>
+          <button class="filter-chip" data-filter="spec-ent">ENT</button>
+          <button class="filter-chip" data-filter="spec-neuro">Neurology</button>
+          <button class="filter-chip" data-filter="spec-eye">Ophthalmology</button>
+          <button class="filter-chip" data-filter="spec-dental">Dentistry</button>
+          <button class="filter-chip" data-filter="spec-surgery">Surgery</button>
+          <button class="filter-chip" data-filter="spec-diabetes">Diabetology</button>
+        </div>
+
+        <!-- Active Filter Indicator Pills -->
+        <div id="active-filter-tags" style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-4); align-items: center; min-height: 28px;"></div>
+
+        <!-- Results Header & Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+          <div id="results-count" style="font-weight: 700; color: var(--color-ink-950); font-size: 0.9375rem; font-feature-settings: 'tnum';">
+            Loading doctors...
+          </div>
+
+          <div style="display: flex; align-items: center; gap: var(--space-3);">
+            <!-- View Layout Toggle -->
+            <div style="display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 2px; background: var(--color-surface);">
+              <button id="view-mode-list-btn" class="view-toggle-btn active" title="List View" aria-label="List View">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+              </button>
+              <button id="view-mode-grid-btn" class="view-toggle-btn" title="Grid View" aria-label="Grid View">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              </button>
+            </div>
+
+            <!-- Sort Select -->
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <label for="sort-select" style="font-size: 0.8125rem; color: var(--color-ink-500); margin: 0; white-space: nowrap;">Sort By:</label>
+              <select id="sort-select" class="form-control" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8125rem;">
+                <option value="rating">Top Rated & Verified</option>
+                <option value="fee_asc">Consultation Fee: Low to High</option>
+                <option value="fee_desc">Consultation Fee: High to Low</option>
+                <option value="experience">Years of Experience</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctors List with Shimmer Skeletons -->
+        <div id="doctors-list" class="doctors-list-list-view">
+          <div class="skeleton-card"><div style="display: flex; gap: var(--space-4);"><div class="skeleton skeleton-avatar"></div><div style="flex:1;"><div class="skeleton skeleton-text" style="width:40%;"></div><div class="skeleton skeleton-text" style="width:70%;"></div><div class="skeleton skeleton-text" style="width:50%;"></div></div></div></div>
+          <div class="skeleton-card"><div style="display: flex; gap: var(--space-4);"><div class="skeleton skeleton-avatar"></div><div style="flex:1;"><div class="skeleton skeleton-text" style="width:40%;"></div><div class="skeleton skeleton-text" style="width:70%;"></div><div class="skeleton skeleton-text" style="width:50%;"></div></div></div></div>
+          <div class="skeleton-card"><div style="display: flex; gap: var(--space-4);"><div class="skeleton skeleton-avatar"></div><div style="flex:1;"><div class="skeleton skeleton-text" style="width:40%;"></div><div class="skeleton skeleton-text" style="width:70%;"></div><div class="skeleton skeleton-text" style="width:50%;"></div></div></div></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="card" style="display: none; text-align: center; padding: var(--space-12) var(--space-6);">
+          <div style="width: 56px; height: 56px; border-radius: var(--radius-full); background: var(--color-teal-50); color: var(--color-teal-700); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-4); border: 1px solid var(--color-teal-200);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-2);">No Specialists Match Your Criteria</h3>
+          <p style="color: var(--color-ink-600); max-width: 420px; margin: 0 auto var(--space-6); font-size: 0.875rem; line-height: 1.5;">
+            We couldn't find any certified doctors matching this combination of filters. Try clearing specific constraints or searching by broad medical specialty.
+          </p>
+          <button id="empty-reset-btn" class="btn btn-primary">Reset All Filters</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+    import { getLang, t } from '/js/i18n.js';
+    import { icons, renderDoctorAvatar } from '/js/icons.js';
+
+    renderNavbar();
+    renderFooter();
+
+    // Check media query for mobile toggle button display
+    const checkMobileWidth = () => {
+      const toggleBtn = document.getElementById('filter-mobile-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.style.display = window.innerWidth <= 900 ? 'inline-flex' : 'none';
+      }
+    };
+    checkMobileWidth();
+    window.addEventListener('resize', checkMobileWidth);
+
+    // Layout View Mode (List vs Grid)
+    let currentViewMode = 'list';
+    const listBtn = document.getElementById('view-mode-list-btn');
+    const gridBtn = document.getElementById('view-mode-grid-btn');
+    const doctorsListEl = document.getElementById('doctors-list');
+
+    listBtn?.addEventListener('click', () => {
+      currentViewMode = 'list';
+      listBtn.classList.add('active');
+      gridBtn.classList.remove('active');
+      doctorsListEl.classList.remove('doctors-list-grid-view');
+      doctorsListEl.classList.add('doctors-list-list-view');
+      fetchDoctors();
+    });
+
+    gridBtn?.addEventListener('click', () => {
+      currentViewMode = 'grid';
+      gridBtn.classList.add('active');
+      listBtn.classList.remove('active');
+      doctorsListEl.classList.remove('doctors-list-list-view');
+      doctorsListEl.classList.add('doctors-list-grid-view');
+      fetchDoctors();
+    });
+
+    // Parse URL query params
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const searchInput = document.getElementById('filter-search');
+    const specialtySelect = document.getElementById('filter-specialty');
+    const hospitalSelect = document.getElementById('filter-hospital');
+    const feeSlider = document.getElementById('filter-fee');
+    const feeValText = document.getElementById('fee-val-text');
+    const ratingSelect = document.getElementById('filter-rating');
+    const dateInput = document.getElementById('filter-date');
+    const sortSelect = document.getElementById('sort-select');
+
+    // Prepopulate from URL
+    if (urlParams.get('search')) searchInput.value = urlParams.get('search');
+    if (urlParams.get('max_fee')) {
+      feeSlider.value = urlParams.get('max_fee');
+      feeValText.textContent = `৳ ${urlParams.get('max_fee')}`;
+    }
+    if (urlParams.get('sort')) sortSelect.value = urlParams.get('sort');
+
+    async function initFilters() {
+      try {
+        const [specRes, hospRes] = await Promise.all([
+          api.get('/specialties'),
+          api.get('/hospitals')
+        ]);
+
+        const lang = getLang();
+
+        specialtySelect.innerHTML = '<option value="">All Specialties</option>';
+        specRes.data.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.dataset.slug = s.slug;
+          opt.textContent = lang === 'bn' ? s.name_bn : s.name_en;
+          const paramSpec = urlParams.get('specialty_id') || urlParams.get('specialty') || urlParams.get('specialty_slug');
+          if (paramSpec && (paramSpec == s.id || paramSpec == s.slug)) opt.selected = true;
+          specialtySelect.appendChild(opt);
+        });
+
+        hospitalSelect.innerHTML = '<option value="">All Hospitals & Clinics</option>';
+        hospRes.data.forEach(h => {
+          const opt = document.createElement('option');
+          opt.value = h.id;
+          opt.textContent = lang === 'bn' ? h.name_bn : h.name_en;
+          const paramHosp = urlParams.get('hospital_id') || urlParams.get('hospital');
+          if (paramHosp && paramHosp == h.id) opt.selected = true;
+          hospitalSelect.appendChild(opt);
+        });
+
+        fetchDoctors();
+      } catch (err) {
+        console.error('Error initializing filters:', err);
+      }
+    }
+
+    function renderActiveFilterTags() {
+      const tagContainer = document.getElementById('active-filter-tags');
+      if (!tagContainer) return;
+      tagContainer.innerHTML = '';
+
+      const tags = [];
+
+      if (searchInput.value.trim()) {
+        tags.push({
+          label: `Search: "${searchInput.value.trim()}"`,
+          type: 'search',
+          clear: () => { searchInput.value = ''; }
+        });
+      }
+
+      if (specialtySelect.value) {
+        const specName = specialtySelect.options[specialtySelect.selectedIndex]?.text || 'Specialty';
+        tags.push({
+          label: specName,
+          type: 'spec',
+          clear: () => { specialtySelect.value = ''; }
+        });
+      }
+
+      if (hospitalSelect.value) {
+        const hospName = hospitalSelect.options[hospitalSelect.selectedIndex]?.text || 'Hospital';
+        tags.push({
+          label: hospName,
+          type: 'hosp',
+          clear: () => { hospitalSelect.value = ''; }
+        });
+      }
+
+      if (parseInt(feeSlider.value) < 2500) {
+        tags.push({
+          label: `Fee ≤ ৳${feeSlider.value}`,
+          type: 'fee',
+          clear: () => {
+            feeSlider.value = 2500;
+            feeValText.textContent = '৳ 2,500';
+          }
+        });
+      }
+
+      if (ratingSelect.value) {
+        tags.push({
+          label: `${ratingSelect.value}+ Rating`,
+          type: 'rating',
+          clear: () => { ratingSelect.value = ''; }
+        });
+      }
+
+      if (dateInput.value) {
+        tags.push({
+          label: `Date: ${dateInput.value}`,
+          type: 'date',
+          clear: () => { dateInput.value = ''; }
+        });
+      }
+
+      if (tags.length === 0) return;
+
+      const title = document.createElement('span');
+      title.style.fontSize = '0.75rem';
+      title.style.fontWeight = '700';
+      title.style.color = 'var(--color-ink-500)';
+      title.style.textTransform = 'uppercase';
+      title.style.letterSpacing = '0.04em';
+      title.textContent = 'Active:';
+      tagContainer.appendChild(title);
+
+      tags.forEach(t => {
+        const pill = document.createElement('span');
+        pill.className = 'badge badge-primary';
+        pill.style.cursor = 'pointer';
+        pill.style.fontSize = '0.75rem';
+        pill.style.padding = '0.3rem 0.65rem';
+        pill.style.display = 'inline-flex';
+        pill.style.alignItems = 'center';
+        pill.style.gap = '0.4rem';
+        pill.innerHTML = `<span>${t.label}</span> <span style="font-weight: 800; opacity: 0.8; display: flex;">✕</span>`;
+        pill.title = 'Click to remove filter';
+        pill.addEventListener('click', () => {
+          t.clear();
+          fetchDoctors();
+        });
+        tagContainer.appendChild(pill);
+      });
+
+      const clearAllBtn = document.createElement('button');
+      clearAllBtn.className = 'btn btn-secondary btn-sm';
+      clearAllBtn.style.fontSize = '0.6875rem';
+      clearAllBtn.style.padding = '0.2rem 0.5rem';
+      clearAllBtn.textContent = 'Clear All';
+      clearAllBtn.addEventListener('click', resetFilters);
+      tagContainer.appendChild(clearAllBtn);
+    }
+
+    async function fetchDoctors() {
+      const container = document.getElementById('doctors-list');
+      const emptyState = document.getElementById('empty-state');
+      const countEl = document.getElementById('results-count');
+
+      renderActiveFilterTags();
+
+      container.innerHTML = `
+        <div class="skeleton-card">
+          <div style="display: flex; gap: var(--space-3); align-items: center;">
+            <div class="skeleton-shimmer skeleton-avatar"></div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <div class="skeleton-shimmer skeleton-line" style="width: 60%; height: 18px;"></div>
+              <div class="skeleton-shimmer skeleton-line" style="width: 40%; height: 12px;"></div>
+            </div>
+          </div>
+          <div class="skeleton-shimmer skeleton-line" style="width: 90%; height: 12px; margin-top: 8px;"></div>
+          <div class="skeleton-shimmer skeleton-line" style="width: 75%; height: 12px;"></div>
+        </div>
+        <div class="skeleton-card">
+          <div style="display: flex; gap: var(--space-3); align-items: center;">
+            <div class="skeleton-shimmer skeleton-avatar"></div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <div class="skeleton-shimmer skeleton-line" style="width: 55%; height: 18px;"></div>
+              <div class="skeleton-shimmer skeleton-line" style="width: 35%; height: 12px;"></div>
+            </div>
+          </div>
+          <div class="skeleton-shimmer skeleton-line" style="width: 85%; height: 12px; margin-top: 8px;"></div>
+          <div class="skeleton-shimmer skeleton-line" style="width: 70%; height: 12px;"></div>
+        </div>
+      `;
+
+      const params = new URLSearchParams();
+      if (searchInput.value.trim()) params.append('search', searchInput.value.trim());
+      if (specialtySelect.value) params.append('specialty_id', specialtySelect.value);
+      if (hospitalSelect.value) params.append('hospital_id', hospitalSelect.value);
+      if (feeSlider.value < 2500) params.append('max_fee', feeSlider.value);
+      if (ratingSelect.value) params.append('min_rating', ratingSelect.value);
+      if (dateInput.value) params.append('date', dateInput.value);
+      if (sortSelect.value) params.append('sort', sortSelect.value);
+
+      try {
+        const res = await api.get(`/doctors?${params.toString()}`);
+        const doctors = res.data;
+        const lang = getLang();
+
+        countEl.textContent = `Showing ${doctors.length} Verified Specialist${doctors.length === 1 ? '' : 's'}`;
+
+        if (doctors.length === 0) {
+          container.innerHTML = '';
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        emptyState.style.display = 'none';
+        container.innerHTML = '';
+
+        doctors.forEach(d => {
+          const card = document.createElement('div');
+          card.className = 'doctor-card tilt-card reveal-up';
+
+          if (currentViewMode === 'list') {
+            card.className = 'doctor-card doctor-card-list-layout tilt-card reveal-up';
+            card.innerHTML = `
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                ${renderDoctorAvatar(d.name, d.id, 72, true, d.avatar_url)}
+                <span class="badge badge-success" style="font-size: 0.6875rem;">
+                  BMDC ${d.bmdc_reg_no}
+                </span>
+              </div>
+
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; gap: var(--space-2); align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap;">
+                  <span class="badge badge-primary" style="font-size: 0.75rem; font-weight: 700;">
+                    ${lang === 'bn' ? d.specialty_name_bn : d.specialty_name_en}
+                  </span>
+                  <span class="badge badge-neutral" style="font-size: 0.75rem; font-feature-settings: 'tnum';">
+                    ${d.experience_years}+ Yrs Exp
+                  </span>
+                  <span class="slot-live-beacon" style="font-size: 0.6875rem;">SLOT AVAILABLE TODAY</span>
+                </div>
+                <h3 style="font-size: 1.1875rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem; letter-spacing: -0.015em;">
+                  <a href="/doctor-profile.html?id=${d.id}" style="color: inherit; text-decoration: none;">${d.name}</a>
+                </h3>
+                <div class="doctor-degrees" style="margin-bottom: var(--space-2); font-weight: 500;">${d.qualifications}</div>
+                
+                <div style="font-size: 0.8125rem; color: var(--color-ink-600); display: flex; align-items: flex-start; gap: 0.4rem; background: var(--color-surface-subtle); padding: 0.45rem 0.65rem; border-radius: var(--radius-xs); border: 1px solid var(--color-border); max-width: 580px;">
+                  <span style="color: var(--color-teal-700); margin-top: 1px; flex-shrink: 0;">${icons.mapPin(15)}</span>
+                  <span><strong style="color: var(--color-ink-900);">${lang === 'bn' ? d.hospital_name_bn : d.hospital_name_en}</strong> — ${d.chamber_address}</span>
+                </div>
+              </div>
+
+              <div class="doctor-card-actions" style="text-align: right; min-width: 185px; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2); border-left: 1px solid var(--color-border); padding-left: var(--space-5);">
+                <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.875rem; background: var(--color-warning-subtle); padding: 0.2rem 0.5rem; border-radius: var(--radius-xs); border: 1px solid var(--color-warning-border);">
+                  <span style="color: #b45309; display: flex;">${icons.starFilled(14)}</span>
+                  <strong style="color: var(--color-ink-950); font-feature-settings: 'tnum';">${d.rating_avg.toFixed(1)}</strong>
+                  <span style="color: var(--color-ink-600); font-size: 0.75rem;">(${d.rating_count} reviews)</span>
+                </div>
+
+                <div>
+                  <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block; text-transform: uppercase; letter-spacing: 0.04em;">Consultation Fee</span>
+                  <span class="doctor-fee-tag" style="font-size: 1.375rem; font-feature-settings: 'tnum'; color: var(--color-teal-800);">৳ ${d.consultation_fee}</span>
+                  <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block;">Follow-up: ৳${d.follow_up_fee}</span>
+                </div>
+
+                <div style="display: flex; gap: var(--space-2); align-items: center;">
+                  <a href="/doctor-profile.html?id=${d.id}" class="btn btn-secondary btn-sm" style="font-size: 0.8125rem;">
+                    Profile
+                  </a>
+                  <a href="/doctor-profile.html?id=${d.id}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+                    <span>Book Slot</span>
+                    <span style="display: flex;">${icons.arrowRight(14)}</span>
+                  </a>
+                </div>
+              </div>
+            `;
+          } else {
+            // Grid layout
+            card.innerHTML = `
+              <div class="doctor-card-header" style="align-items: center; gap: var(--space-3); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3);">
+                ${renderDoctorAvatar(d.name, d.id, 62, true, d.avatar_url)}
+                <div class="doctor-meta" style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
+                    <span class="badge badge-success" style="font-size: 0.625rem;">
+                      BMDC ${d.bmdc_reg_no}
+                    </span>
+                  </div>
+                  <h3 style="font-size: 1.0625rem; margin: 0 0 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <a href="/doctor-profile.html?id=${d.id}" style="color: inherit; text-decoration: none;">${d.name}</a>
+                  </h3>
+                  <div class="doctor-specialty">${lang === 'bn' ? d.specialty_name_bn : d.specialty_name_en}</div>
+                  <div class="doctor-degrees" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${d.qualifications}</div>
+                </div>
+              </div>
+
+              <div style="font-size: 0.8125rem; color: var(--color-ink-600); line-height: 1.4; display: flex; align-items: flex-start; gap: 0.4rem; padding: var(--space-2) 0;">
+                <span style="color: var(--color-teal-700); margin-top: 2px; flex-shrink: 0;">${icons.mapPin(15)}</span>
+                <div>
+                  <strong style="color: var(--color-ink-900); font-size: 0.8125rem;">${lang === 'bn' ? d.hospital_name_bn : d.hospital_name_en}</strong><br>
+                  <span style="color: var(--color-ink-500); font-size: 0.75rem;">${d.chamber_address}</span>
+                </div>
+              </div>
+
+              <div class="doctor-stats-row">
+                <div class="doctor-stat-item" style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span style="color: #b45309; display: flex;">${icons.starFilled(14)}</span>
+                  <strong style="color: var(--color-ink-950); font-feature-settings: 'tnum';">${d.rating_avg.toFixed(1)}</strong>
+                  <span style="color: var(--color-ink-500); font-size: 0.75rem;">(${d.rating_count})</span>
+                </div>
+                <div class="doctor-stat-item" style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span style="color: var(--color-ink-400); display: flex;">${icons.clock(14)}</span>
+                  <span style="font-feature-settings: 'tnum';"><strong>${d.experience_years}</strong> yrs</span>
+                </div>
+              </div>
+
+              <div class="doctor-card-footer" style="padding-top: var(--space-2);">
+                <div>
+                  <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block; text-transform: uppercase;">Fee</span>
+                  <span class="doctor-fee-tag" style="font-feature-settings: 'tnum'; font-size: 1.1875rem; color: var(--color-teal-800);">৳ ${d.consultation_fee}</span>
+                </div>
+                <a href="/doctor-profile.html?id=${d.id}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+                  <span>Book</span>
+                  <span style="display: flex;">${icons.arrowRight(14)}</span>
+                </a>
+              </div>
+            `;
+          }
+
+          container.appendChild(card);
+        });
+
+        window.initAllAnimations?.();
+
+      } catch (err) {
+        console.error('Failed to load doctors list:', err);
+        container.innerHTML = '<div style="color: var(--color-danger); text-align: center; padding: var(--space-8);">Error loading doctors. Please check network connection.</div>';
+      }
+    }
+
+    // Attach listeners
+    searchInput.addEventListener('input', debounce(fetchDoctors, 300));
+    specialtySelect.addEventListener('change', fetchDoctors);
+    hospitalSelect.addEventListener('change', fetchDoctors);
+    ratingSelect.addEventListener('change', fetchDoctors);
+    dateInput.addEventListener('change', fetchDoctors);
+    sortSelect.addEventListener('change', fetchDoctors);
+
+    feeSlider.addEventListener('input', (e) => {
+      feeValText.textContent = `৳ ${e.target.value}`;
+    });
+    feeSlider.addEventListener('change', fetchDoctors);
+
+    // Mobile Filter Sidebar Toggle
+    const mobileFilterToggleBtn = document.getElementById('filter-mobile-toggle-btn');
+    const filterSidebar = document.getElementById('filter-sidebar');
+    mobileFilterToggleBtn?.addEventListener('click', () => {
+      filterSidebar.classList.toggle('mobile-open');
+      const isOpen = filterSidebar.classList.contains('mobile-open');
+      mobileFilterToggleBtn.innerHTML = isOpen 
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg> <span>Close Filters</span>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> <span>Toggle Search & Filters</span>`;
+    });
+
+    // Quick Filter Chips Handling
+    const chips = document.querySelectorAll('.filter-chip');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const filterType = chip.getAttribute('data-filter');
+
+        // Reset inputs first
+        specialtySelect.value = '';
+        ratingSelect.value = '';
+        feeSlider.value = 2500;
+        feeValText.textContent = '৳ 2,500';
+
+        if (filterType === 'top-rated') {
+          ratingSelect.value = '4.8';
+        } else if (filterType === 'budget') {
+          feeSlider.value = 1000;
+          feeValText.textContent = '৳ 1,000';
+        } else if (filterType === 'spec-cardio') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('cardio') || opt.text.toLowerCase().includes('হৃদ')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-gynae') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('gynae') || opt.text.toLowerCase().includes('স্ত্রী')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-pedia') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('pediatric') || opt.text.toLowerCase().includes('শিশু')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-derma') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('derma') || opt.text.toLowerCase().includes('চর্ম')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-medicine') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('medicine') || opt.text.toLowerCase().includes('মেডিসিন')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-ent') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('ent') || opt.text.toLowerCase().includes('নাক')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-neuro') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('neuro') || opt.text.toLowerCase().includes('স্নায়ু')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-eye') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('ophthal') || opt.text.toLowerCase().includes('চক্ষু')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-dental') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('dent') || opt.text.toLowerCase().includes('দন্ত')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-surgery') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('surgery') || opt.text.toLowerCase().includes('সার্জারি')) {
+              opt.selected = true; break;
+            }
+          }
+        } else if (filterType === 'spec-diabetes') {
+          for (const opt of specialtySelect.options) {
+            if (opt.text.toLowerCase().includes('endocrin') || opt.text.toLowerCase().includes('ডায়াবেটিস')) {
+              opt.selected = true; break;
+            }
+          }
+        }
+
+        fetchDoctors();
+      });
+    });
+
+    function resetFilters() {
+      chips.forEach(c => c.classList.remove('active'));
+      document.querySelector('.filter-chip[data-filter="all"]')?.classList.add('active');
+      searchInput.value = '';
+      specialtySelect.value = '';
+      hospitalSelect.value = '';
+      feeSlider.value = 2500;
+      feeValText.textContent = '৳ 2,500';
+      ratingSelect.value = '';
+      dateInput.value = '';
+      sortSelect.value = 'rating';
+      fetchDoctors();
+    }
+
+    document.getElementById('reset-filters-btn').addEventListener('click', resetFilters);
+    document.getElementById('empty-reset-btn').addEventListener('click', resetFilters);
+
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    window.addEventListener('languageChanged', () => {
+      initFilters();
+    });
+
+    initFilters();
+  </script>
+</body>
+</html>

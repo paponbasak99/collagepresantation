@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin-dashboard.html
+Disallow: /doctor-panel.html
+Disallow: /reception-panel.html
+Disallow: /api/
+
+Sitemap: https://docbook.health/sitemap.xml

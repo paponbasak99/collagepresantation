@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocBook — Telemedicine Video Consultation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    body {
+      background: #090d16;
+      color: #f8fafc;
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .telemed-header {
+      background: #0e1526;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .telemed-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      height: calc(100vh - 65px);
+    }
+
+    /* Video Grid Area */
+    .video-viewport {
+      position: relative;
+      background: #050811;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .remote-video-el {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #090e1d;
+    }
+
+    .local-video-box {
+      position: absolute;
+      bottom: 96px;
+      right: 24px;
+      width: 220px;
+      height: 140px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(20, 184, 166, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      background: #111827;
+      z-index: 20;
+    }
+
+    .local-video-el {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .local-video-label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 30;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .ctrl-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .ctrl-btn.off {
+      background: #ef4444;
+      color: white;
+    }
+
+    .ctrl-btn.hangup {
+      background: #dc2626;
+      width: 56px;
+      height: 56px;
+    }
+
+    .ctrl-btn.hangup:hover {
+      background: #b91c1c;
+    }
+
+    /* Clinical Side Drawer */
+    .clinical-drawer {
+      background: #0d1424;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .drawer-section {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .call-timer {
+      font-family: 'Outfit', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #38bdf8;
+      background: rgba(14, 165, 233, 0.12);
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+
+    .waiting-peer-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 15, 28, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 15;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Telemed Header -->
+  <header class="telemed-header">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="font-size: 1.6rem;">🩺</div>
+      <div>
+        <div style="font-weight: 700; font-size: 1.05rem;" id="consult-title">Telemedicine Consultation</div>
+        <div style="font-size: 0.75rem; color: #94a3b8;" id="consult-subtitle">End-to-End Encrypted WebRTC Session</div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div id="call-timer" class="call-timer">00:00</div>
+      <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="history.back()">Exit Room</button>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="telemed-container">
+    <!-- Video Viewport -->
+    <main class="video-viewport">
+      <!-- Remote Peer Video -->
+      <video id="remote-video" class="remote-video-el" autoplay playsinline></video>
+
+      <!-- Waiting Overlay if peer not yet connected -->
+      <div id="waiting-overlay" class="waiting-peer-overlay">
+        <div class="spinner" style="width: 48px; height: 48px; border-width: 4px;"></div>
+        <div style="font-size: 1.2rem; font-weight: 600; color: #e2e8f0;" id="waiting-text">Connecting to secure medical room...</div>
+        <div style="font-size: 0.85rem; color: #94a3b8;">Waiting for other participant to enter.</div>
+      </div>
+
+      <!-- Local Video Picture-in-Picture -->
+      <div class="local-video-box">
+        <video id="local-video" class="local-video-el" autoplay playsinline muted></video>
+        <div class="local-video-label">You</div>
+      </div>
+
+      <!-- Control Bar -->
+      <div class="controls-bar">
+        <button id="toggle-mic-btn" class="ctrl-btn" title="Mute/Unmute Mic">🎤</button>
+        <button id="toggle-cam-btn" class="ctrl-btn" title="Camera On/Off">📷</button>
+        <button id="toggle-screen-btn" class="ctrl-btn" title="Share Screen">🖥️</button>
+        <button id="hangup-btn" class="ctrl-btn hangup" title="End Call">📞</button>
+      </div>
+    </main>
+
+    <!-- Right: Clinical Consultation Side Drawer -->
+    <aside class="clinical-drawer">
+      <div class="drawer-section">
+        <h3 style="font-size: 0.9rem; text-transform: uppercase; color: #94a3b8; margin: 0 0 10px; letter-spacing: 0.05em;">Appointment Summary</h3>
+        <div style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+          <div><strong>Token:</strong> <span id="apt-serial">--</span></div>
+          <div><strong>Patient:</strong> <span id="apt-patient">--</span></div>
+          <div><strong>Doctor:</strong> <span id="apt-doctor">--</span></div>
+          <div><strong>Reason:</strong> <span id="apt-reason">--</span></div>
+        </div>
+      </div>
+
+      <div class="drawer-section" style="flex: 1; display: flex; flex-direction: column;">
+        <h3 style="font-size: 0.9rem; text-transform: uppercase; color: #94a3b8; margin: 0 0 10px; letter-spacing: 0.05em;">Clinical Notes</h3>
+        <textarea id="telemed-notes" class="form-input" style="flex: 1; min-height: 160px; background: rgba(0,0,0,0.2); resize: none; color: white;" placeholder="Record clinical observations, vitals, or symptoms during consultation..."></textarea>
+      </div>
+
+      <div id="doctor-actions-box" style="display: none;">
+        <button id="open-prescription-btn" class="btn btn-primary" style="width: 100%;">
+          ✍️ Write E-Prescription
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module">
+    import { api } from '/js/api.js';
+    import { showToast } from '/js/toast.js';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const appointmentId = urlParams.get('appointment_id');
+
+    if (!appointmentId) {
+      alert('No appointment ID provided.');
+      window.location.href = '/my-appointments.html';
+    }
+
+    let localStream = null;
+    let peerConnection = null;
+    let sessionData = null;
+    let isCaller = false;
+    let callTimerInterval = null;
+    let callSeconds = 0;
+    let isMicMuted = false;
+    let isCamOff = false;
+
+    const localVideo = document.getElementById('local-video');
+    const remoteVideo = document.getElementById('remote-video');
+    const waitingOverlay = document.getElementById('waiting-overlay');
+    const waitingText = document.getElementById('waiting-text');
+
+    async function initSession() {
+      try {
+        const res = await api.get(`/api/telemedicine/session/${appointmentId}`);
+        sessionData = res.data;
+
+        // Set UI info
+        document.getElementById('apt-serial').textContent = `SL - ${sessionData.serialNumber}`;
+        document.getElementById('apt-patient').textContent = `${sessionData.patient.name} (${sessionData.patient.age}y, ${sessionData.patient.gender})`;
+        document.getElementById('apt-doctor').textContent = sessionData.doctor.name;
+        document.getElementById('apt-reason').textContent = sessionData.patient.reason || 'General Consultation';
+        document.getElementById('consult-title').textContent = `${sessionData.doctor.name} & ${sessionData.patient.name}`;
+
+        if (sessionData.myRole === 'DOCTOR') {
+          document.getElementById('doctor-actions-box').style.display = 'block';
+          document.getElementById('open-prescription-btn').addEventListener('click', () => {
+            window.open(`/doctor-panel.html?consult_id=${appointmentId}`, '_blank');
+          });
+        }
+
+        // Doctor acts as offer initiator
+        isCaller = sessionData.myRole === 'DOCTOR';
+
+        await startLocalMedia();
+        createPeerConnection();
+
+        if (isCaller) {
+          waitingText.textContent = `Waiting for patient (${sessionData.patient.name}) to join...`;
+          await makeOffer();
+        } else {
+          waitingText.textContent = `Connecting with ${sessionData.doctor.name}...`;
+        }
+
+        // Start pulling signals
+        startSignalingLoop();
+        startCallTimer();
+      } catch (err) {
+        showToast(err.message || 'Failed to initialize video session', 'error');
+        setTimeout(() => window.location.href = '/', 2500);
+      }
+    }
+
+    async function startLocalMedia() {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: true
+        });
+        localVideo.srcObject = localStream;
+      } catch (e) {
+        console.warn('Camera/mic access error:', e);
+        showToast('Please grant camera and microphone permissions to join consultation.', 'error');
+      }
+    }
+
+    function createPeerConnection() {
+      const config = {
+        iceServers: sessionData.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]
+      };
+
+      peerConnection = new RTCPeerConnection(config);
+
+      // Add local tracks to peer connection
+      if (localStream) {
+        localStream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, localStream);
+        });
+      }
+
+      // Handle remote tracks
+      peerConnection.ontrack = (event) => {
+        if (event.streams && event.streams[0]) {
+          remoteVideo.srcObject = event.streams[0];
+          waitingOverlay.style.display = 'none';
+        }
+      };
+
+      // Handle ICE candidates
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          sendSignal('candidate', event.candidate);
+        }
+      };
+
+      peerConnection.onconnectionstatechange = () => {
+        if (peerConnection.connectionState === 'connected') {
+          waitingOverlay.style.display = 'none';
+          showToast('Medical consultation call connected securely.', 'success');
+        } else if (peerConnection.connectionState === 'disconnected' || peerConnection.connectionState === 'failed') {
+          waitingOverlay.style.display = 'flex';
+          waitingText.textContent = 'Peer connection lost. Reconnecting...';
+        }
+      };
+    }
+
+    async function makeOffer() {
+      try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        await sendSignal('offer', offer);
+      } catch (e) {
+        console.error('Error creating offer:', e);
+      }
+    }
+
+    async function sendSignal(type, data) {
+      try {
+        await api.post(`/api/telemedicine/signal/${appointmentId}`, { type, data });
+      } catch (e) {
+        console.warn('Signaling send error:', e);
+      }
+    }
+
+    async function pullSignals() {
+      try {
+        const res = await api.get(`/api/telemedicine/signal/${appointmentId}`);
+        const signals = res.data || [];
+
+        for (const sig of signals) {
+          if (sig.type === 'offer' && !isCaller) {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(sig.data));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            await sendSignal('answer', answer);
+          } else if (sig.type === 'answer' && isCaller) {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(sig.data));
+          } else if (sig.type === 'candidate') {
+            try {
+              await peerConnection.addIceCandidate(new RTCIceCandidate(sig.data));
+            } catch (err) {
+              console.warn('Error adding candidate:', err);
+            }
+          } else if (sig.type === 'hangup') {
+            showToast('Participant ended the consultation call.', 'info');
+            setTimeout(() => window.location.href = '/my-appointments.html', 1500);
+          }
+        }
+      } catch (e) {
+        console.warn('Pull signals error:', e);
+      }
+    }
+
+    function startSignalingLoop() {
+      setInterval(pullSignals, 2000);
+    }
+
+    // Call Timer
+    function startCallTimer() {
+      const timerEl = document.getElementById('call-timer');
+      callTimerInterval = setInterval(() => {
+        callSeconds++;
+        const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+        const secs = String(callSeconds % 60).padStart(2, '0');
+        timerEl.textContent = `${mins}:${secs}`;
+      }, 1000);
+    }
+
+    // Media Controls
+    document.getElementById('toggle-mic-btn').addEventListener('click', (e) => {
+      if (!localStream) return;
+      isMicMuted = !isMicMuted;
+      localStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+      e.currentTarget.classList.toggle('off', isMicMuted);
+      e.currentTarget.textContent = isMicMuted ? '🔇' : '🎤';
+    });
+
+    document.getElementById('toggle-cam-btn').addEventListener('click', (e) => {
+      if (!localStream) return;
+      isCamOff = !isCamOff;
+      localStream.getVideoTracks().forEach(track => track.enabled = !isCamOff);
+      e.currentTarget.classList.toggle('off', isCamOff);
+      e.currentTarget.textContent = isCamOff ? '🚫' : '📷';
+    });
+
+    document.getElementById('toggle-screen-btn').addEventListener('click', async (e) => {
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        const screenTrack = screenStream.getVideoTracks()[0];
+        const sender = peerConnection.getSenders().find(s => s.track.kind === 'video');
+        if (sender) sender.replaceTrack(screenTrack);
+        localVideo.srcObject = screenStream;
+
+        screenTrack.onended = () => {
+          if (localStream) {
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (sender) sender.replaceTrack(videoTrack);
+            localVideo.srcObject = localStream;
+          }
+        };
+      } catch (err) {
+        console.warn('Screen share cancelled/denied:', err);
+      }
+    });
+
+    document.getElementById('hangup-btn').addEventListener('click', async () => {
+      if (confirm('End this telemedicine video consultation?')) {
+        await sendSignal('hangup', {});
+        if (localStream) localStream.getTracks().forEach(t => t.stop());
+        if (peerConnection) peerConnection.close();
+        window.location.href = sessionData?.myRole === 'DOCTOR' ? '/doctor-panel.html' : '/my-appointments.html';
+      }
+    });
+
+    initSession();
+  </script>
+</body>
+</html>

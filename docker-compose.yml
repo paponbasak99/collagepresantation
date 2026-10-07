@@ -1,0 +1,27 @@
+services:
+  docbook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docbook-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - docbook-data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=change_this_to_a_secure_random_key_in_production
+      - ENCRYPTION_KEY=change_this_to_32_byte_aes_key_in_production_1234
+      - DATABASE_URL=/app/data/docbook.db
+      - CLINIC_NAME="DocBook Health Center"
+      - CLINIC_CITY="Dhaka"
+      - CLINIC_PHONE="+8801700000000"
+      - RATE_LIMIT_WINDOW_MS=60000
+      - RATE_LIMIT_MAX_REQUESTS=200
+      - SLOT_HOLD_MINUTES=5
+
+volumes:
+  docbook-data:
+    name: docbook-sqlite-data

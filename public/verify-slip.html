@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Clinical Appointment Record — DocBook</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+  <style>
+    .verification-wrap {
+      min-height: calc(100vh - 180px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.25rem;
+    }
+    .cert-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      max-width: 640px;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .cert-header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .cert-watermark {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .shield-icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .shield-icon-wrap.success {
+      background: #ecfdf5;
+      color: #059669;
+      border: 2px solid #a7f3d0;
+    }
+    .shield-icon-wrap.error {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 2px solid #fecaca;
+    }
+    [data-theme="dark"] .shield-icon-wrap.success {
+      background: rgba(16, 185, 129, 0.15);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    [data-theme="dark"] .shield-icon-wrap.error {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .cert-body {
+      padding: 2rem;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    @media (max-width: 500px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+    .detail-cell {
+      background: var(--bg-muted);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+    }
+    .detail-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .detail-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .pulse-radar {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--primary-200);
+      border-top-color: var(--primary-600);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.25rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <main class="verification-wrap">
+    <div id="verify-card" class="cert-card">
+      
+      <!-- STATE 1: LOADING -->
+      <div id="loading-state" style="padding: 4rem 2rem; text-align: center;">
+        <div class="pulse-radar"></div>
+        <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin: 0 0 0.5rem; color: var(--text-main);">
+          Authenticating Clinical Slip
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">
+          Querying DocBook cryptographic ledger and Bangladesh Medical Council verification registry...
+        </p>
+      </div>
+
+      <!-- STATE 2: SUCCESS / AUTHENTIC RECORD -->
+      <div id="success-state" style="display: none;">
+        <div class="cert-header">
+          <div class="cert-watermark">DOCBOOK SECURE CLINICAL REGISTRY • AUTHENTIC RECORD</div>
+          <div class="shield-icon-wrap success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </div>
+          <span class="badge badge-success" style="font-size: 0.775rem; padding: 0.3rem 0.75rem; font-weight: 700; letter-spacing: 0.04em;">
+            CRYPTOGRAPHICALLY VERIFIED
+          </span>
+          <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; margin: 0.75rem 0 0.25rem; color: var(--text-main);">
+            Authentic Appointment Record
+          </h2>
+          <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0;">
+            This slip was officially issued by DocBook for verified hospital outpatient consultation.
+          </p>
+        </div>
+
+        <div class="cert-body">
+          <!-- Queue Serial Banner -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--primary-50); border: 1px solid var(--primary-200); border-radius: var(--radius-sm); padding: 0.85rem 1.25rem; margin-bottom: 1.25rem;">
+            <div>
+              <span style="display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--primary-800);">Chamber Queue Serial</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Assigned consultation order</span>
+            </div>
+            <span id="v-serial" style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 800; color: var(--primary-800); font-variant-numeric: tabular-nums;">
+              SL - 01
+            </span>
+          </div>
+
+          <!-- Structured Clinical Details -->
+          <div class="detail-grid">
+            <div class="detail-cell">
+              <span class="detail-label">Appointment Reference</span>
+              <strong id="v-apt-num" class="detail-value" style="font-family: var(--font-mono, monospace); color: var(--primary-700);">APT-0000</strong>
+            </div>
+            <div class="detail-cell">
+              <span class="detail-label">Consultation Status</span>
+              <div><span id="v-status" class="badge badge-primary">CONFIRMED</span></div>
+            </div>
+            <div class="detail-cell">
+              <span class="detail-label">Patient Name</span>
+              <strong id="v-patient" class="detail-value">Patient Name</strong>
+            </div>
+            <div class="detail-cell">
+              <span class="detail-label">Age & Gender</span>
+              <span id="v-patient-info" class="detail-value">30 yrs • MALE</span>
+            </div>
+            <div class="detail-cell">
+              <span class="detail-label">Attending Doctor</span>
+              <strong id="v-doctor" class="detail-value">Dr. Name</strong>
+            </div>
+            <div class="detail-cell">
+              <span class="detail-label">Clinical Specialty</span>
+              <span id="v-specialty" class="detail-value">Cardiology</span>
+            </div>
+            <div class="detail-cell">
+              <span class="detail-label">Scheduled Date & Time</span>
+              <strong id="v-datetime" class="detail-value" style="font-variant-numeric: tabular-nums;">2026-10-06 at 16:30</strong>
+            </div>
+            <div class="detail-cell">
+              <span class="detail-label">Settlement Status</span>
+              <div><span id="v-payment" class="badge badge-success">PAID</span></div>
+            </div>
+          </div>
+
+          <!-- Navigation & Print CTAs -->
+          <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+            <button onclick="window.print()" class="btn btn-secondary btn-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+              Print Verification Copy
+            </button>
+            <a href="/index.html" class="btn btn-primary btn-sm">
+              DocBook Home
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE 3: ERROR / UNVERIFIED -->
+      <div id="error-state" style="display: none; padding: 3rem 2rem; text-align: center;">
+        <div class="shield-icon-wrap error" style="margin: 0 auto 1.25rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--danger); margin: 0 0 0.5rem;">
+          Invalid or Revoked Slip
+        </h2>
+        <p id="error-message" style="color: var(--text-muted); font-size: 0.9rem; max-width: 440px; margin: 0 auto 1.75rem; line-height: 1.5;">
+          This appointment slip could not be authenticated against the clinical database. It may have expired, been cancelled, or the QR signature may be corrupted.
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center;">
+          <a href="/index.html" class="btn btn-secondary btn-sm">Return to DocBook</a>
+          <a href="/doctors.html" class="btn btn-primary btn-sm">Book Real Appointment</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const aptNumber = urlParams.get('number');
+
+    async function verifySlip() {
+      const loading = document.getElementById('loading-state');
+      const success = document.getElementById('success-state');
+      const error = document.getElementById('error-state');
+
+      if (!aptNumber) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        document.getElementById('error-message').textContent = 'No appointment reference number provided in the verification URL.';
+        return;
+      }
+
+      try {
+        const res = await api.get(`/appointments/verify/${aptNumber}`);
+        loading.style.display = 'none';
+
+        if (res.success && res.data) {
+          const d = res.data;
+          document.getElementById('v-serial').textContent = d.serial_badge;
+          document.getElementById('v-apt-num').textContent = d.appointment_number;
+          document.getElementById('v-status').textContent = d.status;
+          document.getElementById('v-patient').textContent = d.patient_name;
+          document.getElementById('v-patient-info').textContent = `${d.patient_age} yrs • ${d.patient_gender}`;
+          document.getElementById('v-doctor').textContent = d.doctor_name;
+          document.getElementById('v-specialty').textContent = d.specialty;
+          document.getElementById('v-datetime').textContent = `${d.date} at ${d.time}`;
+          document.getElementById('v-payment').textContent = `${d.payment_status || 'UNPAID'} (৳${d.fee_amount})`;
+
+          success.style.display = 'block';
+        } else {
+          error.style.display = 'block';
+        }
+      } catch (err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        document.getElementById('error-message').textContent = err.message || 'Appointment record verification failed.';
+      }
+    }
+
+    verifySlip();
+  </script>
+</body>
+</html>

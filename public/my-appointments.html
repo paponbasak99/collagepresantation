@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Appointments & Medical Records — DocBook</title>
+  <meta name="description" content="View your upcoming outpatient consultations, track live chamber queue status, view digital prescriptions, and manage bookings.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <style>
+    .appointment-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-5);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-6);
+      align-items: center;
+      transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    }
+    .appointment-card:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+    @media (max-width: 768px) {
+      .appointment-card {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+    }
+    /* Refund 3-Segment Visual Bar */
+    .refund-bar-container {
+      margin: var(--space-4) 0;
+    }
+    .refund-segments-track {
+      display: flex;
+      height: 10px;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: var(--space-2);
+      border: 1px solid var(--color-border);
+    }
+    .refund-segment {
+      height: 100%;
+    }
+    .refund-seg-90 { width: 50%; background: var(--color-success); }
+    .refund-seg-50 { width: 30%; background: var(--color-warning); }
+    .refund-seg-0  { width: 20%; background: var(--color-danger); }
+
+    .refund-labels-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.6875rem;
+      color: var(--color-ink-500);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <div class="container" style="padding: var(--space-8) var(--space-4);">
+    <!-- Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-5);">
+      <div>
+        <div class="live-status-strip" style="margin-bottom: var(--space-2);">
+          <span class="status-dot-live"></span>
+          <span>Patient Portal & Outpatient Journey</span>
+        </div>
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">
+          My Appointments & Records
+        </h1>
+        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem;">
+          Track live chamber queue positions, print verification slips, read digital prescriptions, or manage reschedule requests.
+        </p>
+      </div>
+      <a href="/doctors.html" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+        <span>Book New Visit</span>
+      </a>
+    </div>
+
+    <!-- Live Queue Highlight Banner (If user has upcoming today) -->
+    <div id="live-queue-highlight" style="display: none; margin-bottom: var(--space-6);"></div>
+
+    <!-- Tabs Navigation -->
+    <div style="display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-6); overflow-x: auto;">
+      <button id="tab-upcoming-btn" class="btn btn-sm btn-primary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        Upcoming Visits (<span id="count-upcoming">0</span>)
+      </button>
+      <button id="tab-completed-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        Completed Visits (<span id="count-completed">0</span>)
+      </button>
+      <button id="tab-cancelled-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        Cancelled Visits (<span id="count-cancelled">0</span>)
+      </button>
+    </div>
+
+    <!-- Appointments Container -->
+    <div id="appointments-container" style="display: flex; flex-direction: column; gap: var(--space-4);">
+      <div style="text-align: center; padding: var(--space-10); color: var(--color-ink-500);">Loading your appointments...</div>
+    </div>
+  </div>
+
+  <!-- Cancellation Modal with Visual 3-Segment Refund Bar -->
+  <div id="cancel-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="font-size: 1.125rem;">Cancel Appointment</h3>
+        <button id="cancel-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="cancel-info-banner" style="background: var(--color-surface-subtle); padding: var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border); margin-bottom: var(--space-4); font-size: 0.875rem;">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- 3-Segment Refund Visualization -->
+        <div class="refund-bar-container">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-ink-700); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--space-1);">
+            Refund Tier Policy
+          </div>
+          <div class="refund-segments-track">
+            <div class="refund-segment refund-seg-90" title=">24h: 90% Refund"></div>
+            <div class="refund-segment refund-seg-50" title="6-24h: 50% Refund"></div>
+            <div class="refund-segment refund-seg-0" title="<6h: 0% Refund"></div>
+          </div>
+          <div class="refund-labels-row">
+            <span>&gt; 24h Prior (90%)</span>
+            <span>6 - 24h (50%)</span>
+            <span>&lt; 6h (0%)</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: var(--space-4);">
+          <label class="form-label" style="font-size: 0.8125rem;">Reason for Cancellation *</label>
+          <select id="cancel-reason-select" class="form-control" style="margin-bottom: var(--space-2);">
+            <option value="Personal schedule conflict">Personal schedule conflict</option>
+            <option value="Health condition resolved">Health condition resolved</option>
+            <option value="Need to reschedule to another date">Need to reschedule to another date</option>
+            <option value="Other">Other reason</option>
+          </select>
+          <input type="text" id="cancel-reason-other" class="form-control" placeholder="Specify reason..." style="display: none;">
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+        <button id="cancel-modal-dismiss" class="btn btn-secondary btn-sm">Keep Appointment</button>
+        <button id="confirm-cancel-btn" class="btn btn-danger btn-sm">Confirm Cancellation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reschedule Modal -->
+  <div id="reschedule-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="font-size: 1.125rem;">Reschedule Consultation</h3>
+        <button id="reschedule-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.8125rem; color: var(--color-ink-600); margin: 0 0 var(--space-4);">
+          Select a new chamber date and open slot. Rescheduling is complimentary up to 6 hours before the booked consultation.
+        </p>
+
+        <div class="form-group" style="margin-bottom: var(--space-4);">
+          <label class="form-label" style="font-size: 0.8125rem;">Select New Date</label>
+          <input type="date" id="reschedule-date" class="form-control">
+        </div>
+
+        <div id="reschedule-slots-container">
+          <div style="text-align: center; padding: var(--space-6); color: var(--color-ink-500); font-size: 0.875rem;">
+            Select a date above to view open slots.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="reschedule-dismiss" class="btn btn-secondary btn-sm">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Digital Prescription Modal -->
+  <div id="prescription-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: var(--space-2);">
+          <span style="color: var(--color-teal-700);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h3a2 2 0 0 0 0-4H9v7"/><path d="m11 13 3 3"/></svg>
+          </span>
+          <h3 class="modal-title" style="font-size: 1.125rem;">Official Digital Prescription</h3>
+        </div>
+        <button id="rx-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="rx-modal-body">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer" style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+        <button id="rx-print-btn" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+          <span>Print Prescription</span>
+        </button>
+        <button id="rx-dismiss-btn" class="btn btn-secondary btn-sm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Doctor Review Modal -->
+  <div id="review-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="font-size: 1.125rem;">Rate & Review Doctor</h3>
+        <button id="review-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; margin-bottom: var(--space-4);">
+          <div style="font-size: 0.8125rem; color: var(--color-ink-500); margin-bottom: var(--space-2);">Your clinical experience rating:</div>
+          <div id="star-rating-box" style="font-size: 2rem; cursor: pointer; color: #cbd5e1; user-select: none; display: flex; justify-content: center; gap: 0.35rem;">
+            <span data-star="1">★</span>
+            <span data-star="2">★</span>
+            <span data-star="3">★</span>
+            <span data-star="4">★</span>
+            <span data-star="5">★</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 0.8125rem;">Doctor Feedback (Optional)</label>
+          <textarea id="review-comment" class="form-control" rows="3" placeholder="Describe the consultation clarity, waiting time, and treatment guidance..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+        <button id="submit-review-btn" class="btn btn-primary btn-sm">Submit Feedback</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api, getCurrentUser } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+    import { showToast } from '/js/toast.js';
+    import { icons, renderDoctorAvatar } from '/js/icons.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const user = getCurrentUser();
+    if (!user) {
+      window.location.href = '/login.html?redirect=/my-appointments.html';
+    }
+
+    let activeTab = 'upcoming';
+    let allAppointments = [];
+
+    async function loadAppointments() {
+      try {
+        const res = await api.get('/appointments/my');
+        allAppointments = res.data;
+
+        // Update Tab Counters
+        const upcoming = allAppointments.filter(a => ['PENDING_PAYMENT', 'CONFIRMED', 'ARRIVED', 'IN_CONSULTATION'].includes(a.status));
+        const completed = allAppointments.filter(a => a.status === 'COMPLETED');
+        const cancelled = allAppointments.filter(a => a.status === 'CANCELLED');
+
+        document.getElementById('count-upcoming').textContent = upcoming.length;
+        document.getElementById('count-completed').textContent = completed.length;
+        document.getElementById('count-cancelled').textContent = cancelled.length;
+
+        // If today has active upcoming appointment, display live queue highlight widget
+        renderLiveQueueHighlight(upcoming);
+
+        renderAppointmentsList();
+
+      } catch (err) {
+        console.error('Failed to load appointments:', err);
+        showToast('Error loading appointments.', 'error');
+      }
+    }
+
+    async function renderLiveQueueHighlight(upcomingList) {
+      const banner = document.getElementById('live-queue-highlight');
+      if (!banner) return;
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const todayApt = upcomingList.find(a => a.date === todayStr);
+
+      if (!todayApt) {
+        banner.style.display = 'none';
+        return;
+      }
+
+      banner.style.display = 'block';
+
+      let nowServingStr = '--';
+      let aheadCount = 0;
+      let estWait = '~15 mins';
+
+      try {
+        const snapRes = await api.get(`/queue/snapshot?doctor_id=${todayApt.doctor_id}`);
+        const snap = snapRes.data && snapRes.data[0];
+        if (snap) {
+          if (snap.nowServing) {
+            nowServingStr = `SL - ${String(snap.nowServing.serialNumber).padStart(2, '0')}`;
+            aheadCount = Math.max(0, todayApt.serial_number - snap.nowServing.serialNumber);
+          } else if (snap.stats && snap.stats.completedCount > 0) {
+            nowServingStr = `SL - ${String(snap.stats.completedCount).padStart(2, '0')}`;
+            aheadCount = Math.max(0, todayApt.serial_number - snap.stats.completedCount);
+          } else {
+            nowServingStr = 'Starting';
+            aheadCount = Math.max(0, todayApt.serial_number - 1);
+          }
+          estWait = aheadCount === 0 ? 'Your Turn Now!' : `~${aheadCount * 12} mins`;
+        }
+      } catch (_) {}
+
+      banner.innerHTML = `
+        <div class="queue-airport-board">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-5);">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span class="status-dot-live"></span>
+                <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #38bdf8; letter-spacing: 0.05em;">Live Chamber Status • Active Today</span>
+              </div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: #ffffff;">${todayApt.doctor_name}</h3>
+              <div style="font-size: 0.8125rem; color: #94a3b8;">${todayApt.hospital_name_en} • Chamber Room</div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+              <button id="refresh-queue-btn" class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #e2e8f0; font-size: 0.75rem;">
+                <span id="refresh-spin-icon" style="display: inline-flex;">🔄</span> Refresh
+              </button>
+              <a href="/appointment-slip.html?id=${todayApt.id}" class="btn btn-primary btn-sm" style="font-weight: 700;">
+                View Digital Slip
+              </a>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); align-items: center; background: rgba(0,0,0,0.35); padding: var(--space-4); border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.08);">
+            <div>
+              <span style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; display: block; margin-bottom: 0.35rem;">Now Serving in Chamber</span>
+              <div class="queue-split-flap">${nowServingStr}</div>
+            </div>
+
+            <div>
+              <span style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; display: block; margin-bottom: 0.35rem;">Your Assigned Token</span>
+              <div style="font-family: var(--font-mono); font-size: 1.75rem; font-weight: 800; color: #38bdf8; line-height: 1.2;">
+                SL - ${String(todayApt.serial_number).padStart(2, '0')}
+              </div>
+              <span style="font-size: 0.75rem; color: #cbd5e1;">${aheadCount === 0 ? '👉 Proceed to Doctor Room' : `${aheadCount} patient${aheadCount === 1 ? '' : 's'} ahead of you`}</span>
+            </div>
+
+            <div>
+              <span style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; display: block; margin-bottom: 0.35rem;">Estimated Wait Time</span>
+              <div style="font-size: 1.25rem; font-weight: 700; color: #f59e0b; font-feature-settings: 'tnum';">
+                ⏱ ${estWait}
+              </div>
+              <span style="font-size: 0.75rem; color: #94a3b8;">Avg ~12 mins / consultation</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('refresh-queue-btn')?.addEventListener('click', () => {
+        loadAppointments();
+      });
+    }
+
+    function renderAppointmentsList() {
+      const container = document.getElementById('appointments-container');
+      const filtered = allAppointments.filter(a => {
+        if (activeTab === 'upcoming') {
+          return ['PENDING_PAYMENT', 'CONFIRMED', 'ARRIVED', 'IN_CONSULTATION'].includes(a.status);
+        } else if (activeTab === 'completed') {
+          return a.status === 'COMPLETED';
+        } else if (activeTab === 'cancelled') {
+          return a.status === 'CANCELLED';
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align: center; padding: var(--space-12) var(--space-6);">
+            <div style="width: 52px; height: 52px; border-radius: var(--radius-full); background: var(--color-teal-50); color: var(--color-teal-700); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-3); border: 1px solid var(--color-teal-200);">
+              ${icons.calendar(24)}
+            </div>
+            <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-2);">No ${activeTab} visits found</h3>
+            <p style="color: var(--color-ink-600); max-width: 420px; margin: 0 auto var(--space-5); font-size: 0.875rem;">
+              You do not have any ${activeTab} clinical appointments scheduled.
+            </p>
+            <a href="/doctors.html" class="btn btn-primary">Find a Doctor</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      filtered.forEach(apt => {
+        const card = document.createElement('div');
+        card.className = 'appointment-card';
+
+        const isPaid = apt.payment_status === 'PAID';
+        const isUpcoming = ['PENDING_PAYMENT', 'CONFIRMED', 'ARRIVED', 'IN_CONSULTATION'].includes(apt.status);
+        const isCompleted = apt.status === 'COMPLETED';
+        const isCancelled = apt.status === 'CANCELLED';
+
+        let statusBadge = `<span class="badge badge-info">${apt.status}</span>`;
+        if (apt.status === 'CONFIRMED') statusBadge = `<span class="badge badge-success">Confirmed</span>`;
+        if (apt.status === 'COMPLETED') statusBadge = `<span class="badge badge-success">Completed</span>`;
+        if (apt.status === 'CANCELLED') statusBadge = `<span class="badge badge-danger">Cancelled</span>`;
+
+        card.innerHTML = `
+          <div style="display: flex; gap: var(--space-4); align-items: flex-start;">
+            <div>
+              ${renderDoctorAvatar(apt.doctor_name, apt.doctor_id, 64, true, apt.avatar_url)}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; gap: var(--space-2); align-items: center; margin-bottom: var(--space-2); flex-wrap: wrap;">
+                <span class="badge badge-primary" style="font-family: var(--font-mono); font-weight: 700;">
+                  SL - ${String(apt.serial_number).padStart(2, '0')}
+                </span>
+                ${statusBadge}
+                <span class="badge ${isPaid ? 'badge-success' : 'badge-warning'}">
+                  ${isPaid ? 'PAID' : 'PAY AT CLINIC'}
+                </span>
+              </div>
+
+              <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">${apt.doctor_name}</h3>
+              <div style="color: var(--color-teal-700); font-weight: 600; font-size: 0.875rem;">
+                ${apt.specialty_name_en} — ${apt.hospital_name_en}
+              </div>
+
+              <div style="display: flex; gap: var(--space-4); margin-top: var(--space-3); font-size: 0.8125rem; color: var(--color-ink-600); flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span style="color: var(--color-teal-700);">${icons.calendar(14)}</span>
+                  <span style="font-feature-settings: 'tnum';"><strong>${apt.date}</strong> at <strong>${apt.time}</strong></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span style="color: var(--color-teal-700);">${icons.user(14)}</span>
+                  <span>Patient: <strong>${apt.patient_name}</strong> (${apt.patient_gender}, ${apt.patient_age} yrs)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span style="color: var(--color-teal-700);">${icons.banknote(14)}</span>
+                  <span style="font-feature-settings: 'tnum';">Fee: <strong>৳ ${apt.fee_amount}</strong></span>
+                </div>
+              </div>
+
+              ${apt.reason_for_visit ? `<div style="font-size: 0.8125rem; color: var(--color-ink-500); margin-top: var(--space-2);">Reason: ${apt.reason_for_visit}</div>` : ''}
+
+              ${isUpcoming ? `
+                <!-- Live Queue Position Box -->
+                <div id="queue-box-${apt.id}" style="margin-top: var(--space-3); background: var(--color-surface-subtle); border: 1px dashed var(--color-teal-400); border-radius: var(--radius-sm); padding: var(--space-3); max-width: 520px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <span style="font-size: 0.6875rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase;">Live Chamber Queue</span>
+                      <div id="queue-status-${apt.id}" style="font-size: 0.875rem; font-weight: 700; color: var(--color-teal-800); margin-top: 0.15rem;">
+                        Checking queue position...
+                      </div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm check-queue-btn" data-apt-id="${apt.id}" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;">
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+              ` : ''}
+              
+              ${isCancelled && apt.refund_amount > 0 ? `
+                <div style="background: var(--color-success-subtle); color: var(--color-success-text); border: 1px solid var(--color-success-border); padding: 0.35rem 0.65rem; border-radius: var(--radius-xs); font-size: 0.75rem; margin-top: var(--space-2); display: inline-block;">
+                  Refund Credited: ৳ ${apt.refund_amount} (${apt.refund_percentage}%)
+                </div>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Actions Column -->
+          <div style="display: flex; flex-direction: column; gap: var(--space-2); min-width: 160px;">
+            <a href="/appointment-slip.html?id=${apt.id}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
+              <span>View Slip & QR</span>
+            </a>
+
+            ${isUpcoming ? `
+              <button class="btn btn-secondary btn-sm reschedule-btn" data-apt-id="${apt.id}" data-doc-id="${apt.doctor_id}">
+                Reschedule
+              </button>
+              <button class="btn btn-danger-outline btn-sm cancel-btn" data-apt-id="${apt.id}" data-date="${apt.date}" data-time="${apt.time}" data-fee="${apt.fee_amount}">
+                Cancel Visit
+              </button>
+            ` : ''}
+
+            ${isCompleted ? `
+              ${apt.prescription_id ? `
+                <a href="/prescription-slip.html?id=${apt.id}" target="_blank" class="btn btn-primary btn-sm">
+                  Official Rx PDF
+                </a>
+                <button class="btn btn-secondary btn-sm view-rx-btn" data-apt-id="${apt.id}">
+                  Quick View Rx
+                </button>
+              ` : ''}
+              ${!apt.review_id ? `
+                <button class="btn btn-secondary btn-sm review-btn" data-apt-id="${apt.id}">
+                  Leave Review
+                </button>
+              ` : `
+                <span style="font-size: 0.75rem; color: var(--color-success); font-weight: 600; text-align: center;">✓ Reviewed</span>
+              `}
+            ` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      attachActionHandlers();
+    }
+
+    // Tab buttons
+    document.getElementById('tab-upcoming-btn').addEventListener('click', () => switchTab('upcoming'));
+    document.getElementById('tab-completed-btn').addEventListener('click', () => switchTab('completed'));
+    document.getElementById('tab-cancelled-btn').addEventListener('click', () => switchTab('cancelled'));
+
+    function switchTab(tab) {
+      activeTab = tab;
+      ['upcoming', 'completed', 'cancelled'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}-btn`);
+        if (t === tab) {
+          btn.className = 'btn btn-sm btn-primary';
+        } else {
+          btn.className = 'btn btn-sm btn-secondary';
+        }
+      });
+      renderAppointmentsList();
+    }
+
+    function attachActionHandlers() {
+      // Cancellation
+      document.querySelectorAll('.cancel-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const aptId = btn.getAttribute('data-apt-id');
+          const date = btn.getAttribute('data-date');
+          const time = btn.getAttribute('data-time');
+          const fee = Number(btn.getAttribute('data-fee'));
+
+          openCancelModal(aptId, date, time, fee);
+        });
+      });
+
+      // Reschedule
+      document.querySelectorAll('.reschedule-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const aptId = btn.getAttribute('data-apt-id');
+          const docId = btn.getAttribute('data-doc-id');
+          openRescheduleModal(aptId, docId);
+        });
+      });
+
+      // View Prescription
+      document.querySelectorAll('.view-rx-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const aptId = btn.getAttribute('data-apt-id');
+          openPrescriptionModal(aptId);
+        });
+      });
+
+      // Leave Review
+      document.querySelectorAll('.review-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const aptId = btn.getAttribute('data-apt-id');
+          openReviewModal(aptId);
+        });
+      });
+
+      // Live Queue Tracker check
+      document.querySelectorAll('.check-queue-btn').forEach(btn => {
+        const aptId = btn.getAttribute('data-apt-id');
+        fetchQueuePosition(aptId);
+        btn.addEventListener('click', () => fetchQueuePosition(aptId));
+      });
+    }
+
+    async function fetchQueuePosition(aptId) {
+      const statusEl = document.getElementById(`queue-status-${aptId}`);
+      if (!statusEl) return;
+
+      try {
+        const res = await api.get(`/appointments/${aptId}/queue-position`);
+        const q = res.data;
+        statusEl.innerHTML = `
+          <span>${q.statusMessage}</span>
+          <span style="font-size: 0.75rem; color: var(--color-ink-500); display: block; margin-top: 0.15rem;">
+            Serving: <strong>${q.currentServingSerial}</strong> • Your Serial: <strong>${q.serialBadge}</strong>
+          </span>
+        `;
+      } catch (err) {
+        statusEl.textContent = 'Queue status unavailable right now.';
+      }
+    }
+
+    // Cancellation Logic with Dynamic Refund Calculation
+    let activeCancelAptId = null;
+
+    function openCancelModal(aptId, dateStr, timeStr, fee) {
+      activeCancelAptId = aptId;
+      const modal = document.getElementById('cancel-modal');
+      const banner = document.getElementById('cancel-info-banner');
+
+      // Calculate diff in hours
+      const aptTime = new Date(`${dateStr}T${timeStr}`);
+      const diffHours = (aptTime.getTime() - Date.now()) / (1000 * 60 * 60);
+
+      let refundPct = 0;
+      if (diffHours >= 24) refundPct = 90;
+      else if (diffHours >= 6) refundPct = 50;
+      else refundPct = 0;
+
+      const refundAmount = Math.round((fee * refundPct) / 100);
+
+      banner.innerHTML = `
+        <div style="margin-bottom: 0.35rem;">Time Until Scheduled Consultation: <strong>${Math.max(0, Math.round(diffHours * 10) / 10)} Hours</strong></div>
+        <div style="margin-bottom: 0.35rem;">Original Consultation Fee: <strong>৳ ${fee}</strong></div>
+        <div style="font-size: 1rem; color: ${refundPct > 0 ? 'var(--color-success)' : 'var(--color-danger)'}; font-weight: 700;">
+          Applicable Refund: ${refundPct}% (৳ ${refundAmount})
+        </div>
+      `;
+
+      modal.classList.add('show');
+    }
+
+    document.getElementById('cancel-modal-close').addEventListener('click', () => {
+      document.getElementById('cancel-modal').classList.remove('show');
+    });
+    document.getElementById('cancel-modal-dismiss').addEventListener('click', () => {
+      document.getElementById('cancel-modal').classList.remove('show');
+    });
+
+    document.getElementById('confirm-cancel-btn').addEventListener('click', async () => {
+      const reasonSelect = document.getElementById('cancel-reason-select').value;
+      const otherInput = document.getElementById('cancel-reason-other').value.trim();
+      const reason = reasonSelect === 'Other' ? otherInput : reasonSelect;
+
+      try {
+        const res = await api.post(`/appointments/${activeCancelAptId}/cancel`, { reason });
+        document.getElementById('cancel-modal').classList.remove('show');
+        showToast(res.message || 'Appointment cancelled.', 'success');
+        loadAppointments();
+      } catch (err) {
+        showToast(err.message || 'Failed to cancel appointment.', 'error');
+      }
+    });
+
+    // Reschedule Logic
+    let activeReschedAptId = null;
+    let activeReschedDocId = null;
+
+    function openRescheduleModal(aptId, docId) {
+      activeReschedAptId = aptId;
+      activeReschedDocId = docId;
+      const modal = document.getElementById('reschedule-modal');
+
+      const dateInput = document.getElementById('reschedule-date');
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      dateInput.min = tomorrow.toISOString().slice(0, 10);
+      dateInput.value = tomorrow.toISOString().slice(0, 10);
+
+      loadRescheduleSlots(tomorrow.toISOString().slice(0, 10));
+
+      modal.classList.add('show');
+    }
+
+    document.getElementById('reschedule-date').addEventListener('change', (e) => {
+      loadRescheduleSlots(e.target.value);
+    });
+
+    async function loadRescheduleSlots(dateStr) {
+      const container = document.getElementById('reschedule-slots-container');
+      container.innerHTML = '<div style="text-align: center; padding: var(--space-4); color: var(--color-ink-500);">Loading available slots...</div>';
+
+      try {
+        const res = await api.get(`/doctors/${activeReschedDocId}/slots?date=${dateStr}`);
+        const availSlots = res.data.filter(s => s.effective_status === 'AVAILABLE');
+
+        if (availSlots.length === 0) {
+          container.innerHTML = '<div style="text-align: center; padding: var(--space-6); color: var(--color-ink-500);">No available slots on this date.</div>';
+          return;
+        }
+
+        container.innerHTML = '<div class="slots-grid"></div>';
+        const grid = container.querySelector('.slots-grid');
+
+        availSlots.forEach(s => {
+          const btn = document.createElement('button');
+          btn.className = 'slot-btn';
+          btn.textContent = s.start_time;
+          btn.addEventListener('click', async () => {
+            await submitReschedule(s.id);
+          });
+          grid.appendChild(btn);
+        });
+
+      } catch (err) {
+        container.innerHTML = '<div style="color: var(--color-danger); text-align: center;">Error loading slots.</div>';
+      }
+    }
+
+    async function submitReschedule(newSlotId) {
+      try {
+        const res = await api.post(`/appointments/${activeReschedAptId}/reschedule`, { newSlotId });
+        document.getElementById('reschedule-modal').classList.remove('show');
+        showToast('Appointment rescheduled successfully!', 'success');
+        loadAppointments();
+      } catch (err) {
+        showToast(err.message || 'Reschedule failed.', 'error');
+      }
+    }
+
+    document.getElementById('reschedule-modal-close').addEventListener('click', () => {
+      document.getElementById('reschedule-modal').classList.remove('show');
+    });
+    document.getElementById('reschedule-dismiss').addEventListener('click', () => {
+      document.getElementById('reschedule-modal').classList.remove('show');
+    });
+
+    // Digital Prescription Modal
+    async function openPrescriptionModal(aptId) {
+      const modal = document.getElementById('prescription-modal');
+      const body = document.getElementById('rx-modal-body');
+      body.innerHTML = '<div style="text-align: center; padding: var(--space-8); color: var(--color-ink-500);">Loading prescription...</div>';
+      modal.classList.add('show');
+
+      try {
+        const res = await api.get(`/prescriptions/appointment/${aptId}`);
+        const rx = res.data;
+
+        body.innerHTML = `
+          <div style="border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-4); margin-bottom: var(--space-4);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">${rx.doctor_name}</h3>
+                <div style="color: var(--color-teal-700); font-weight: 600; font-size: 0.875rem;">${rx.specialty_name_en}</div>
+                <div style="font-size: 0.8125rem; color: var(--color-ink-500);">${rx.doctor_qualifications} • BMDC: ${rx.bmdc_reg_no}</div>
+              </div>
+              <div style="text-align: right; font-size: 0.8125rem;">
+                <strong style="color: var(--color-ink-900);">${rx.hospital_name_en}</strong>
+                <div style="color: var(--color-ink-500); font-feature-settings: 'tnum';">${rx.appointment_date}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); font-size: 0.8125rem; background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); margin-bottom: var(--space-4); border: 1px solid var(--color-border);">
+            <div>Patient: <strong style="color: var(--color-ink-900);">${rx.patient_name}</strong> (${rx.patient_gender}, ${rx.patient_age} yrs)</div>
+            <div>Token Ref: <strong style="font-family: var(--font-mono);">${rx.appointment_number}</strong></div>
+          </div>
+
+          <div style="margin-bottom: var(--space-4);">
+            <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase;">Clinical Diagnosis:</div>
+            <div style="font-size: 1rem; font-weight: 700; color: var(--color-teal-800);">${rx.diagnosis}</div>
+            ${rx.symptoms ? `<div style="font-size: 0.8125rem; color: var(--color-ink-600); margin-top: 0.25rem;">Symptoms: ${rx.symptoms}</div>` : ''}
+          </div>
+
+          <!-- Rx Medication Table -->
+          <div style="margin-bottom: var(--space-4);">
+            <div style="font-size: 0.875rem; font-weight: 700; color: var(--color-ink-950); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.04em;">Medications Prescribed</div>
+            <div class="table-container">
+              <table style="font-size: 0.8125rem;">
+                <thead>
+                  <tr>
+                    <th>Medicine Name</th>
+                    <th>Dosage</th>
+                    <th>Instruction</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rx.medicines.map(m => `
+                    <tr>
+                      <td><strong>${m.medicine_name}</strong></td>
+                      <td>${m.dosage}</td>
+                      <td>${m.instruction}</td>
+                      <td>${m.duration}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Diagnostic Tests -->
+          ${rx.tests && rx.tests.length > 0 ? `
+            <div style="margin-bottom: var(--space-4);">
+              <div style="font-size: 0.875rem; font-weight: 700; color: var(--color-ink-950); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.04em;">Diagnostic Investigations</div>
+              <ul style="padding-left: 1.25rem; font-size: 0.8125rem; color: var(--color-ink-700); margin: 0;">
+                ${rx.tests.map(t => `<li><strong>${t.test_name}</strong> ${t.notes ? `(${t.notes})` : ''}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+
+          <!-- Advice -->
+          ${rx.advice ? `
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.8125rem; margin-bottom: var(--space-3);">
+              <strong style="color: var(--color-ink-900);">Clinical Advice:</strong><br>
+              <span style="color: var(--color-ink-700);">${rx.advice}</span>
+            </div>
+          ` : ''}
+
+          ${rx.follow_up_date ? `
+            <div style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-600);">
+              Next Consultation Date: <strong style="color: var(--color-teal-800);">${rx.follow_up_date}</strong>
+            </div>
+          ` : ''}
+        `;
+
+        document.getElementById('rx-print-btn').onclick = () => window.print();
+
+      } catch (err) {
+        body.innerHTML = '<div style="color: var(--color-danger); text-align: center;">Unable to load prescription.</div>';
+      }
+    }
+
+    document.getElementById('rx-modal-close').addEventListener('click', () => {
+      document.getElementById('prescription-modal').classList.remove('show');
+    });
+    document.getElementById('rx-dismiss-btn').addEventListener('click', () => {
+      document.getElementById('prescription-modal').classList.remove('show');
+    });
+
+    // Doctor Review Modal Logic
+    let activeReviewAptId = null;
+    let selectedStarRating = 5;
+
+    function openReviewModal(aptId) {
+      activeReviewAptId = aptId;
+      selectedStarRating = 5;
+      updateStarDisplay(5);
+      document.getElementById('review-comment').value = '';
+      document.getElementById('review-modal').classList.add('show');
+    }
+
+    function updateStarDisplay(rating) {
+      selectedStarRating = rating;
+      const stars = document.querySelectorAll('#star-rating-box span');
+      stars.forEach(s => {
+        const starNum = Number(s.getAttribute('data-star'));
+        s.style.color = starNum <= rating ? '#d97706' : '#cbd5e1';
+      });
+    }
+
+    document.querySelectorAll('#star-rating-box span').forEach(s => {
+      s.addEventListener('click', () => {
+        const rating = Number(s.getAttribute('data-star'));
+        updateStarDisplay(rating);
+      });
+    });
+
+    document.getElementById('submit-review-btn').addEventListener('click', async () => {
+      const comment = document.getElementById('review-comment').value.trim();
+
+      try {
+        await api.post('/reviews', {
+          appointmentId: Number(activeReviewAptId),
+          rating: selectedStarRating,
+          comment
+        });
+
+        document.getElementById('review-modal').classList.remove('show');
+        showToast('Review submitted successfully!', 'success');
+        loadAppointments();
+      } catch (err) {
+        showToast(err.message || 'Failed to submit review.', 'error');
+      }
+    });
+
+    document.getElementById('review-modal-close').addEventListener('click', () => {
+      document.getElementById('review-modal').classList.remove('show');
+    });
+
+    loadAppointments();
+  </script>
+</body>
+</html>

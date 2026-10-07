@@ -1,0 +1,359 @@
+================================================================================
+DOCBOOK UI COMPREHENSIVE ARCHITECTURE & PROMPTING GUIDE
+================================================================================
+File: UI-GUIDE.txt
+Application: DocBook — Doctor Appointment Booking & Clinic Management System
+Stack: Pure Vanilla HTML5, Vanilla CSS3, Vanilla ES6+ JavaScript (Zero Frameworks)
+Server: Node.js (v20+) / Express.js / SQLite (WAL Mode) at http://localhost:3000
+
+This document is your blueprint to understand every page, component, style token,
+and interactive widget in the DocBook platform. Use the copy-pasteable prompt
+templates at the bottom to instruct the AI on specific UI improvements.
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+1. High-Level UI Philosophy & Architecture
+2. Global Layout & Reusable Shell Elements
+3. Complete Page Directory (File by File Breakdown)
+4. Design System Tokens (Colors, Typography, Elevation)
+5. Interactive Widgets & Medical Specialty Components
+6. Key CSS Classes & DOM Selectors Cheat Sheet
+7. Ready-to-Use Prompt Templates for UI Improvements
+
+================================================================================
+1. HIGH-LEVEL UI PHILOSOPHY & ARCHITECTURE
+================================================================================
+- Zero-Framework Architecture: Pure semantic HTML5 and vanilla CSS3 components.
+  No React, Vue, or Tailwind. Every style is direct, inspectable, and fast.
+- Dual Theme Engine:
+  * Light Mode: Warm Stone (#faf8f5) & Pristine Card Surface (#ffffff).
+  * Dark Mode: Luxe Obsidian (#070a10) with Sapphire-Slate Card Elevation (#0e1422)
+    and luminous cyan-teal accents (#2dd4bf).
+- Bilingual Support: Instant live language toggle between English and Bengali (বাংলা)
+  powered by `public/js/i18n.js` with `data-i18n` attributes.
+- Accessibility System: Built-in A+ font size scaling (Normal, Large, Extra Large)
+  and high-contrast mode switcher (`public/js/accessibility.js`).
+- Role-Based Portals: Four distinct user journeys:
+  * Patient: Discovery, 5-min slot hold, checkout, appointments, slips.
+  * Doctor: Live chamber queue, consultation caller, e-prescription writer.
+  * Receptionist: Check-in arrivals, cash collection, walk-in token generation.
+  * Admin: Clinic KPIs, doctor verification, doctor CRUD, audit trails.
+
+================================================================================
+2. GLOBAL LAYOUT & REUSABLE SHELL ELEMENTS
+================================================================================
+Mount Points:
+- `#navbar-mount`: Dynamically rendered by `public/js/navbar.js` on every page.
+- `#footer-mount`: Dynamically rendered by `public/js/navbar.js` (renderFooter()).
+
+A. Top Emergency Bar (.emergency-top-bar):
+   - Height: Compact 28px, deep midnight obsidian gradient.
+   - Live Beacon: Dual-layer pulsating radar sonar dot (.emergency-beacon-dot &
+     .emergency-radar-sonar).
+   - Live Badge: 24/7 TRIAGE pill tag.
+   - Animated Ticker: Vertical sliding track (.emergency-ticker-track) that cycles
+     through 3 clinical guarantees every 3.5s (pauses on hover).
+   - Quick-Dial Chips: Micro-glass pills with hover lift & icons:
+     * Ambulance: +8801711223301 (.emergency-chip-ambulance)
+     * Health Call: 16263 (.emergency-chip-health)
+     * Emergency: 999 (.emergency-chip-red with pulsing warning icon)
+
+B. Universal Sticky Navbar (.navbar):
+   - Brand Logo: Stethoscope icon in teal box + "DocBook" title (.nav-brand).
+   - Primary Navigation (.nav-links): Home, Find Doctors, AI Triage modal trigger.
+   - Role-Specific Link: Dynamically added when logged in (Appointments, Doctor Panel,
+     Reception Desk, or Admin Dashboard).
+   - Action Toolbar (.nav-actions):
+     * [A+] Font Size Scaler (#font-size-toggle-btn)
+     * [বাং / EN] Language Switcher (#lang-toggle-btn)
+     * [Moon / Sun] Dark/Light Theme Toggle (#theme-toggle-btn)
+     * User Dropdown Pill (#user-menu-btn): Shows avatar, first name, role badge,
+       and dropdown menu for profile links and sign out.
+   - Mobile Hamburger: 3-line SVG toggle button opening slide-out drawer (#mobile-drawer).
+
+C. Global AI Symptom Checker Modal (#ai-symptom-modal):
+   - Available across all pages via the navbar "AI Triage" button or keyboard shortcut.
+   - Natural language symptom input with real-time urgency triage detection:
+     * Routine / Non-Emergency (Green)
+     * High Priority (Amber)
+     * Emergency Triage Required (Crimson alert banner)
+   - Matches symptoms to clinical departments and recommends verified active doctors.
+
+D. Global Footer (.footer):
+   - 4-column responsive grid:
+     1. Brand summary & 24/7 Clinical Desk hotline.
+     2. Quick Links (Home, Doctors, AI Symptom Checker, Appointments).
+     3. Top Specialties (Cardiology, Pediatrics, Gynecology, Dermatology, Orthopedics).
+     4. BMDC Accreditation Shield & 100% Verified badge.
+   - Sub-footer with copyright and legal links (Terms of Care, Privacy, Refund Policy).
+
+================================================================================
+3. COMPLETE PAGE DIRECTORY (FILE BY FILE BREAKDOWN)
+================================================================================
+
+1. Homepage (`public/index.html`)
+   - Hero Section: Editorial typography heading, live chamber indicator pill,
+     4-field unified search bar (Keyword, Specialty dropdown, Hospital dropdown,
+     and "Find Doctor" button).
+   - Floating Hero Badges: "100% BMDC Verified" and "4.9/5.0 Patient Satisfaction".
+   - Trust Metrics Bar: 4 KPI highlight boxes (100% BMDC, 15+ Hospitals, etc.).
+   - Specialty Grid: 8 interactive department cards with custom medical SVG icons.
+   - Featured Doctors Carousel: Top-rated doctors with fee tags and instant booking.
+   - 3-Step "How It Works" Flow: Find Doctor -> 5-Min Hold -> Pay & Get Slip.
+
+2. Doctor Search & Directory (`public/doctors.html`)
+   - Left Sidebar: Faceted filters (Search keyword, Specialty checkboxes, Hospital
+     dropdown, Gender radio, Consultation fee range slider, Day-of-week chips).
+   - Top Filter Bar: Active count indicator, Sort dropdown (Rating, Experience, Fee),
+     Grid/List view switch buttons (.view-toggle-btn).
+   - Doctor Cards Grid: Doctors rendered with monogram avatar, BMDC shield badge,
+     hospital affiliation, fee tags, and direct slot booking button.
+
+3. Doctor Profile & Slot Selection (`public/doctor-profile.html`)
+   - Profile Header: Verified avatar, full medical degrees, chamber address, fees.
+   - 7-Day Interactive Date Picker: Horizontal sliding calendar pills with day/date.
+   - Shift-Based Slot Picker: Grouped by Morning, Afternoon, and Evening shifts.
+     Each slot displays start time, status (Available, Held, Booked), and click-to-hold.
+   - 5-Minute Hold Notification: Live countdown bar triggered upon slot reservation.
+   - Cancellation Waitlist Banner: Displayed when all slots for a date are full.
+
+4. Checkout & Payment (`public/booking.html`)
+   - 5-Minute Reservation Hold Bar: Floating top banner with live countdown timer.
+     If the timer expires, the slot is automatically released back to the pool.
+   - Patient Info Form: Radio for "Myself" vs "Family Member", name, phone, age, gender.
+   - Fee Breakdown Summary: Consultation fee, clinic platform charge, total.
+   - Payment Selector: Selectable gateway cards (bKash, Nagad, Card, Pay at Clinic).
+   - Terms Acceptance Checkbox & Submit Booking Button.
+
+5. Patient Appointments Dashboard (`public/my-appointments.html`)
+   - Live Chamber Queue Tracker Widget: Shows current serving token (SL-01), your
+     token (SL-04), patients ahead of you, and dynamic estimated wait time.
+   - Tab Navigation: Upcoming Appointments, Completed Consultations, Cancelled.
+   - Appointment Cards: Doctor monogram, date/time, chamber room, fee status,
+     actions (View Slip, Reschedule, Cancel, View Prescription, Write Review).
+   - 3-Tier Visual Refund Meter: Shows expected refund % when requesting cancellation.
+
+6. Login & Registration Portal (`public/login.html`)
+   - Split Layout: Left editorial brand banner with trust metrics, right interactive form.
+   - 1-Click Demo Logins: 4 instant login pills (Admin, Doctor, Receptionist, Patient).
+   - Authentication Modes:
+     * Password Login: Phone number + password.
+     * Passwordless OTP Login: 6-digit auto-advancing segmented OTP input boxes.
+     * Patient Registration: Name, phone, password, math CAPTCHA verification.
+
+7. Doctor Chamber Workspace (`public/doctor-panel.html`)
+   - Header: Doctor status toggle (Active in Chamber / Away), practicing date filter.
+   - Live OPD Queue Manager: Real-time patient list with sequential SL numbers.
+   - Consultation Actions: Call Patient -> In Consultation -> Mark Completed.
+   - Digital Prescription Writer Modal: Patient diagnosis, symptoms, medication
+     dosage table (Drug, Dosage, Duration, Advice), lab test orders, physician seal.
+   - Schedule & Leave Manager: Declare day leaves, shift timings, slot blockouts.
+
+8. Reception Front Desk Desk (`public/reception-panel.html`)
+   - Practicing Doctors Bar: Live list of doctors currently consulting today.
+   - Patient Arrival Check-In: Search booking ID or phone to mark patient as "Arrived".
+   - Cash Collection: Record on-spot cash payments for "Pay at Clinic" bookings.
+   - Walk-in Token Generator: Instantly generate emergency or walk-in queue tokens.
+
+9. Admin Analytics & Management Dashboard (`public/admin-dashboard.html`)
+   - KPI Summary Cards: Total Consultations, Active Doctors, Today Revenue, Holds.
+   - Interactive SVG Visualizations: Consultations trend chart, revenue channel pie.
+   - Doctor Verification Table: Inspect BMDC registration credentials, approve or
+     suspend practicing licenses.
+   - System Audit Trail: Live log viewer showing medical record access, logins, holds.
+   - CSV Export: 1-click download of appointments, financial ledgers, and doctors.
+
+10. Printable Slips & Verification Pages:
+    - `public/appointment-slip.html`: Print-optimized medical token with sequential SL
+      badge, QR code verification graphic, chamber directions, and clinic rules.
+    - `public/prescription-slip.html`: Printable e-prescription with doctor seal,
+      BMDC stamp, medication tables, diagnostic orders, and verification QR code.
+    - `public/verify-slip.html`: Public verification landing page displayed when scanning
+      any QR code with a smartphone camera.
+
+================================================================================
+4. DESIGN SYSTEM TOKENS (COLORS, TYPOGRAPHY, ELEVATION)
+================================================================================
+
+A. Color System:
+   Tokens                      Light Theme Value        Dark Theme (Obsidian)
+   -----------------------------------------------------------------------------
+   --color-canvas              #faf8f5 (Stone)          #070a10 (Deep Obsidian)
+   --color-surface             #ffffff (Pristine Card)  #0e1422 (Sapphire Slate)
+   --color-surface-subtle      #f4f0e8 (Panel)          #131a2b (Card Inset)
+   --color-muted               #ede8df (Divider)        #1a2338 (Muted Slate)
+   --color-header-bg           rgba(250,248,245,0.92)   rgba(7,10,16,0.88)
+   --color-teal-700 (Brand)    #0d7a71 (Clinical Teal)  #0d9488 (Emerald Teal)
+   --color-teal-500 (Glow)     #14b8a6                  #2dd4bf (Luminous Cyan)
+   --color-ink-950 (Headings)  #0a0e14                  #ffffff (Pure Crisp White)
+   --color-ink-900 (Titles)    #111827                  #f1f5f9
+   --color-ink-700 (Body)      #374151                  #cbd5e1 (Zero-Fatigue Body)
+   --color-ink-500 (Meta)      #6b7280                  #64748b
+   --color-border              #e7e4dc                  rgba(255, 255, 255, 0.08)
+   --color-border-strong       #b8b1a3                  rgba(255, 255, 255, 0.16)
+   --color-danger              #b91c1c                  #f87171 (Soft Crimson)
+   --color-warning             #b45309                  #fbbf24 (Soft Amber Gold)
+   --color-success             #15803d                  #34d399 (Clinical Emerald)
+   --color-info                #0369a1                  #38bdf8 (Sky Azure)
+
+B. Typography:
+   - Display Font: 'Fraunces', serif (Editorial, warm, clinical authority).
+   - UI Body Font: 'Plus Jakarta Sans', sans-serif (Clean geometric modern UI).
+   - Bengali Font: 'Hind Siliguri', sans-serif (Pixel-perfect Bangla script).
+   - Numbers: Tabular lining figures (font-feature-settings: 'tnum') on prices,
+     slots, dates, queue numbers, and timers.
+
+C. Shadows & Elevation:
+   - --shadow-xs:       Subtle component boundary.
+   - --shadow-sm:       Small elevation for buttons and chips.
+   - --shadow-md:       Default card elevation with top-edge hairline highlight.
+   - --shadow-lg:       Elevated dropdowns, hero search box, and feature cards.
+   - --shadow-floating: Heavy modal and slide-out drawer diffused shadow.
+
+================================================================================
+5. INTERACTIVE WIDGETS & MEDICAL SPECIALTY COMPONENTS
+================================================================================
+
+1. 5-Minute Atomic Slot Hold Bar (.countdown-bar):
+   - Live visual countdown bar indicating temporary slot reservation.
+   - Background sweeper releases abandoned holds every 30 seconds.
+   - Concurrency guarantee: Zero double-booking via SQLite BEGIN IMMEDIATE.
+
+2. Live OPD Chamber Queue Tracker (.queue-tracker):
+   - Shows sequential patient position: "Now Serving SL-02 | Your SL-05".
+   - Shows dynamic remaining patients: "3 patients ahead of you (~24 min wait)".
+   - Pulsing emerald live chamber dot.
+
+3. Doctor Monogram Avatar (.doctor-monogram-avatar):
+   - Algorithmic 2-letter physician initials with verified check shield badge.
+   - Harmonized translucent glass palette in dark mode.
+
+4. 3-Stage Cancellation Refund Tier Bar:
+   - Visual tier meter indicating refund policy:
+     * > 24 hours: 90% refund
+     * 6 to 24 hours: 50% refund
+     * < 6 hours: 0% non-refundable
+   - Automatically highlights the current active tier based on appointment time.
+
+5. Segmented OTP Verification Boxes:
+   - 6 standalone single-digit input fields with auto-advance, backspace retreat,
+     and copy-paste distribution.
+
+================================================================================
+6. KEY CSS CLASSES & DOM SELECTORS CHEAT SHEET
+================================================================================
+Selector                       Purpose
+--------------------------------------------------------------------------------
+.emergency-top-bar             Top 28px hotline and animated clinical ticker bar
+.emergency-bar-inner           Flexbox container aligning top bar with main navbar
+.emergency-beacon-wrap         Dual-layer pulsing radar sonar beacon wrapper
+.emergency-badge               "24/7 TRIAGE" glowing micro-badge
+.emergency-ticker-viewport     Viewport for vertical sliding text guarantees
+.emergency-chip                Interactive quick-dial pills (Ambulance, 16263, 999)
+.navbar                        Universal sticky glassmorphism navigation header
+.navbar-inner                  Navbar inner container (68px height)
+.nav-brand                     Logo icon and "DocBook" typography
+.nav-links                     Desktop navigation list
+.nav-link                      Individual navigation anchor item
+.user-menu                     Profile trigger and dropdown wrapper
+.user-dropdown                 Floating user profile and signout menu
+.mobile-drawer                 Slide-out mobile navigation drawer
+.card                          Standard elevated card component
+.card-interactive              Card with hover lift and glowing border aura
+.doctor-card                   Physician card in directory search results
+.doctor-monogram-avatar        Monogram physician avatar circle/box
+.avatar-verified-badge         BMDC verified green shield badge
+.hero-search-box               4-field unified search card on homepage
+.live-status-strip             Live outpatient chamber badge strip
+.trust-metric-box              Homepage KPI highlight counter card
+.btn-primary                   Main clinical action button (cyan-teal gradient)
+.btn-secondary                 Frosted surface button with hairline border
+.btn-outline                   Border-only accent button
+.form-control                  Universal 44px text input, select, and textarea
+.chip                          Filter chip / tag button
+.slot-btn                      Interactive appointment time slot button
+.slot-btn.selected             Active selected time slot button
+.badge-success                 Sage/emerald status pill (Confirmed, Active)
+.badge-warning                 Amber status pill (Pending, High Priority)
+.badge-danger                  Crimson status pill (Emergency, Cancelled)
+.badge-info                    Azure status pill (In Consultation, Match)
+.data-table                    Admin and receptionist tabular data grid
+.toast                         Floating system notification toast alert
+
+================================================================================
+7. READY-TO-USE PROMPT TEMPLATES FOR UI IMPROVEMENTS
+================================================================================
+Copy, customize, and submit any of the following prompts to request specific UI
+enhancements.
+
+--------------------------------------------------------------------------------
+PROMPT TEMPLATE 1: "Polish and Modernize the Homepage Hero Section"
+--------------------------------------------------------------------------------
+"Please improve the homepage hero section in public/index.html and public/css/main.css:
+1. Make the hero search box feel more premium with modern glassmorphism (16px backdrop-blur,
+   subtle 1px border gradient, and soft teal ambient shadow on focus).
+2. Add smooth micro-animations when hovering the '100% BMDC Verified' and '4.9 Rating'
+   floating badges (slight 2px float up, soft glow).
+3. Ensure the search input and select dropdowns have 44px touch targets with clean
+   icon prefixes and crisp placeholder text.
+4. Keep the design responsive on mobile so the search card stacks gracefully."
+
+--------------------------------------------------------------------------------
+PROMPT TEMPLATE 2: "Enhance Doctor Cards in the Directory"
+--------------------------------------------------------------------------------
+"Please update the doctor directory cards in public/doctors.html and public/css/components.css:
+1. Add an ambient clinical glow on hover (teal aura, 2px elevation, border illumination).
+2. Enhance the doctor monogram avatar with a subtle inner ring and high-contrast badge.
+3. Make the 'Next Available Slot' badge more noticeable with a live pulsing dot.
+4. Display consultation fee and follow-up fee in crisp tabular figures with clear labeling.
+5. In dark mode, ensure card background is deep obsidian (#0e1422) with frosted border."
+
+--------------------------------------------------------------------------------
+PROMPT TEMPLATE 3: "Elevate the Dark Theme Across the Entire Site"
+--------------------------------------------------------------------------------
+"Please refine the dark theme across public/css/main.css and public/css/components.css:
+1. Deepen the canvas to ultra-rich obsidian (#070a10) with zero grayish muddiness.
+2. Add subtle inner light reflections (inset 0 1px 0 rgba(255,255,255,0.06)) to all
+   cards, panels, and modals.
+3. Make primary buttons and selected slot chips pop with radiant cyan-teal gradients
+   and soft neon drop glows.
+4. Verify that table headers, input placeholders, and dropdown options have high contrast
+   and zero readability issues.
+5. Ensure smooth 0.25s transitions when toggling between light and dark themes."
+
+--------------------------------------------------------------------------------
+PROMPT TEMPLATE 4: "Improve the Live Chamber Queue Tracker Widget"
+--------------------------------------------------------------------------------
+"Please improve the patient live queue tracker widget on public/my-appointments.html:
+1. Design it like an airport flight departure board or modern hospital status display.
+2. Highlight 'Now Serving: SL-02' with a glowing green beacon and prominent tabular numbers.
+3. Highlight 'Your Turn: SL-05' with a distinct patient badge and progress step indicator.
+4. Add an animated refresh button that pulses when re-fetching live queue data.
+5. Show a friendly animated countdown estimate: 'Estimated consultation in ~18 minutes'."
+
+--------------------------------------------------------------------------------
+PROMPT TEMPLATE 5: "Revamp the 5-Minute Slot Hold Checkout Experience"
+--------------------------------------------------------------------------------
+"Please enhance the booking checkout flow in public/booking.html:
+1. Make the 5-minute slot hold countdown bar more dramatic with a smooth progress bar
+   that slowly shrinks as time passes.
+2. Turn the countdown text amber when under 2 minutes, and pulsing red when under 30 seconds.
+3. Modernize the payment gateway tiles (bKash, Nagad, Card, Pay at Clinic) with authentic
+   brand badges, clear 0% transaction fee chips, and a distinct selected check ring.
+4. Add an animated lock icon on the 'Confirm Booking' button showing end-to-end security."
+
+--------------------------------------------------------------------------------
+PROMPT TEMPLATE 6: "Optimize Mobile Touch & Navigation Experience"
+--------------------------------------------------------------------------------
+"Please optimize the mobile UX across all pages:
+1. Ensure the mobile slide-out navigation drawer (#mobile-drawer) opens with a smooth
+   spring animation and has clear icon links for all user roles.
+2. On mobile screens (<= 540px), ensure the top emergency bar displays the critical
+   Emergency 999 hotline without breaking into multiple lines.
+3. Add a sticky bottom bar on public/doctor-profile.html for mobile screens with the
+   doctor's fee and a prominent 'Select Slot' button.
+4. Ensure all tap targets are at least 44px x 44px to comply with accessibility standards."
+================================================================================
+END OF UI GUIDE
+================================================================================

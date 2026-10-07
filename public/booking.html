@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout & Confirm Appointment — DocBook</title>
+  <meta name="description" content="Complete outpatient booking with atomic 5-minute hold, patient details, and verified payment via bKash, Nagad, or clinic desk.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <style>
+    .checkout-layout-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .checkout-layout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .payment-tile {
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      transition: all var(--duration-fast) var(--ease-out);
+      position: relative;
+    }
+    .payment-tile:hover {
+      border-color: var(--color-teal-500);
+      background: var(--color-surface-subtle);
+    }
+    .payment-tile.selected {
+      border-color: var(--color-teal-700);
+      background: var(--color-surface);
+      box-shadow: 0 0 0 2px rgba(13, 122, 113, 0.15);
+    }
+    .payment-tile.selected::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-teal-700);
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <div class="container" style="padding: var(--space-8) var(--space-4); max-width: 1060px;">
+    <!-- 3-Step Journey Stepper -->
+    <div class="stepper" style="margin-bottom: var(--space-6); justify-content: center;">
+      <div class="step-item step-completed">
+        <div class="step-number">✓</div>
+        <div class="step-label">Select Slot</div>
+      </div>
+      <div class="step-line step-active"></div>
+      <div class="step-item step-active">
+        <div class="step-number">2</div>
+        <div class="step-label">Patient Details</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-label">Slip & Token</div>
+      </div>
+    </div>
+
+    <!-- 5-Minute Hold Countdown Bar with Dynamic Visual Progress -->
+    <div id="hold-banner" class="hold-banner" style="display: flex; flex-direction: column; gap: var(--space-2);">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: var(--space-3);">
+        <div style="display: flex; align-items: center; gap: var(--space-3);">
+          <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--color-teal-50); color: var(--color-teal-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <strong style="color: var(--color-ink-950); font-size: 0.875rem;" data-i18n="slot_reserved_notice">Slot Temporarily Reserved (5-Min Atomic Hold)</strong>
+            <div style="font-size: 0.75rem; color: var(--color-ink-500);">Complete checkout to finalize your verified appointment token.</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0;">
+          <span style="font-size: 0.8125rem; color: var(--color-ink-600); font-weight: 600;" data-i18n="remaining_time">Remaining:</span>
+          <span id="hold-countdown" class="hold-timer-text">05:00</span>
+        </div>
+      </div>
+      <div class="hold-progress-bar-container">
+        <div id="hold-progress-fill" class="hold-progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <div class="checkout-layout-grid">
+      <!-- Left: Patient Information Form -->
+      <main class="card" style="padding: var(--space-6);">
+        <h2 style="font-family: var(--font-display); font-size: 1.375rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-4);" data-i18n="checkout_heading">Patient Consultation Form</h2>
+
+        <form id="booking-form">
+          <!-- Self vs Family Toggle -->
+          <div style="display: flex; gap: var(--space-6); margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+            <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-weight: 600; font-size: 0.875rem;">
+              <input type="radio" name="patient_type" value="SELF" checked>
+              <span data-i18n="book_for_self">Consulting For Myself</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-weight: 600; font-size: 0.875rem;">
+              <input type="radio" name="patient_type" value="FAMILY">
+              <span data-i18n="book_for_family">For Family Member / Dependent</span>
+            </label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+            <div class="form-group">
+              <label class="form-label" data-i18n="patient_name">Patient Full Name *</label>
+              <input type="text" id="patient-name" class="form-control" required placeholder="Enter full legal name">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" data-i18n="patient_phone">Mobile Number *</label>
+              <input type="tel" id="patient-phone" class="form-control" required placeholder="017xxxxxxxx">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+            <div class="form-group">
+              <label class="form-label" data-i18n="patient_age">Age (Years) *</label>
+              <input type="number" id="patient-age" class="form-control" min="1" max="120" value="30" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" data-i18n="patient_gender">Gender *</label>
+              <select id="patient-gender" class="form-control">
+                <option value="MALE" data-i18n="gender_male">Male</option>
+                <option value="FEMALE" data-i18n="gender_female">Female</option>
+                <option value="OTHER" data-i18n="gender_other">Other</option>
+              </select>
+            </div>
+
+            <div id="relation-group" class="form-group" style="display: none;">
+              <label class="form-label" data-i18n="patient_relation">Relationship</label>
+              <input type="text" id="patient-relation" class="form-control" placeholder="Mother, Child, Spouse">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" data-i18n="reason_for_visit">Primary Reason for Consultation *</label>
+            <input type="text" id="patient-reason" class="form-control" required placeholder="e.g. Follow-up after fever, joint discomfort, prescription refill..." data-i18n-placeholder="reason_placeholder">
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-5);">
+            <label class="form-label" data-i18n="notes">Medical History or Notes (Optional)</label>
+            <textarea id="patient-notes" class="form-control" rows="2" placeholder="List any known drug allergies, previous diagnoses, or current prescriptions..."></textarea>
+          </div>
+
+          <!-- Emergency Priority Booking Option -->
+          <div style="background: rgba(220, 38, 38, 0.04); border: 1px solid rgba(220, 38, 38, 0.25); border-radius: var(--radius-sm); padding: var(--space-4); margin-bottom: var(--space-6);">
+            <label style="display: flex; align-items: center; gap: var(--space-2); font-weight: 700; color: var(--color-danger); cursor: pointer; font-size: 0.875rem;">
+              <input type="checkbox" id="is-emergency-checkbox">
+              <span>Request Priority Clinical Triage</span>
+            </label>
+            <div id="emergency-notes-container" style="display: none; margin-top: var(--space-3);">
+              <label class="form-label" style="font-size: 0.75rem; color: var(--color-danger);">Emergency Triage Notes for Doctor *</label>
+              <input type="text" id="emergency-notes-input" class="form-control" placeholder="Describe acute symptom onset (e.g. severe shortness of breath, acute laceration)...">
+              <small style="color: var(--color-ink-500); display: block; margin-top: 0.25rem; font-size: 0.75rem;">
+                This appointment will be flagged in the clinical chamber queue for expedited consultation.
+              </small>
+            </div>
+          </div>
+
+          <!-- Payment Method Selection -->
+          <div style="margin-bottom: var(--space-6);">
+            <h4 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-3);" data-i18n="select_payment_method">Payment Method</h4>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-3);">
+              <label class="payment-tile selected" id="tile-bkash">
+                <input type="radio" name="payment_mode" value="BKASH" checked style="display: none;">
+                <span class="payment-tile-badge">✓</span>
+                <div style="font-weight: 800; color: #d12053; font-size: 1.0625rem; font-family: var(--font-display);">bKash</div>
+                <div style="font-size: 0.6875rem; color: var(--color-ink-500);">Instant MFS Wallet</div>
+              </label>
+
+              <label class="payment-tile" id="tile-nagad">
+                <input type="radio" name="payment_mode" value="NAGAD" style="display: none;">
+                <span class="payment-tile-badge">✓</span>
+                <div style="font-weight: 800; color: #ea580c; font-size: 1.0625rem; font-family: var(--font-display);">Nagad</div>
+                <div style="font-size: 0.6875rem; color: var(--color-ink-500);">Instant Post-Office MFS</div>
+              </label>
+
+              <label class="payment-tile" id="tile-clinic">
+                <input type="radio" name="payment_mode" value="CASH_AT_CLINIC" style="display: none;">
+                <span class="payment-tile-badge">✓</span>
+                <div style="font-weight: 800; color: var(--color-teal-800); font-size: 1.0625rem; font-family: var(--font-display);">Pay at Clinic</div>
+                <div style="font-size: 0.6875rem; color: var(--color-ink-500);">Front desk cash receipt</div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" id="submit-booking-btn" class="btn btn-primary btn-lg btn-block" style="font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" data-i18n="confirm_and_pay">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Confirm & Pay ৳ <span id="btn-fee-val">0</span></span>
+          </button>
+          <div style="text-align: center; margin-top: 0.5rem; font-size: 0.75rem; color: var(--color-ink-500); display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+            <span>🔒 256-Bit SSL Encrypted Verification • Instant Serial Token</span>
+          </div>
+        </form>
+      </main>
+
+      <!-- Right: Persistent Summary Card -->
+      <aside style="position: sticky; top: 5.5rem;">
+        <div class="card" style="padding: var(--space-5);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Consultation Summary</h3>
+            <span class="badge badge-primary">Held Slot</span>
+          </div>
+
+          <!-- Doctor & Slot Details -->
+          <div id="booking-summary-banner" style="margin-bottom: var(--space-4);">
+            <div style="display: flex; gap: var(--space-3); align-items: flex-start; margin-bottom: var(--space-3);">
+              <div id="doc-summary-avatar"></div>
+              <div>
+                <h4 id="doc-summary-name" style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">Loading Doctor...</h4>
+                <div id="doc-summary-specialty" style="color: var(--color-teal-700); font-weight: 600; font-size: 0.8125rem;">Specialist</div>
+                <div id="doc-summary-chamber" style="font-size: 0.75rem; color: var(--color-ink-500); margin-top: 0.25rem;">Chamber</div>
+              </div>
+            </div>
+
+            <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 600; display: block;">Date</span>
+                <span id="slot-summary-date" style="font-weight: 700; font-size: 0.875rem; color: var(--color-ink-950); font-feature-settings: 'tnum';">Date</span>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 600; display: block;">Slot Time</span>
+                <span id="slot-summary-time" style="color: var(--color-teal-800); font-weight: 800; font-size: 1rem; font-feature-settings: 'tnum';">Time</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fee Breakdown Table -->
+          <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-3); margin-bottom: var(--space-4);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2); font-size: 0.8125rem;">
+              <span style="color: var(--color-ink-600);" data-i18n="consultation_fee">Consultation Fee</span>
+              <span id="breakdown-fee" style="font-weight: 600; font-feature-settings: 'tnum';">৳ 0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2); font-size: 0.8125rem;">
+              <span style="color: var(--color-ink-500);" data-i18n="vat_platform_fee">Platform Booking Fee</span>
+              <span style="color: var(--color-success); font-weight: 600;">FREE (৳ 0)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--color-border); padding-top: var(--space-3); font-weight: 800; font-size: 1.125rem; color: var(--color-ink-950);">
+              <span data-i18n="total_payable">Total Amount</span>
+              <span id="breakdown-total" style="color: var(--color-teal-700); font-feature-settings: 'tnum';">৳ 0</span>
+            </div>
+          </div>
+
+          <!-- Trust Guarantees -->
+          <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--color-border); font-size: 0.75rem; color: var(--color-ink-600); display: flex; flex-direction: column; gap: var(--space-2);">
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <span style="color: var(--color-teal-700);">✓</span>
+              <span>100% BMDC Certified Medical Practitioner</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <span style="color: var(--color-teal-700);">✓</span>
+              <span>Full Refund for Cancellations &gt;24h before Chamber</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <span style="color: var(--color-teal-700);">✓</span>
+              <span>Instant QR Verifiable Appointment Token</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Simulated MFS Payment Gateway Modal (bKash & Nagad) -->
+  <div id="mfs-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 400px; padding: 0; overflow: hidden;">
+      <div id="mfs-header" style="background: #d12053; color: white; padding: var(--space-5); text-align: center;">
+        <h3 id="mfs-title" style="font-size: 1.25rem; font-weight: 800; margin: 0 0 var(--space-1); color: white;">bKash Payment Gateway</h3>
+        <p style="font-size: 0.75rem; opacity: 0.9; margin: 0;">Merchant: DocBook Healthcare Ltd.</p>
+        <div style="font-size: 1.5rem; font-weight: 800; margin-top: var(--space-2); font-feature-settings: 'tnum';">৳ <span id="mfs-amount">0</span></div>
+      </div>
+
+      <div class="modal-body" style="padding: var(--space-5);">
+        <div id="mfs-step-1">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" style="font-size: 0.8125rem;">Wallet Mobile Number</label>
+            <input type="tel" id="mfs-wallet" class="form-control" value="01712345678" placeholder="017xxxxxxxx">
+          </div>
+          <div style="background: var(--color-surface-subtle); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.75rem; margin-bottom: var(--space-4); color: var(--color-ink-600); border: 1px solid var(--color-border);">
+            <strong>Demo Sandbox:</strong> Any 11-digit wallet number accepted. OTP is <strong>123456</strong>, PIN is <strong>12345</strong>.
+          </div>
+          <button id="mfs-next-btn" class="btn btn-primary btn-block">Confirm Wallet & Send OTP</button>
+        </div>
+
+        <div id="mfs-step-2" style="display: none;">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" style="font-size: 0.8125rem;">Enter 6-Digit OTP</label>
+            <input type="text" id="mfs-otp" class="form-control" value="123456" maxlength="6" style="letter-spacing: 0.25em; text-align: center; font-size: 1.25rem; font-weight: 800; font-family: var(--font-mono);">
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-5);">
+            <label class="form-label" style="font-size: 0.8125rem;">Enter 5-Digit PIN</label>
+            <input type="password" id="mfs-pin" class="form-control" value="12345" maxlength="5" style="letter-spacing: 0.25em; text-align: center; font-size: 1.25rem; font-family: var(--font-mono);">
+          </div>
+          <button id="mfs-pay-btn" class="btn btn-primary btn-block">Authorize & Pay ৳ <span id="mfs-pay-amount">0</span></button>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: center; background: var(--color-surface-subtle); padding: var(--space-3);">
+        <button id="mfs-cancel-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">Cancel Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Sticky Bottom Action Bar (Total + Confirm) -->
+  <div class="mobile-sticky-action-bar" id="mobile-booking-action-bar">
+    <div>
+      <div style="font-size: 0.72rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Total Payable</div>
+      <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-teal-700); font-feature-settings: 'tnum';" id="mobile-booking-total">৳ 0</div>
+    </div>
+    <button id="mobile-confirm-btn" class="btn btn-primary" style="font-weight: 700; padding: 0.65rem 1.5rem;">
+      <span>Confirm Booking</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api, getCurrentUser } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+    import { showToast } from '/js/toast.js';
+    import { icons, renderDoctorAvatar } from '/js/icons.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const slotId = urlParams.get('slotId');
+    const doctorId = urlParams.get('doctorId');
+    const slotDate = urlParams.get('date');
+    const slotTime = urlParams.get('time');
+
+    if (!slotId || !doctorId) {
+      window.location.href = '/doctors.html';
+    }
+
+    const user = getCurrentUser();
+    if (!user) {
+      window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.href)}`;
+    }
+
+    let doctor = null;
+    let holdRemainingSeconds = 300; // 5 minutes
+    let countdownInterval = null;
+
+    // Payment Tile Selection Styling
+    const tiles = document.querySelectorAll('.payment-tile');
+    tiles.forEach(tile => {
+      tile.addEventListener('click', () => {
+        tiles.forEach(t => t.classList.remove('selected'));
+        tile.classList.add('selected');
+        const radio = tile.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      });
+    });
+
+    async function initCheckout() {
+      // Prefill user details
+      document.getElementById('patient-name').value = user.name || '';
+      document.getElementById('patient-phone').value = user.phone || '';
+      if (user.age) document.getElementById('patient-age').value = user.age;
+      if (user.gender) document.getElementById('patient-gender').value = user.gender;
+
+      // Self vs Family toggle
+      document.querySelectorAll('input[name="patient_type"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          const isFamily = e.target.value === 'FAMILY';
+          document.getElementById('relation-group').style.display = isFamily ? 'block' : 'none';
+          if (isFamily) {
+            document.getElementById('patient-name').value = '';
+            document.getElementById('patient-name').placeholder = 'Family member legal name';
+          } else {
+            document.getElementById('patient-name').value = user.name || '';
+          }
+        });
+      });
+
+      // Load Doctor info
+      try {
+        const res = await api.get(`/doctors/${doctorId}`);
+        doctor = res.data;
+
+        const avatarContainer = document.getElementById('doc-summary-avatar');
+        if (avatarContainer) {
+          avatarContainer.innerHTML = renderDoctorAvatar(doctor.name, doctor.id, 56, true, doctor.avatar_url);
+        }
+
+        document.getElementById('doc-summary-name').textContent = doctor.name;
+        document.getElementById('doc-summary-specialty').textContent = doctor.specialty_name_en;
+        document.getElementById('doc-summary-chamber').textContent = `${doctor.hospital_name_en} — ${doctor.chamber_address}`;
+        document.getElementById('slot-summary-date').textContent = slotDate;
+        document.getElementById('slot-summary-time').textContent = slotTime;
+
+        document.getElementById('breakdown-fee').textContent = `৳ ${doctor.consultation_fee}`;
+        document.getElementById('breakdown-total').textContent = `৳ ${doctor.consultation_fee}`;
+        const mobileTotalEl = document.getElementById('mobile-booking-total');
+        if (mobileTotalEl) mobileTotalEl.textContent = `৳ ${doctor.consultation_fee}`;
+        document.getElementById('mobile-confirm-btn')?.addEventListener('click', () => {
+          document.getElementById('submit-booking-btn')?.click();
+        });
+        document.getElementById('btn-fee-val').textContent = doctor.consultation_fee;
+        document.getElementById('mfs-amount').textContent = doctor.consultation_fee;
+        document.getElementById('mfs-pay-amount').textContent = doctor.consultation_fee;
+
+        startHoldCountdown();
+
+      } catch (err) {
+        showToast('Failed to load doctor checkout details.', 'error');
+      }
+    }
+
+    function startHoldCountdown() {
+      const timerEl = document.getElementById('hold-countdown');
+      const bannerEl = document.getElementById('hold-banner');
+
+      countdownInterval = setInterval(() => {
+        holdRemainingSeconds--;
+        if (holdRemainingSeconds <= 0) {
+          clearInterval(countdownInterval);
+          timerEl.textContent = '00:00';
+          bannerEl.classList.add('critical');
+          alert('Your 5-minute reservation hold has expired. The slot has been released back to other patients.');
+          window.location.href = `/doctor-profile.html?id=${doctorId}`;
+          return;
+        }
+
+        const mins = Math.floor(holdRemainingSeconds / 60).toString().padStart(2, '0');
+        const secs = (holdRemainingSeconds % 60).toString().padStart(2, '0');
+        timerEl.textContent = `${mins}:${secs}`;
+
+        const fillEl = document.getElementById('hold-progress-fill');
+        if (fillEl) {
+          const pct = Math.max(0, (holdRemainingSeconds / 300) * 100);
+          fillEl.style.width = pct + '%';
+          if (holdRemainingSeconds < 30) {
+            fillEl.className = 'hold-progress-bar-fill hold-progress-danger';
+          } else if (holdRemainingSeconds < 120) {
+            fillEl.className = 'hold-progress-bar-fill hold-progress-warning';
+          }
+        }
+
+        if (holdRemainingSeconds < 60) {
+          bannerEl.classList.add('critical');
+        } else if (holdRemainingSeconds < 120) {
+          bannerEl.classList.add('warning');
+        }
+      }, 1000);
+    }
+
+    // Toggle emergency notes input
+    const emergencyCheckbox = document.getElementById('is-emergency-checkbox');
+    const emergencyNotesContainer = document.getElementById('emergency-notes-container');
+    emergencyCheckbox?.addEventListener('change', () => {
+      emergencyNotesContainer.style.display = emergencyCheckbox.checked ? 'block' : 'none';
+      if (emergencyCheckbox.checked) {
+        document.getElementById('emergency-notes-input').focus();
+      }
+    });
+
+    // Booking Submission
+    document.getElementById('booking-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const paymentMode = document.querySelector('input[name="payment_mode"]:checked').value;
+      const patientType = document.querySelector('input[name="patient_type"]:checked').value;
+      const patientName = document.getElementById('patient-name').value.trim();
+      const patientPhone = document.getElementById('patient-phone').value.trim();
+      const patientAge = parseInt(document.getElementById('patient-age').value, 10);
+      const patientGender = document.getElementById('patient-gender').value;
+      const patientRelation = document.getElementById('patient-relation').value.trim();
+      const reasonForVisit = document.getElementById('patient-reason').value.trim();
+      const notes = document.getElementById('patient-notes').value.trim();
+      const isEmergency = emergencyCheckbox ? emergencyCheckbox.checked : false;
+      const emergencyNotes = isEmergency ? document.getElementById('emergency-notes-input').value.trim() : null;
+
+      const idempotencyKey = 'IDEM-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+
+      const bookingPayload = {
+        slotId: Number(slotId),
+        patientType,
+        patientName,
+        patientPhone,
+        patientAge,
+        patientGender,
+        patientRelation: patientType === 'FAMILY' ? patientRelation : 'Self',
+        reasonForVisit,
+        notes,
+        isEmergency,
+        emergencyNotes,
+        idempotencyKey,
+        paymentMethod: paymentMode
+      };
+
+      if (paymentMode === 'CASH_AT_CLINIC') {
+        submitFinalBooking(bookingPayload);
+      } else {
+        openMfsModal(paymentMode, bookingPayload);
+      }
+    });
+
+    let activeBookingPayload = null;
+
+    function openMfsModal(mode, payload) {
+      activeBookingPayload = payload;
+      const modal = document.getElementById('mfs-modal');
+      const header = document.getElementById('mfs-header');
+      const title = document.getElementById('mfs-title');
+
+      if (mode === 'BKASH') {
+        header.style.background = '#d12053';
+        title.textContent = 'bKash Payment Gateway';
+      } else {
+        header.style.background = '#ea580c';
+        title.textContent = 'Nagad Payment Gateway';
+      }
+
+      document.getElementById('mfs-step-1').style.display = 'block';
+      document.getElementById('mfs-step-2').style.display = 'none';
+      modal.classList.add('show');
+    }
+
+    document.getElementById('mfs-next-btn').addEventListener('click', () => {
+      const wallet = document.getElementById('mfs-wallet').value.trim();
+      if (!wallet || wallet.length < 11) {
+        showToast('Please enter a valid 11-digit wallet number', 'warning');
+        return;
+      }
+      document.getElementById('mfs-step-1').style.display = 'none';
+      document.getElementById('mfs-step-2').style.display = 'block';
+      showToast('Mock OTP sent to wallet! Enter OTP: 123456 and PIN: 12345', 'info');
+    });
+
+    document.getElementById('mfs-pay-btn').addEventListener('click', () => {
+      const otp = document.getElementById('mfs-otp').value.trim();
+      const pin = document.getElementById('mfs-pin').value.trim();
+
+      if (otp !== '123456') {
+        showToast('Invalid OTP! Please enter 123456', 'error');
+        return;
+      }
+
+      if (pin !== '12345') {
+        showToast('Invalid PIN! Please enter 12345', 'error');
+        return;
+      }
+
+      const txRef = `TRX-${activeBookingPayload.paymentMethod.slice(0, 2)}-${Date.now().toString().slice(-8)}`;
+      activeBookingPayload.transactionRef = txRef;
+
+      document.getElementById('mfs-modal').classList.remove('show');
+      submitFinalBooking(activeBookingPayload);
+    });
+
+    document.getElementById('mfs-cancel-btn').addEventListener('click', () => {
+      document.getElementById('mfs-modal').classList.remove('show');
+      showToast('Payment cancelled.', 'warning');
+    });
+
+    async function submitFinalBooking(payload) {
+      const submitBtn = document.getElementById('submit-booking-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Securing Appointment...';
+
+      try {
+        const res = await api.post('/appointments/book', payload);
+        clearInterval(countdownInterval);
+
+        showToast('Appointment successfully confirmed!', 'success');
+        setTimeout(() => {
+          window.location.href = `/appointment-slip.html?id=${res.data.id}`;
+        }, 600);
+
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm & Book';
+        showToast(err.message || 'Booking failed. Slot may have expired.', 'error');
+      }
+    }
+
+    initCheckout();
+  </script>
+</body>
+</html>

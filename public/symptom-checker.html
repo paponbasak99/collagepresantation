@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical AI Symptom Triage & Specialist Guidance — DocBook</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+  <style>
+    .triage-hero {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 0 2.25rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+    .category-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      transition: all var(--motion-fast) var(--ease-out);
+      user-select: none;
+    }
+    .category-card:hover {
+      border-color: var(--primary-400);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    .category-card.active {
+      border-color: var(--primary-600);
+      background: var(--primary-50);
+      box-shadow: 0 0 0 2px var(--primary-600);
+    }
+    [data-theme="dark"] .category-card.active {
+      background: rgba(13, 122, 113, 0.15);
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 2px var(--primary-500);
+    }
+    .cat-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-700);
+      flex-shrink: 0;
+    }
+    .symptom-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-full);
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all var(--motion-fast) var(--ease-out);
+    }
+    .symptom-tag:hover {
+      background: var(--primary-50);
+      border-color: var(--primary-400);
+      color: var(--primary-800);
+    }
+    [data-theme="dark"] .symptom-tag:hover {
+      background: rgba(13, 122, 113, 0.2);
+      color: var(--primary-300);
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <!-- Hero Header -->
+  <header class="triage-hero">
+    <div class="container container-narrow">
+      <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary-50); color: var(--primary-800); border: 1px solid var(--primary-200); padding: 0.35rem 0.85rem; border-radius: var(--radius-full); font-weight: 700; font-size: 0.775rem; letter-spacing: 0.04em; margin-bottom: 1rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+        CLINICAL DECISION SUPPORT • DINAJPUR OPD
+      </div>
+      <h1 style="font-family: var(--font-display); font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; letter-spacing: -0.02em; margin: 0 0 0.75rem; color: var(--text-main);">
+        Intelligent Medical Symptom Triage
+      </h1>
+      <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+        Describe what you are experiencing in English or বাংলা to find the right clinical specialty and book accredited hospital consultants.
+      </p>
+    </div>
+  </header>
+
+  <main class="container container-narrow" style="padding-bottom: 4rem;">
+    <!-- Step 1: Organ System Filter -->
+    <div class="card" style="margin-bottom: 2rem; padding: 1.75rem;">
+      <div style="margin-bottom: 1.25rem;">
+        <span style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--primary-700); display: block; margin-bottom: 0.25rem;">STEP 1 OF 2</span>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text-main);">Select affected body area or organ system:</h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.85rem; margin-bottom: 1.5rem;">
+        <div class="category-card" data-cat="cardio">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Heart & Chest</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">হৃদরোগ ও বুক</div>
+          </div>
+        </div>
+
+        <div class="category-card" data-cat="derma">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Skin, Hair & Nails</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">চর্ম ও চুল</div>
+          </div>
+        </div>
+
+        <div class="category-card" data-cat="neuro">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Brain & Nerves</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">মাথাব্যথা ও স্নায়ু</div>
+          </div>
+        </div>
+
+        <div class="category-card" data-cat="pedia">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Infant & Child</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">শিশু রোগ</div>
+          </div>
+        </div>
+
+        <div class="category-card" data-cat="gynae">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="20" x2="12" y2="4"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Maternal & Women</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">স্ত্রীরোগ ও প্রসূতি</div>
+          </div>
+        </div>
+
+        <div class="category-card" data-cat="gastro">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A8 8 0 0 1 14 6h4v12a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4.13Z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Stomach & Digestion</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">গ্যাস্ট্রিক ও পেট</div>
+          </div>
+        </div>
+
+        <div class="category-card" data-cat="ortho">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 10c.7-.7 1.6-1 2.5-1a3.5 3.5 0 1 0-5 5c0 .9-.3 1.8-1 2.5l-4 4c-.7.7-1.6 1-2.5 1a3.5 3.5 0 1 0 5-5c0-.9.3-1.8 1-2.5Z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Bones & Joints</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">হাড় ও বাতব্যথা</div>
+          </div>
+        </div>
+
+        <div class="category-card" data-cat="lungs">
+          <div class="cat-icon-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M12 9a4 4 0 0 0-4-4c-2.5 0-5 2.5-5 7 0 4.5 2.5 6 5 6h4M12 9a4 4 0 0 1 4-4c2.5 0 5 2.5 5 7 0 4.5-2.5 6-5 6h-4"/></svg>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem;">Lungs & Respiratory</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-bn);">শ্বাসকষ্ট ও হাঁপানি</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Suggested Tags -->
+      <div id="quick-symptoms-box">
+        <span style="font-size: 0.775rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.6rem;">
+          Click to add verified clinical keywords to your description:
+        </span>
+        <div id="symptom-tags-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          <span class="symptom-tag" data-text="Mild chest pressure on exertion">Mild chest pressure on exertion</span>
+          <span class="symptom-tag" data-text="বুকে চাপ বা ব্যথা">বুকে চাপ বা ব্যথা</span>
+          <span class="symptom-tag" data-text="Skin rash with intense itching">Skin rash with itching</span>
+          <span class="symptom-tag" data-text="চামড়ায় লাল ফুসকুড়ি ও চুলকানি">চামড়ায় লাল ফুসকুড়ি</span>
+          <span class="symptom-tag" data-text="Severe throbbing migraine headache">Throbbing migraine</span>
+          <span class="symptom-tag" data-text="Child fever and cough for 2 days">Child fever & cough</span>
+          <span class="symptom-tag" data-text="Severe stomach acidity and bloating">Stomach acidity & bloating</span>
+          <span class="symptom-tag" data-text="Lower back pain radiating down leg">Lower back pain</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Input Box -->
+    <div class="card" style="margin-bottom: 2rem; padding: 2rem;">
+      <form id="symptom-checker-form">
+        <div class="form-group">
+          <span style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--primary-700); display: block; margin-bottom: 0.25rem;">STEP 2 OF 2</span>
+          <label class="form-label" for="symptom-text-input" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">
+            Describe symptoms in your own natural language:
+          </label>
+          <textarea id="symptom-text-input" class="form-control" rows="4" style="font-size: 0.95rem; line-height: 1.6; resize: vertical;" placeholder="e.g. I have had severe chest tightness and breathlessness since morning, along with occasional palpitations. Or: আমার গত দুই দিন ধরে চামড়ায় তীব্র চুলকানি ও লাল ফুসকুড়ি হয়েছে..." required></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.25rem;">
+          <button type="button" id="clear-btn" class="btn btn-secondary btn-sm">Clear Text</button>
+          <button type="submit" id="analyze-btn" class="btn btn-primary" style="padding: 0.75rem 1.75rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            Run Clinical Triage
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Mount Container -->
+    <div id="results-container" style="display: none;">
+      <!-- Populated dynamically via JS -->
+    </div>
+
+    <!-- Safety Disclaimer -->
+    <div style="background: var(--bg-muted); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-top: 2rem;">
+      <strong style="color: var(--text-main);">Clinical Advisory:</strong> DocBook AI Triage is an algorithmic decision-support tool designed for informational clinical navigation and OPD specialist matching. It does not constitute a definitive medical diagnosis. In case of suspected myocardial infarction, severe stroke, or acute hemorrhage, please proceed immediately to the nearest hospital emergency room.
+    </div>
+  </main>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+    import { getLang } from '/js/i18n.js';
+    import { showToast } from '/js/toast.js';
+    import { icons, renderDoctorAvatar } from '/js/icons.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const categorySymptoms = {
+      cardio: [
+        'Chest pain radiating to left arm',
+        'বুকে চাপ ও শ্বাসকষ্ট',
+        'Palpitations and irregular pulse',
+        'উচ্চ রক্তচাপ ও বুক ধড়ফড়',
+        'Shortness of breath when climbing stairs'
+      ],
+      derma: [
+        'Skin rash with severe itching',
+        'চামড়ায় লাল ফুসকুড়ি ও চুলকানি',
+        'Stubborn facial acne and redness',
+        'Hair loss and flaky dandruff',
+        'Fungal ringworm patches on body'
+      ],
+      neuro: [
+        'Severe throbbing migraine on one side',
+        'হঠাৎ তীব্র মাথা ঘোরা ও অসাড়তা',
+        'Numbness and tingling in fingertips',
+        'Dizziness and loss of balance',
+        'Memory lapse and tremor in hands'
+      ],
+      pedia: [
+        'Infant high fever with irritability',
+        'বাচ্চার তীব্র জ্বর ও কাশি',
+        'Child persistent cough and wheezing',
+        'Toddler vomiting and poor appetite',
+        'Pediatric developmental vaccination check'
+      ],
+      gynae: [
+        'Irregular menstrual cycle and cramps',
+        'গর্ভকালীন প্রথম ট্রাইমেস্টার চেকআপ',
+        'Severe lower pelvic pain',
+        'White vaginal discharge with burning',
+        'Morning sickness and nausea'
+      ],
+      gastro: [
+        'Severe heartburn and acid reflux',
+        'পেটে তীব্র গ্যাস ও বুক জ্বালাপোড়া',
+        'Stomach bloating and indigestion',
+        'Watery diarrhea and abdominal cramps',
+        'Chronic constipation for a week'
+      ],
+      ortho: [
+        'Knee joint pain when walking',
+        'হাড়ের জয়েন্টে ব্যথা ও ফোলা ভাব',
+        'Lower back pain radiating down leg',
+        'Frozen shoulder and stiffness',
+        'Ankle sprain after sports injury'
+      ],
+      lungs: [
+        'Wheezing and chronic dry cough',
+        'হাঁপানি ও শ্বাস নিতে কষ্ট হওয়া',
+        'Cough with thick yellow phlegm',
+        'Chest congestion and breathlessness',
+        'Allergic asthma attacks at night'
+      ]
+    };
+
+    const textarea = document.getElementById('symptom-text-input');
+    const tagsContainer = document.getElementById('symptom-tags-list');
+    const categoryCards = document.querySelectorAll('.category-card');
+
+    categoryCards.forEach(card => {
+      card.addEventListener('click', () => {
+        categoryCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const cat = card.getAttribute('data-cat');
+        const list = categorySymptoms[cat] || [];
+
+        tagsContainer.innerHTML = list.map(item => `
+          <span class="symptom-tag" data-text="${item}">${item}</span>
+        `).join('');
+
+        attachTagListeners();
+      });
+    });
+
+    function attachTagListeners() {
+      document.querySelectorAll('.symptom-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          const text = tag.getAttribute('data-text');
+          if (textarea.value.trim().length > 0) {
+            textarea.value = textarea.value.trim() + ', ' + text;
+          } else {
+            textarea.value = text;
+          }
+          textarea.focus();
+        });
+      });
+    }
+    attachTagListeners();
+
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      textarea.value = '';
+      textarea.focus();
+      document.getElementById('results-container').style.display = 'none';
+    });
+
+    // Form submission
+    document.getElementById('symptom-checker-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = textarea.value.trim();
+      if (!text) {
+        showToast('Please type your symptoms.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('analyze-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner" style="width:14px; height:14px; margin-right:6px;"></span> Analyzing clinical patterns...`;
+
+      const resultsContainer = document.getElementById('results-container');
+      resultsContainer.style.display = 'block';
+      resultsContainer.innerHTML = `
+        <div class="card" style="text-align: center; padding: 3rem 1.5rem;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+            ${icons.activity(24)}
+          </div>
+          <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Analyzing Symptoms Across Clinical Specialties</h3>
+          <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 440px; margin: 0 auto;">Cross-referencing symptoms with BMDC clinical specialty guidelines and verified Dinajpur doctor chambers...</p>
+        </div>
+      `;
+
+      try {
+        const res = await api.post('/ai/symptom-checker', { symptoms: text });
+        const data = res.data;
+        const currentLang = getLang();
+
+        const isEmergency = data.urgency === 'EMERGENCY';
+        let urgencyBadge = `<span class="badge badge-success">ROUTINE / NON-EMERGENCY</span>`;
+        if (data.urgency === 'HIGH') urgencyBadge = `<span class="badge badge-warning">HIGH PRIORITY</span>`;
+        if (isEmergency) urgencyBadge = `<span class="badge badge-danger">CRITICAL EMERGENCY CASE</span>`;
+
+        let doctorsHtml = '';
+        if (data.recommendedDoctors && data.recommendedDoctors.length > 0) {
+          doctorsHtml = `
+            <div style="margin-top: 2rem;">
+              <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);">Recommended Verified Dinajpur Specialists:</h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                ${data.recommendedDoctors.map(d => `
+                  <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.25rem; border-color: var(--color-teal-200);">
+                    <div>
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                        <span class="badge badge-primary" style="font-size: 0.7rem; font-weight: 700;">
+                          ${icons.shieldCheck(12)} BMDC Verified
+                        </span>
+                        <span style="font-weight: 700; color: #b45309; font-size: 0.85rem; display: flex; align-items: center; gap: 0.2rem;">
+                          ${icons.starFilled(13)} ${d.rating_avg.toFixed(1)}
+                        </span>
+                      </div>
+                      <div style="display: flex; gap: var(--space-3); align-items: center; margin-bottom: 0.5rem;">
+                        ${renderDoctorAvatar(d.doctor_name, d.id, 48, true, d.avatar_url)}
+                        <div style="flex: 1; min-width: 0;">
+                          <h4 style="font-size: 1rem; font-weight: 700; margin: 0 0 0.15rem; color: var(--color-ink-950);">${d.doctor_name}</h4>
+                          <div style="color: var(--color-teal-700); font-weight: 600; font-size: 0.8125rem;">${d.specialty_name}</div>
+                        </div>
+                      </div>
+                      <div style="font-size: 0.8rem; color: var(--color-ink-600); margin-bottom: 0.75rem; line-height: 1.4;">
+                        <strong>${d.hospital_name}</strong><br>${d.chamber_address}
+                      </div>
+                    </div>
+                    <div style="border-top: 1px solid var(--border); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                      <div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Consultation Fee</span>
+                        <strong style="color: var(--text-main); font-size: 1.05rem; font-variant-numeric: tabular-nums;">৳ ${d.consultation_fee}</strong>
+                      </div>
+                      <a href="/doctor-profile.html?id=${d.id}" class="btn btn-primary btn-sm">
+                        Book Slot ${icons.arrowRight(12)}
+                      </a>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        resultsContainer.innerHTML = `
+          <div class="card" style="border: 1.5px solid ${isEmergency ? 'var(--danger)' : 'var(--primary-600)'}; padding: 2rem;">
+            <!-- Urgency & Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;">CLINICAL TRIAGE RESULTS</span>
+              ${urgencyBadge}
+            </div>
+
+            <!-- Emergency Warning Banner if Detected -->
+            ${data.emergencyAlert ? `
+              <div style="background: var(--color-danger-subtle); border: 1.5px solid var(--color-danger-border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                  <div style="color: var(--color-danger);">${icons.alertTriangle(24)}</div>
+                  <div>
+                    <h4 style="color: var(--color-danger-text); font-size: 1.05rem; font-weight: 700; margin: 0 0 0.25rem;">Immediate Emergency Care Advised</h4>
+                    <p style="color: var(--color-ink-700); font-size: 0.875rem; margin: 0 0 0.85rem; line-height: 1.5;">${data.emergencyAlert}</p>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                      <a href="tel:999" class="btn btn-danger btn-sm">Call National SOS (999)</a>
+                      <a href="tel:16263" class="btn btn-secondary btn-sm">Call Health Line (16263)</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Primary Recommended Specialty -->
+            <div style="background: var(--bg-muted); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.25rem; border: 1px solid var(--border-light);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Recommended Clinical Department:</span>
+                <span class="badge badge-primary" style="font-size: 0.75rem; font-weight: 700;">${data.suggestedSpecialty.confidence} Match Confidence</span>
+              </div>
+              <h2 style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 700; color: var(--primary-800); margin: 0 0 0.35rem;">
+                ${currentLang === 'bn' ? data.suggestedSpecialty.nameBn : data.suggestedSpecialty.nameEn}
+              </h2>
+              <div style="font-size: 0.825rem; color: var(--text-muted);">
+                Matched clinical indicators: <strong>${data.suggestedSpecialty.matchedSymptoms.join(', ')}</strong>
+              </div>
+            </div>
+
+            <!-- Differential Alternatives if any -->
+            ${data.differentialSpecialties && data.differentialSpecialties.length > 0 ? `
+              <div style="margin-bottom: 1.25rem; font-size: 0.85rem; color: var(--text-muted);">
+                <strong>Differential considerations:</strong>
+                ${data.differentialSpecialties.map(diff => `
+                  <span class="badge" style="background: var(--bg-muted); margin-left: 0.4rem; font-size: 0.75rem;">${currentLang === 'bn' ? diff.nameBn : diff.nameEn} (${diff.confidence})</span>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <!-- Recommended Doctors in Dinajpur -->
+            ${doctorsHtml}
+          </div>
+        `;
+
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+
+      } catch (err) {
+        console.error('Triage error:', err);
+        resultsContainer.innerHTML = `
+          <div class="card" style="text-align: center; padding: 2rem; color: var(--danger);">
+            ${err.message || 'Error executing clinical symptom triage. Please check your network.'}
+          </div>
+        `;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+          Run Clinical Triage
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

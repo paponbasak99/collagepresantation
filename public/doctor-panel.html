@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Clinical Workspace & Chamber OPD — DocBook</title>
+  <meta name="description" content="Clinical consultation workspace: OPD queue management, digital e-prescription builder, weekly chamber scheduling, and revenue analytics.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <style>
+    .queue-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-4);
+    }
+    .queue-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .queue-card.active-patient {
+      border: 1.5px solid var(--color-teal-700);
+      background: var(--color-surface);
+      box-shadow: 0 0 0 3px rgba(13, 122, 113, 0.12);
+    }
+    .serial-tag {
+      font-size: 0.9375rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-teal-800);
+      background: var(--color-teal-50);
+      border: 1px solid var(--color-teal-200);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-xs);
+      display: inline-block;
+    }
+    [data-theme="dark"] .serial-tag {
+      background: rgba(45, 212, 191, 0.1);
+      color: var(--color-teal-300);
+      border-color: rgba(45, 212, 191, 0.25);
+    }
+    .med-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1.2fr 1fr auto;
+      gap: var(--space-2);
+      align-items: center;
+      margin-bottom: var(--space-2);
+      animation: fadeInRow var(--duration-fast) var(--ease-out);
+    }
+    @keyframes fadeInRow {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 768px) {
+      .med-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .shortcut-tag {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      background: var(--color-surface-subtle);
+      border: 1px solid var(--color-border);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      color: var(--color-ink-600);
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <div class="container" style="padding: var(--space-8) var(--space-4);">
+    <!-- Top Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-5);">
+      <div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+          <span class="status-dot-live"></span>
+          <span id="doctor-status-badge" class="badge badge-success">ACTIVE CLINICAL CHAMBER</span>
+          <span class="shortcut-tag">[Alt+R] Refresh</span>
+        </div>
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">
+          Doctor Clinical Workspace
+        </h1>
+        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem;">
+          Real-time outpatient queue control, digital e-prescriptions with diagnostic lab routing, and weekly schedule editor.
+        </p>
+      </div>
+
+      <!-- Date Selector for OPD Queue -->
+      <div style="display: flex; align-items: center; gap: var(--space-2);">
+        <label for="queue-date" style="font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-600); white-space: nowrap;">Session Date:</label>
+        <input type="date" id="queue-date" class="form-control" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8125rem;">
+        <button id="refresh-queue-btn" class="btn btn-secondary btn-sm" title="Refresh Queue" style="display: inline-flex; align-items: center; gap: 0.3rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: var(--space-2); border-bottom: 1px solid var(--color-border); margin-bottom: var(--space-6); overflow-x: auto;">
+      <button id="tab-queue-btn" class="btn btn-sm btn-primary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        Today's OPD Queue (<span id="total-queue-count" style="font-feature-settings: 'tnum';">0</span>)
+      </button>
+      <button id="tab-schedule-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        Chamber Schedule & Leaves
+      </button>
+      <button id="tab-earnings-btn" class="btn btn-sm btn-secondary" style="border-radius: var(--radius-sm) var(--radius-sm) 0 0; padding: var(--space-2) var(--space-4);">
+        Consultation Earnings & Reports
+      </button>
+    </div>
+
+    <!-- TAB 1: OPD QUEUE VIEW -->
+    <div id="tab-queue-view">
+      <!-- Quick Queue KPI Bar -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-5);">
+        <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-ink-400);">
+          <div style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Waiting in Queue</div>
+          <div id="stat-waiting" style="font-size: 1.875rem; font-weight: 800; color: var(--color-ink-950); font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
+        </div>
+
+        <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-warning);">
+          <div style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Arrived at Chamber</div>
+          <div id="stat-arrived" style="font-size: 1.875rem; font-weight: 800; color: #b45309; font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
+        </div>
+
+        <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-teal-700);">
+          <div style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">In Chamber Consultation</div>
+          <div id="stat-in-consult" style="font-size: 1.875rem; font-weight: 800; color: var(--color-teal-800); font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
+        </div>
+
+        <div class="card" style="padding: var(--space-4); border-left: 3px solid var(--color-success);">
+          <div style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Completed Visits</div>
+          <div id="stat-completed" style="font-size: 1.875rem; font-weight: 800; color: var(--color-success-text); font-family: var(--font-display); font-feature-settings: 'tnum'; margin-top: 0.15rem;">0</div>
+        </div>
+      </div>
+
+      <!-- Filter queue by status -->
+      <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5); flex-wrap: wrap;">
+        <button class="queue-filter-btn btn btn-sm btn-primary" data-status="">All Patients</button>
+        <button class="queue-filter-btn btn btn-sm btn-secondary" data-status="ARRIVED">Arrived (<span id="btn-count-arrived">0</span>)</button>
+        <button class="queue-filter-btn btn btn-sm btn-secondary" data-status="IN_CONSULTATION">In Chamber (<span id="btn-count-consult">0</span>)</button>
+        <button class="queue-filter-btn btn btn-sm btn-secondary" data-status="CONFIRMED">Waiting (<span id="btn-count-waiting">0</span>)</button>
+        <button class="queue-filter-btn btn btn-sm btn-secondary" data-status="COMPLETED">Completed</button>
+      </div>
+
+      <!-- Patients Queue List -->
+      <div id="queue-container">
+        <div style="text-align: center; padding: var(--space-10); color: var(--color-ink-500);">
+          Loading patient queue...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SCHEDULE & LEAVES VIEW -->
+    <div id="tab-schedule-view" style="display: none;">
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6);">
+        <!-- Weekly Regular Schedule -->
+        <div class="card" style="padding: var(--space-6);">
+          <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">Weekly Chamber Schedule</h2>
+          <p style="color: var(--color-ink-600); font-size: 0.875rem; margin: 0 0 var(--space-5);">
+            Set consultation hours, slot duration, and lunch/prayer breaks for each day of the week.
+          </p>
+
+          <form id="schedule-form">
+            <div id="schedule-days-container" style="display: flex; flex-direction: column; gap: var(--space-3);">
+              <!-- 7 Days Injected Dynamically -->
+            </div>
+
+            <div style="margin-top: var(--space-5); display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary" id="save-schedule-btn">Save Chamber Schedule</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Doctor Planned Leaves -->
+        <div>
+          <div class="card" style="padding: var(--space-5); margin-bottom: var(--space-6);">
+            <h2 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">Schedule Leave Day</h2>
+            <p style="color: var(--color-ink-600); font-size: 0.8125rem; margin: 0 0 var(--space-4);">
+              Mark days you won't be available at the chamber. Patient slot bookings are automatically blocked.
+            </p>
+
+            <form id="leave-form">
+              <div class="form-group" style="margin-bottom: var(--space-3);">
+                <label class="form-label" for="leave-date-input" style="font-size: 0.8125rem;">Leave Date</label>
+                <input type="date" id="leave-date-input" class="form-control" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="leave-reason-input" style="font-size: 0.8125rem;">Reason</label>
+                <input type="text" id="leave-reason-input" class="form-control" placeholder="e.g. Medical Conference, Personal Leave" required>
+              </div>
+
+              <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">+ Record Chamber Leave</button>
+            </form>
+          </div>
+
+          <div class="card" style="padding: var(--space-5);">
+            <h3 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-3);">Upcoming Chamber Leaves</h3>
+            <div id="leaves-list-container">
+              <div style="font-size: 0.8125rem; color: var(--color-ink-500);">Loading leaves...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: EARNINGS & REPORTS VIEW -->
+    <div id="tab-earnings-view" style="display: none;">
+      <!-- KPI Top Summary -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div class="card" style="padding: var(--space-5);">
+          <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Today's Revenue</div>
+          <div id="earnings-today-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-teal-700); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
+          <div style="font-size: 0.8125rem; color: var(--color-ink-500);"><span id="earnings-today-pts">0</span> consultations completed</div>
+        </div>
+
+        <div class="card" style="padding: var(--space-5);">
+          <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Last 30 Days</div>
+          <div id="earnings-month-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-ink-950); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
+          <div style="font-size: 0.8125rem; color: var(--color-ink-500);"><span id="earnings-month-pts">0</span> consultations completed</div>
+        </div>
+
+        <div class="card" style="padding: var(--space-5);">
+          <div style="font-size: 0.75rem; color: var(--color-ink-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Career All-Time Total</div>
+          <div id="earnings-all-rev" style="font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--color-ink-950); margin: var(--space-1) 0; font-feature-settings: 'tnum';">৳ 0</div>
+          <div style="font-size: 0.8125rem; color: var(--color-ink-500);"><span id="earnings-all-pts">0</span> lifetime consultations</div>
+        </div>
+      </div>
+
+      <!-- Past 7 Days Table -->
+      <div class="card" style="padding: var(--space-6);">
+        <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-4);">Past 7 Days Consultation & Earnings Breakdown</h2>
+        <div class="table-container">
+          <table style="font-size: 0.875rem;">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Consultations Completed</th>
+                <th>Daily Total (BDT)</th>
+              </tr>
+            </thead>
+            <tbody id="earnings-daily-tbody">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WRITE PRESCRIPTION -->
+  <div id="prescription-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 820px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-teal-700);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h3a2 2 0 0 0 0-4H9v7"/><path d="m11 13 3 3"/></svg>
+            <h3 class="modal-title" style="font-size: 1.125rem; margin: 0;">Author Digital Prescription</h3>
+          </div>
+          <p id="rx-patient-header" style="font-size: 0.8125rem; color: var(--color-ink-500); margin: 0.25rem 0 0;"></p>
+        </div>
+        <button id="rx-modal-close" class="modal-close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="rx-form">
+          <input type="hidden" id="rx-appointment-id">
+
+          <!-- Diagnosis & Symptoms -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="rx-diagnosis" style="font-size: 0.8125rem;">Clinical Diagnosis *</label>
+              <input type="text" id="rx-diagnosis" class="form-control" placeholder="e.g. Acute Bronchitis, Type 2 Diabetes" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="rx-symptoms" style="font-size: 0.8125rem;">Reported Symptoms / Complaints</label>
+              <input type="text" id="rx-symptoms" class="form-control" placeholder="e.g. High fever for 3 days, dry cough">
+            </div>
+          </div>
+
+          <!-- Medicines Rx Section -->
+          <div style="margin-bottom: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 700; font-size: 0.9375rem; text-transform: uppercase; letter-spacing: 0.04em;">Prescribed Medicines</label>
+              <button type="button" id="add-medicine-row-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">+ Add Medicine</button>
+            </div>
+
+            <div id="rx-medicines-list">
+              <!-- Medicine rows -->
+            </div>
+          </div>
+
+          <!-- Diagnostic Tests & Lab Investigations -->
+          <div style="margin-bottom: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 700; font-size: 0.9375rem; text-transform: uppercase; letter-spacing: 0.04em;">Diagnostic Lab Tests (Optional)</label>
+              <button type="button" id="add-test-row-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">+ Add Investigation</button>
+            </div>
+
+            <div id="rx-tests-list">
+              <!-- Test rows -->
+            </div>
+          </div>
+
+          <!-- Doctor Advice & Follow-up -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="rx-advice" style="font-size: 0.8125rem;">Clinical Advice & Lifestyle Restrictions</label>
+              <textarea id="rx-advice" class="form-control" rows="2" placeholder="Drink adequate warm fluids, follow salt restriction, complete antibiotic course..."></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="rx-followup" style="font-size: 0.8125rem;">Follow-Up Date</label>
+              <input type="date" id="rx-followup" class="form-control">
+            </div>
+          </div>
+
+          <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.8125rem; color: var(--color-ink-600); margin-bottom: var(--space-5);">
+            Submitting this prescription concludes the patient consultation and marks the appointment as <strong>COMPLETED</strong> in records.
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: var(--space-2);">
+            <button type="button" id="rx-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="save-rx-btn">Issue Prescription & Finalize Visit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api, getCurrentUser } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+    import { showToast } from '/js/toast.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const user = getCurrentUser();
+    if (!user || (user.role !== 'doctor' && user.role !== 'admin')) {
+      window.location.href = '/login.html?redirect=/doctor-panel.html';
+    }
+
+    // Set today as default date in queue-date input
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const dateInput = document.getElementById('queue-date');
+    dateInput.value = todayStr;
+
+    let currentQueue = [];
+    let activeFilterStatus = '';
+
+    // Tab switching
+    const tabs = {
+      queue: { btn: document.getElementById('tab-queue-btn'), view: document.getElementById('tab-queue-view') },
+      schedule: { btn: document.getElementById('tab-schedule-btn'), view: document.getElementById('tab-schedule-view') },
+      earnings: { btn: document.getElementById('tab-earnings-btn'), view: document.getElementById('tab-earnings-view') }
+    };
+
+    function switchTab(activeKey) {
+      Object.keys(tabs).forEach(k => {
+        if (k === activeKey) {
+          tabs[k].btn.className = 'btn btn-sm btn-primary';
+          tabs[k].view.style.display = 'block';
+        } else {
+          tabs[k].btn.className = 'btn btn-sm btn-secondary';
+          tabs[k].view.style.display = 'none';
+        }
+      });
+
+      if (activeKey === 'schedule') loadScheduleData();
+      if (activeKey === 'earnings') loadEarningsData();
+    }
+
+    tabs.queue.btn.addEventListener('click', () => switchTab('queue'));
+    tabs.schedule.btn.addEventListener('click', () => switchTab('schedule'));
+    tabs.earnings.btn.addEventListener('click', () => switchTab('earnings'));
+
+    // --- TAB 1: QUEUE MANAGEMENT ---
+    async function loadQueue() {
+      const date = dateInput.value;
+      const container = document.getElementById('queue-container');
+      container.innerHTML = '<div style="text-align: center; padding: var(--space-8); color: var(--color-ink-500);">Fetching patient queue...</div>';
+
+      try {
+        const res = await api.get(`/doctor-portal/today-queue?date=${date}`);
+        currentQueue = res.data;
+        const stats = res.stats || {};
+
+        document.getElementById('total-queue-count').textContent = stats.total || 0;
+        document.getElementById('stat-waiting').textContent = stats.waiting_count || 0;
+        document.getElementById('stat-arrived').textContent = stats.arrived_count || 0;
+        document.getElementById('stat-in-consult').textContent = stats.in_consultation_count || 0;
+        document.getElementById('stat-completed').textContent = stats.completed_count || 0;
+
+        document.getElementById('btn-count-arrived').textContent = stats.arrived_count || 0;
+        document.getElementById('btn-count-consult').textContent = stats.in_consultation_count || 0;
+        document.getElementById('btn-count-waiting').textContent = stats.waiting_count || 0;
+
+        renderQueueCards();
+      } catch (err) {
+        container.innerHTML = `<div class="card" style="text-align: center; padding: var(--space-8); color: var(--color-danger);">
+          Failed to load doctor queue: ${err.message || 'Error occurred.'}
+        </div>`;
+      }
+    }
+
+    function renderQueueCards() {
+      const container = document.getElementById('queue-container');
+      const filtered = currentQueue.filter(apt => {
+        if (!activeFilterStatus) return true;
+        return apt.status === activeFilterStatus;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align: center; padding: var(--space-12) var(--space-6);">
+            <div style="font-size: 2rem; margin-bottom: var(--space-2); color: var(--color-ink-400);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3v5a4.5 4.5 0 0 0 9 0V3"/><path d="M9 3v2"/><path d="M4.5 3H3"/><path d="M15 3h-1.5"/><path d="M9 12.5v2a3.5 3.5 0 0 0 7 0v-1"/><circle cx="18" cy="10" r="3"/><circle cx="18" cy="10" r="1"/></svg>
+            </div>
+            <h3 style="font-family: var(--font-display); font-size: 1.125rem; font-weight: 700; margin: 0 0 var(--space-1); color: var(--color-ink-950);">No Patients in Filter</h3>
+            <p style="color: var(--color-ink-500); font-size: 0.875rem; margin: 0;">No consultations match this filter for the selected date.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '<div class="queue-grid"></div>';
+      const grid = container.querySelector('.queue-grid');
+
+      filtered.forEach(apt => {
+        const card = document.createElement('div');
+        const isInConsult = apt.status === 'IN_CONSULTATION';
+        card.className = `queue-card ${isInConsult ? 'active-patient' : ''}`;
+
+        let statusBadge = `<span class="badge badge-neutral">${apt.status}</span>`;
+        if (apt.status === 'ARRIVED') statusBadge = `<span class="badge badge-warning">LOBBY (ARRIVED)</span>`;
+        if (apt.status === 'IN_CONSULTATION') statusBadge = `<span class="badge badge-primary">IN CHAMBER</span>`;
+        if (apt.status === 'COMPLETED') statusBadge = `<span class="badge badge-success">COMPLETED</span>`;
+        if (apt.status === 'NO_SHOW') statusBadge = `<span class="badge badge-danger">NO SHOW</span>`;
+
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3);">
+              <span class="serial-tag">SL - ${String(apt.serial_number).padStart(2, '0')}</span>
+              ${statusBadge}
+            </div>
+
+            <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.2rem;">${apt.patient_name}</h3>
+            <div style="font-size: 0.8125rem; color: var(--color-ink-500); margin-bottom: var(--space-3);">
+              ${apt.patient_age} yrs • ${apt.patient_gender} • ${apt.patient_phone}
+            </div>
+
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-xs); font-size: 0.8125rem; margin-bottom: var(--space-3);">
+              <strong style="color: var(--color-ink-900);">Chief Complaint:</strong> ${apt.reason_for_visit || 'General Outpatient Consultation'}
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--color-ink-500); margin-bottom: var(--space-3); display: flex; justify-content: space-between;">
+              <span>Slot: <strong style="color: var(--color-ink-900); font-feature-settings: 'tnum';">${apt.time}</strong></span>
+              <span>Payment: <strong style="color: ${apt.payment_status === 'PAID' ? 'var(--color-success)' : 'var(--color-warning)'}">${apt.payment_status || 'UNPAID'}</strong></span>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-3); display: flex; gap: var(--space-2); flex-wrap: wrap;">
+            ${apt.status !== 'IN_CONSULTATION' && apt.status !== 'COMPLETED' ? `
+              <button class="btn btn-primary btn-sm call-in-btn" data-apt-id="${apt.id}" style="flex: 1;">
+                Call In
+              </button>
+            ` : ''}
+
+            ${apt.status === 'IN_CONSULTATION' ? `
+              <button class="btn btn-primary btn-sm write-rx-btn" 
+                data-apt-id="${apt.id}" 
+                data-patient-name="${apt.patient_name}" 
+                data-patient-age="${apt.patient_age}" 
+                data-patient-gender="${apt.patient_gender}"
+                data-complaint="${apt.reason_for_visit}"
+                style="flex: 1;">
+                Write Prescription
+              </button>
+            ` : ''}
+
+            ${apt.status === 'COMPLETED' && apt.prescription_id ? `
+              <a href="/my-appointments.html" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                View Rx
+              </a>
+            ` : ''}
+
+            ${apt.status !== 'COMPLETED' && apt.status !== 'NO_SHOW' ? `
+              <button class="btn btn-secondary btn-sm no-show-btn" data-apt-id="${apt.id}" style="color: var(--color-danger); font-size: 0.75rem;">
+                No Show
+              </button>
+            ` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Attach actions
+      container.querySelectorAll('.call-in-btn').forEach(b => {
+        b.addEventListener('click', async () => {
+          const id = b.getAttribute('data-apt-id');
+          await updateStatus(id, 'IN_CONSULTATION');
+        });
+      });
+
+      container.querySelectorAll('.no-show-btn').forEach(b => {
+        b.addEventListener('click', async () => {
+          const id = b.getAttribute('data-apt-id');
+          if (confirm('Mark this patient as No-Show?')) {
+            await updateStatus(id, 'NO_SHOW');
+          }
+        });
+      });
+
+      container.querySelectorAll('.write-rx-btn').forEach(b => {
+        b.addEventListener('click', () => {
+          openPrescriptionModal({
+            id: b.getAttribute('data-apt-id'),
+            name: b.getAttribute('data-patient-name'),
+            age: b.getAttribute('data-patient-age'),
+            gender: b.getAttribute('data-patient-gender'),
+            complaint: b.getAttribute('data-complaint')
+          });
+        });
+      });
+    }
+
+    function playConsultationChime() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.15); // A5
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.8);
+      } catch (_) {}
+    }
+
+    async function updateStatus(appointmentId, status) {
+      try {
+        await api.put(`/doctor-portal/queue/${appointmentId}/status`, { status });
+        if (status === 'IN_CONSULTATION') {
+          playConsultationChime();
+        }
+        showToast(`Patient status updated to ${status}`, 'success');
+        loadQueue();
+      } catch (err) {
+        showToast(err.message || 'Status update failed', 'error');
+      }
+    }
+
+    // Filter Buttons
+    document.querySelectorAll('.queue-filter-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.queue-filter-btn').forEach(x => x.className = 'queue-filter-btn btn btn-sm btn-secondary');
+        b.className = 'queue-filter-btn btn btn-sm btn-primary';
+        activeFilterStatus = b.getAttribute('data-status');
+        renderQueueCards();
+      });
+    });
+
+    dateInput.addEventListener('change', loadQueue);
+    document.getElementById('refresh-queue-btn').addEventListener('click', loadQueue);
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.altKey && e.key.toLowerCase() === 'r') {
+        e.preventDefault();
+        loadQueue();
+        showToast('Refreshed queue', 'info');
+      }
+    });
+
+    // --- PRESCRIPTION WRITER MODAL ---
+    function openPrescriptionModal(patient) {
+      document.getElementById('rx-appointment-id').value = patient.id;
+      document.getElementById('rx-patient-header').textContent = `Patient: ${patient.name} (${patient.age} yrs, ${patient.gender}) • Chief Complaint: ${patient.complaint || 'N/A'}`;
+      document.getElementById('rx-diagnosis').value = '';
+      document.getElementById('rx-symptoms').value = patient.complaint || '';
+      document.getElementById('rx-advice').value = '';
+      document.getElementById('rx-followup').value = '';
+
+      // Reset medicines list with 1 default row
+      const medList = document.getElementById('rx-medicines-list');
+      medList.innerHTML = '';
+      addMedicineRow('Tab. Paracetamol 500mg', '1+0+1', 'After meal', '3 days');
+
+      // Reset tests list
+      document.getElementById('rx-tests-list').innerHTML = '';
+
+      document.getElementById('prescription-modal').classList.add('show');
+    }
+
+    function addMedicineRow(name = '', dosage = '', instruction = 'After meal', duration = '7 days') {
+      const list = document.getElementById('rx-medicines-list');
+      const row = document.createElement('div');
+      row.className = 'med-row';
+      row.innerHTML = `
+        <input type="text" class="form-control med-name" placeholder="Medicine brand / generic" value="${name}" required style="font-size: 0.8125rem;">
+        <input type="text" class="form-control med-dose" placeholder="1+0+1" value="${dosage}" required style="font-size: 0.8125rem;">
+        <input type="text" class="form-control med-inst" placeholder="Instruction" value="${instruction}" required style="font-size: 0.8125rem;">
+        <input type="text" class="form-control med-dur" placeholder="Duration" value="${duration}" required style="font-size: 0.8125rem;">
+        <button type="button" class="btn btn-secondary btn-sm remove-med-btn" style="color: var(--color-danger); padding: 0.25rem 0.5rem;">&times;</button>
+      `;
+
+      row.querySelector('.remove-med-btn').addEventListener('click', () => {
+        if (list.children.length > 1) {
+          row.remove();
+        } else {
+          showToast('At least one medicine is required.', 'warning');
+        }
+      });
+
+      list.appendChild(row);
+    }
+
+    function addTestRow(testName = '', notes = '') {
+      const list = document.getElementById('rx-tests-list');
+      const row = document.createElement('div');
+      row.style.display = 'grid';
+      row.style.gridTemplateColumns = '2fr 2fr auto';
+      row.style.gap = 'var(--space-2)';
+      row.style.marginBottom = 'var(--space-2)';
+      row.innerHTML = `
+        <input type="text" class="form-control test-name" placeholder="Investigation (CBC, Lipid Profile, etc.)" value="${testName}" style="font-size: 0.8125rem;">
+        <input type="text" class="form-control test-notes" placeholder="Notes (Fasting, morning sample)" value="${notes}" style="font-size: 0.8125rem;">
+        <button type="button" class="btn btn-secondary btn-sm remove-test-btn" style="color: var(--color-danger); padding: 0.25rem 0.5rem;">&times;</button>
+      `;
+
+      row.querySelector('.remove-test-btn').addEventListener('click', () => row.remove());
+      list.appendChild(row);
+    }
+
+    document.getElementById('add-medicine-row-btn').addEventListener('click', () => addMedicineRow());
+    document.getElementById('add-test-row-btn').addEventListener('click', () => addTestRow());
+
+    document.getElementById('rx-modal-close').addEventListener('click', () => {
+      document.getElementById('prescription-modal').classList.remove('show');
+    });
+    document.getElementById('rx-cancel-btn').addEventListener('click', () => {
+      document.getElementById('prescription-modal').classList.remove('show');
+    });
+
+    document.getElementById('rx-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const aptId = Number(document.getElementById('rx-appointment-id').value);
+      const diagnosis = document.getElementById('rx-diagnosis').value.trim();
+      const symptoms = document.getElementById('rx-symptoms').value.trim();
+      const advice = document.getElementById('rx-advice').value.trim();
+      const followUpDate = document.getElementById('rx-followup').value;
+
+      const medRows = document.querySelectorAll('#rx-medicines-list .med-row');
+      const medicines = [];
+      medRows.forEach(r => {
+        const name = r.querySelector('.med-name').value.trim();
+        const dosage = r.querySelector('.med-dose').value.trim();
+        const instruction = r.querySelector('.med-inst').value.trim();
+        const duration = r.querySelector('.med-dur').value.trim();
+        if (name) {
+          medicines.push({ medicineName: name, dosage, instruction, duration });
+        }
+      });
+
+      const testRows = document.querySelectorAll('#rx-tests-list > div');
+      const tests = [];
+      testRows.forEach(r => {
+        const testName = r.querySelector('.test-name').value.trim();
+        const notes = r.querySelector('.test-notes').value.trim();
+        if (testName) {
+          tests.push({ testName, notes });
+        }
+      });
+
+      if (medicines.length === 0) {
+        showToast('Please prescribe at least one medicine.', 'error');
+        return;
+      }
+
+      try {
+        await api.post('/prescriptions', {
+          appointmentId: aptId,
+          diagnosis,
+          symptoms,
+          advice,
+          followUpDate,
+          medicines,
+          tests
+        });
+
+        document.getElementById('prescription-modal').classList.remove('show');
+        showToast('Prescription issued and visit concluded!', 'success');
+        loadQueue();
+      } catch (err) {
+        showToast(err.message || 'Failed to issue prescription', 'error');
+      }
+    });
+
+    // --- TAB 2: SCHEDULE & LEAVES ---
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    async function loadScheduleData() {
+      try {
+        const res = await api.get('/doctor-portal/schedule');
+        const schedules = res.data.schedules || [];
+        const leaves = res.data.leaves || [];
+
+        // Build 7-day schedule form
+        const container = document.getElementById('schedule-days-container');
+        container.innerHTML = '';
+
+        for (let day = 0; day < 7; day++) {
+          const s = schedules.find(x => x.day_of_week === day) || {
+            day_of_week: day,
+            start_time: '16:00',
+            end_time: '20:00',
+            slot_duration_minutes: 15,
+            break_start: '',
+            break_end: '',
+            is_active: day !== 5 // default Friday off in BD
+          };
+
+          const row = document.createElement('div');
+          row.style.background = 'var(--color-surface-subtle)';
+          row.style.border = '1px solid var(--color-border)';
+          row.style.padding = 'var(--space-3) var(--space-4)';
+          row.style.borderRadius = 'var(--radius-sm)';
+          row.style.display = 'grid';
+          row.style.gridTemplateColumns = '130px 1fr 1fr 90px 90px 90px';
+          row.style.gap = 'var(--space-2)';
+          row.style.alignItems = 'center';
+
+          row.innerHTML = `
+            <div>
+              <strong style="font-size: 0.875rem; color: var(--color-ink-950);">${dayNames[day]}</strong>
+              <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer; margin-top: 0.15rem; color: var(--color-ink-600);">
+                <input type="checkbox" class="day-active" data-day="${day}" ${s.is_active ? 'checked' : ''}> Open
+              </label>
+            </div>
+            <div>
+              <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase;">Start Time</span>
+              <input type="time" class="form-control day-start" data-day="${day}" value="${s.start_time || '16:00'}" style="font-size: 0.8125rem;">
+            </div>
+            <div>
+              <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase;">End Time</span>
+              <input type="time" class="form-control day-end" data-day="${day}" value="${s.end_time || '20:00'}" style="font-size: 0.8125rem;">
+            </div>
+            <div>
+              <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase;">Slot (Min)</span>
+              <input type="number" class="form-control day-slot" data-day="${day}" value="${s.slot_duration_minutes || 15}" min="5" max="60" style="font-size: 0.8125rem;">
+            </div>
+            <div>
+              <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase;">Break Start</span>
+              <input type="time" class="form-control day-break-start" data-day="${day}" value="${s.break_start || ''}" style="font-size: 0.8125rem;">
+            </div>
+            <div>
+              <span style="font-size: 0.6875rem; color: var(--color-ink-500); text-transform: uppercase;">Break End</span>
+              <input type="time" class="form-control day-break-end" data-day="${day}" value="${s.break_end || ''}" style="font-size: 0.8125rem;">
+            </div>
+          `;
+          container.appendChild(row);
+        }
+
+        // Render Leaves
+        renderLeavesList(leaves);
+
+      } catch (err) {
+        showToast('Error loading doctor schedules', 'error');
+      }
+    }
+
+    function renderLeavesList(leaves) {
+      const container = document.getElementById('leaves-list-container');
+      if (leaves.length === 0) {
+        container.innerHTML = '<div style="font-size: 0.8125rem; color: var(--color-ink-500);">No upcoming leaves scheduled.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      leaves.forEach(l => {
+        const item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+        item.style.padding = 'var(--space-2) 0';
+        item.style.borderBottom = '1px solid var(--color-border)';
+        item.innerHTML = `
+          <div>
+            <strong style="font-size: 0.875rem; color: var(--color-ink-900); font-feature-settings: 'tnum';">${l.leave_date}</strong>
+            <div style="font-size: 0.75rem; color: var(--color-ink-500);">${l.reason || 'Personal'}</div>
+          </div>
+          <button class="btn btn-secondary btn-sm delete-leave-btn" data-id="${l.id}" style="color: var(--color-danger); padding: 0.2rem 0.4rem;">&times;</button>
+        `;
+        item.querySelector('.delete-leave-btn').addEventListener('click', async () => {
+          if (confirm(`Remove scheduled leave for ${l.leave_date}?`)) {
+            await api.delete(`/doctor-portal/leaves/${l.id}`);
+            showToast('Leave day removed', 'success');
+            loadScheduleData();
+          }
+        });
+        container.appendChild(item);
+      });
+    }
+
+    document.getElementById('schedule-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const schedules = [];
+
+      for (let day = 0; day < 7; day++) {
+        const isActive = document.querySelector(`.day-active[data-day="${day}"]`).checked;
+        const startTime = document.querySelector(`.day-start[data-day="${day}"]`).value;
+        const endTime = document.querySelector(`.day-end[data-day="${day}"]`).value;
+        const slotDurationMinutes = Number(document.querySelector(`.day-slot[data-day="${day}"]`).value);
+        const breakStart = document.querySelector(`.day-break-start[data-day="${day}"]`).value;
+        const breakEnd = document.querySelector(`.day-break-end[data-day="${day}"]`).value;
+
+        schedules.push({
+          dayOfWeek: day,
+          startTime,
+          endTime,
+          slotDurationMinutes,
+          breakStart,
+          breakEnd,
+          isActive
+        });
+      }
+
+      try {
+        await api.post('/doctor-portal/schedule', { schedules });
+        showToast('Chamber weekly schedule saved successfully!', 'success');
+      } catch (err) {
+        showToast(err.message || 'Failed to update schedule', 'error');
+      }
+    });
+
+    document.getElementById('leave-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const leaveDate = document.getElementById('leave-date-input').value;
+      const reason = document.getElementById('leave-reason-input').value.trim();
+
+      try {
+        await api.post('/doctor-portal/leaves', { leaveDate, reason });
+        showToast(`Leave scheduled for ${leaveDate}`, 'success');
+        document.getElementById('leave-form').reset();
+        loadScheduleData();
+      } catch (err) {
+        showToast(err.message || 'Failed to add leave', 'error');
+      }
+    });
+
+    // --- TAB 3: EARNINGS & REPORTS ---
+    async function loadEarningsData() {
+      try {
+        const res = await api.get('/doctor-portal/earnings');
+        const data = res.data;
+
+        document.getElementById('earnings-today-rev').textContent = `৳ ${data.today.total_revenue.toLocaleString()}`;
+        document.getElementById('earnings-today-pts').textContent = data.today.total_patients;
+
+        document.getElementById('earnings-month-rev').textContent = `৳ ${data.monthly.total_revenue.toLocaleString()}`;
+        document.getElementById('earnings-month-pts').textContent = data.monthly.total_patients;
+
+        document.getElementById('earnings-all-rev').textContent = `৳ ${data.allTime.total_revenue.toLocaleString()}`;
+        document.getElementById('earnings-all-pts').textContent = data.allTime.total_patients;
+
+        const tbody = document.getElementById('earnings-daily-tbody');
+        tbody.innerHTML = '';
+
+        if (!data.dailyBreakdown || data.dailyBreakdown.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--color-ink-500); padding: var(--space-6);">No recent consultations found.</td></tr>';
+          return;
+        }
+
+        data.dailyBreakdown.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong style="font-feature-settings: 'tnum';">${row.date}</strong></td>
+            <td style="font-feature-settings: 'tnum';">${row.patients_count} patient(s)</td>
+            <td><strong style="color: var(--color-teal-800); font-feature-settings: 'tnum';">৳ ${row.daily_revenue.toLocaleString()}</strong></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        showToast('Failed to load doctor earnings', 'error');
+      }
+    }
+
+    // Initial load
+    loadQueue();
+  </script>
+</body>
+</html>

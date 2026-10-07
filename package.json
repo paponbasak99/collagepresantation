@@ -1,0 +1,44 @@
+{
+  "name": "docbook",
+  "version": "1.0.0",
+  "description": "DocBook - Production-quality Doctor Appointment Booking System",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:init": "node src/db/init.js",
+    "db:seed": "node src/db/seed.js",
+    "db:backup": "node src/db/backup.js",
+    "db:migrate-pg": "node src/db/migrate-to-postgres.js",
+    "test": "node --test --test-concurrency=1 tests/**/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "doctor",
+    "appointment",
+    "booking",
+    "healthcare",
+    "express",
+    "sqlite"
+  ],
+  "author": "DocBook Team",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "qrcode": "^1.5.4",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

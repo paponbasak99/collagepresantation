@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocBook — OPD Waiting Lounge Live TV Display</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <style>
+    :root {
+      --tv-bg: #070b14;
+      --tv-card: #0d1527;
+      --tv-card-border: rgba(255, 255, 255, 0.08);
+      --tv-accent: #0ea5e9;
+      --tv-emerald: #10b981;
+    }
+
+    body {
+      background: var(--tv-bg);
+      color: #f8fafc;
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top TV Lounge Header */
+    .tv-header {
+      background: rgba(13, 21, 39, 0.95);
+      border-bottom: 2px solid rgba(20, 184, 166, 0.3);
+      padding: 16px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+    }
+
+    .tv-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .tv-logo-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 26px;
+      font-weight: 800;
+      box-shadow: 0 0 20px rgba(13, 148, 136, 0.5);
+    }
+
+    .tv-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tv-subtitle {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tv-clock-box {
+      text-align: right;
+    }
+
+    .tv-time {
+      font-family: 'Outfit', monospace;
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    .tv-date {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Main Stage Grid */
+    .tv-stage {
+      flex: 1;
+      padding: 28px 36px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+    }
+
+    /* Now Serving Hero Card */
+    .tv-hero-card {
+      background: linear-gradient(145deg, #0f1c36 0%, #081021 100%);
+      border: 2px solid rgba(14, 165, 233, 0.35);
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(14, 165, 233, 0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tv-hero-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(14, 165, 233, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .tv-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 12px #10b981;
+      animation: pulse-ring 1.5s infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+      100% { transform: scale(0.9); opacity: 1; }
+    }
+
+    .tv-token-display {
+      text-align: center;
+      margin: 24px 0;
+    }
+
+    .tv-token-label {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 600;
+    }
+
+    .tv-token-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 7.5rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+      letter-spacing: -2px;
+      text-shadow: 0 0 40px rgba(56, 189, 248, 0.4);
+      margin: 12px 0;
+    }
+
+    .tv-hero-patient {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.02em;
+    }
+
+    .tv-hero-doctor-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tv-doc-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .tv-doc-chamber {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Queue Side Panel */
+    .tv-queue-card {
+      background: #0d1527;
+      border: 1px solid var(--tv-card-border);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tv-queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 14px;
+    }
+
+    .tv-queue-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tv-queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      max-height: 480px;
+    }
+
+    .tv-queue-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .tv-queue-item.active {
+      border-color: rgba(14, 165, 233, 0.5);
+      background: rgba(14, 165, 233, 0.08);
+    }
+
+    .tv-item-token {
+      font-family: 'Outfit', monospace;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 14px;
+      border-radius: 8px;
+    }
+
+    .tv-item-patient {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .tv-item-status {
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .status-arrived {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-confirmed {
+      background: rgba(234, 179, 8, 0.2);
+      color: #fde047;
+      border: 1px solid rgba(234, 179, 8, 0.3);
+    }
+
+    /* Broadcast & Ticker Footer */
+    .tv-footer {
+      background: #090e1b;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 36px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 1rem;
+    }
+
+    .tv-ticker-tag {
+      background: #ef4444;
+      color: white;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .tv-ticker-text {
+      color: #cbd5e1;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .tv-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tv-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: white;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .tv-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    @media (max-width: 1024px) {
+      .tv-stage {
+        grid-template-columns: 1fr;
+      }
+      .tv-token-number {
+        font-size: 5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top TV Lounge Header -->
+  <header class="tv-header">
+    <div class="tv-brand">
+      <div class="tv-logo-box">🩺</div>
+      <div>
+        <h1 class="tv-title">DocBook Outpatient Center</h1>
+        <div class="tv-subtitle">Live Chamber Queue & Token Call System</div>
+      </div>
+    </div>
+
+    <!-- Live Clock & Controls -->
+    <div style="display: flex; align-items: center; gap: 28px;">
+      <div class="tv-controls">
+        <select id="doctor-filter" class="form-input" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: white; padding: 6px 12px; font-size: 0.875rem; border-radius: 8px;">
+          <option value="">All Practicing Chambers</option>
+        </select>
+        <button id="toggle-audio-btn" class="tv-btn" title="Toggle Voice Callout">
+          <span id="audio-icon">🔊</span> <span id="audio-label">Sound On</span>
+        </button>
+        <button id="fullscreen-btn" class="tv-btn" title="Toggle Fullscreen">
+          ⛶ Fullscreen
+        </button>
+      </div>
+
+      <div class="tv-clock-box">
+        <div id="tv-time" class="tv-time">00:00:00</div>
+        <div id="tv-date" class="tv-date">Loading date...</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Display Stage -->
+  <main class="tv-stage">
+    <!-- Left Hero: Now Serving -->
+    <section class="tv-hero-card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="tv-hero-badge">
+          <span class="pulse-dot"></span>
+          Now In Consultation
+        </div>
+        <div id="live-indicator" style="font-size: 0.85rem; color: #38bdf8; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#38bdf8;"></span>
+          LIVE STREAM ACTIVE
+        </div>
+      </div>
+
+      <div class="tv-token-display">
+        <div class="tv-token-label">Serving Token Number</div>
+        <div id="hero-token-number" class="tv-token-number">--</div>
+        <div id="hero-patient-name" class="tv-hero-patient">Waiting for Next Patient...</div>
+      </div>
+
+      <div class="tv-hero-doctor-box">
+        <div>
+          <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Consulting Physician</div>
+          <div id="hero-doctor-name" class="tv-doc-name">Dr. Selecting...</div>
+          <div id="hero-doctor-specialty" style="font-size: 0.9rem; color: #38bdf8; margin-top: 2px;">General Outpatient</div>
+        </div>
+        <div id="hero-chamber" class="tv-doc-chamber">Chamber 101</div>
+      </div>
+    </section>
+
+    <!-- Right: Next Up Queue Table -->
+    <section class="tv-queue-card">
+      <div class="tv-queue-header">
+        <div class="tv-queue-title">
+          <span>📋</span> Next In Queue
+        </div>
+        <div id="queue-counter" style="font-size: 0.9rem; color: #94a3b8; font-weight: 600;">
+          0 Waiting
+        </div>
+      </div>
+
+      <div id="upcoming-queue-list" class="tv-queue-list">
+        <div style="text-align: center; padding: 40px; color: #64748b;">
+          No waiting patients in queue.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Ticker / Delay Broadcast Bar -->
+  <footer class="tv-footer">
+    <div id="ticker-badge" class="tv-ticker-tag">Notice</div>
+    <div id="ticker-text" class="tv-ticker-text">
+      Welcome to DocBook OPD Healthcare Center. Please take a seat in the waiting lounge until your token number is announced.
+    </div>
+  </footer>
+
+  <script>
+    // Audio synthesizer & chime
+    let soundEnabled = true;
+    let lastAnnouncedToken = null;
+
+    // Web Audio Synthesizer Chime
+    function playChime() {
+      if (!soundEnabled) return;
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        osc1.frequency.setValueAtTime(880, now + 0.15); // A5
+
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(293.66, now); // D4
+        osc2.frequency.setValueAtTime(440, now + 0.15); // A4
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.8);
+        osc2.stop(now + 0.8);
+      } catch (e) {
+        console.warn('Audio chime error:', e);
+      }
+    }
+
+    // Voice announcement using SpeechSynthesis
+    function announceToken(tokenNumber, doctorName, chamber) {
+      if (!soundEnabled || !window.speechSynthesis) return;
+      playChime();
+      setTimeout(() => {
+        try {
+          window.speechSynthesis.cancel();
+          const cleanDoc = doctorName.replace(/^Dr\.\s*/i, '');
+          const utterance = new SpeechSynthesisUtterance(
+            `Token number ${tokenNumber}. Please proceed to Doctor ${cleanDoc}, ${chamber || ''}`
+          );
+          utterance.rate = 0.95;
+          utterance.pitch = 1.0;
+          window.speechSynthesis.speak(utterance);
+        } catch (_) {}
+      }, 700);
+    }
+
+    // Clock Updater
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('tv-time').textContent = timeStr;
+      document.getElementById('tv-date').textContent = dateStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Toggle Audio
+    document.getElementById('toggle-audio-btn').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('audio-icon').textContent = soundEnabled ? '🔊' : '🔇';
+      document.getElementById('audio-label').textContent = soundEnabled ? 'Sound On' : 'Muted';
+    });
+
+    // Toggle Fullscreen
+    document.getElementById('fullscreen-btn').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    // Queue Data Management
+    let allQueues = [];
+    let selectedDoctorId = '';
+
+    async function fetchQueueData() {
+      try {
+        const url = selectedDoctorId ? `/api/queue/live?doctor_id=${selectedDoctorId}` : '/api/queue/live';
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const result = await res.json();
+        allQueues = result.data || [];
+        populateDoctorDropdown();
+        renderQueue();
+      } catch (err) {
+        console.error('Failed to load queue data:', err);
+      }
+    }
+
+    function populateDoctorDropdown() {
+      const select = document.getElementById('doctor-filter');
+      const current = select.value;
+      if (select.children.length <= 1 && allQueues.length > 0) {
+        allQueues.forEach(q => {
+          const opt = document.createElement('option');
+          opt.value = q.doctor.id;
+          opt.textContent = `${q.doctor.name} (${q.doctor.specialty})`;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    document.getElementById('doctor-filter').addEventListener('change', (e) => {
+      selectedDoctorId = e.target.value;
+      fetchQueueData();
+    });
+
+    function renderQueue() {
+      if (!allQueues || allQueues.length === 0) return;
+
+      const queue = selectedDoctorId ? (allQueues.find(q => q.doctor.id == selectedDoctorId) || allQueues[0]) : allQueues[0];
+
+      // Render Hero Card
+      const heroToken = document.getElementById('hero-token-number');
+      const heroPatient = document.getElementById('hero-patient-name');
+      const heroDoctor = document.getElementById('hero-doctor-name');
+      const heroSpecialty = document.getElementById('hero-doctor-specialty');
+      const heroChamber = document.getElementById('hero-chamber');
+
+      heroDoctor.textContent = queue.doctor.name;
+      heroSpecialty.textContent = queue.doctor.specialty;
+      heroChamber.textContent = queue.doctor.chamber || 'Chamber 101';
+
+      if (queue.nowServing) {
+        const tokenFormatted = `SL - ${String(queue.nowServing.serialNumber).padStart(2, '0')}`;
+        heroToken.textContent = tokenFormatted;
+        heroPatient.textContent = queue.nowServing.patientNameMasked || 'Patient';
+
+        // Check if new token announced
+        if (lastAnnouncedToken !== queue.nowServing.serialNumber) {
+          lastAnnouncedToken = queue.nowServing.serialNumber;
+          announceToken(queue.nowServing.serialNumber, queue.doctor.name, queue.doctor.chamber);
+        }
+      } else {
+        heroToken.textContent = '--';
+        heroPatient.textContent = 'Next Patient Ready to Call';
+      }
+
+      // Render Upcoming Queue List
+      const listEl = document.getElementById('upcoming-queue-list');
+      const countEl = document.getElementById('queue-counter');
+      countEl.textContent = `${queue.stats.waitingCount} Waiting`;
+
+      if (queue.upcomingQueue && queue.upcomingQueue.length > 0) {
+        listEl.innerHTML = queue.upcomingQueue.map(item => `
+          <div class="tv-queue-item ${item.status === 'ARRIVED' ? 'active' : ''}">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div class="tv-item-token">SL - ${String(item.serialNumber).padStart(2, '0')}</div>
+              <div>
+                <div class="tv-item-patient">${item.patientNameMasked}</div>
+                <div style="font-size: 0.8rem; color: #94a3b8;">Est. Consultation: ${item.time || 'Upcoming'}</div>
+              </div>
+            </div>
+            <div>
+              <span class="tv-item-status ${item.status === 'ARRIVED' ? 'status-arrived' : 'status-confirmed'}">
+                ${item.status === 'ARRIVED' ? '✓ Checked In' : 'Confirmed'}
+              </span>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 48px 20px; color: #64748b; font-size: 1.1rem;">
+            ✓ All checked-in patients have been served.
+          </div>
+        `;
+      }
+
+      // Render Broadcast Ticker if active
+      const tickerBadge = document.getElementById('ticker-badge');
+      const tickerText = document.getElementById('ticker-text');
+      if (queue.broadcast) {
+        tickerBadge.textContent = 'Doctor Notice';
+        tickerBadge.style.background = '#f59e0b';
+        tickerText.textContent = `⚠️ Chamber Delay Notice: ${queue.doctor.name} is running approx. ${queue.broadcast.delayMinutes} minutes delayed. Note: ${queue.broadcast.message}`;
+      } else {
+        tickerBadge.textContent = 'Notice';
+        tickerBadge.style.background = '#0ea5e9';
+        tickerText.textContent = 'Welcome to DocBook Outpatient Department. Please remain in the lounge until your token is called.';
+      }
+    }
+
+    // Server-Sent Events (SSE) Live Stream
+    function initSSE() {
+      const sse = new EventSource('/api/queue/stream');
+
+      sse.addEventListener('TOKEN_CALLED', (e) => {
+        const payload = JSON.parse(e.data);
+        fetchQueueData();
+      });
+
+      sse.addEventListener('QUEUE_UPDATED', () => {
+        fetchQueueData();
+      });
+
+      sse.addEventListener('DELAY_BROADCAST', (e) => {
+        fetchQueueData();
+      });
+
+      sse.addEventListener('DELAY_RESOLVED', () => {
+        fetchQueueData();
+      });
+
+      sse.onerror = () => {
+        // SSE disconnected, fallback polling every 6 seconds
+        setTimeout(fetchQueueData, 6000);
+      };
+    }
+
+    // Boot
+    fetchQueueData();
+    initSSE();
+    setInterval(fetchQueueData, 10000); // safety fallback poll
+  </script>
+</body>
+</html>

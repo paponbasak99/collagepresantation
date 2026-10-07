@@ -1,0 +1,19 @@
+{
+  "name": "DocBook — Outpatient Care & Clinic Management",
+  "short_name": "DocBook",
+  "description": "Production-quality healthcare clinic booking, live chamber queue tracking, and official e-prescriptions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#0d9488",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/docbook-logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["medical", "health", "productivity"]
+}

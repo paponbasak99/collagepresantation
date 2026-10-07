@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Profile & Chamber Booking — DocBook</title>
+  <meta name="description" content="View verified credentials, weekly chamber hours, patient reviews, and book an appointment slot with atomic 5-minute reservation.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <style>
+    .doctor-profile-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .doctor-profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .date-pill-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      min-width: 82px;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+      color: var(--color-ink-800);
+    }
+    .date-pill-btn:hover {
+      border-color: var(--color-teal-500);
+      background: var(--color-surface-subtle);
+    }
+    .date-pill-btn.active {
+      background: var(--color-teal-700);
+      color: white;
+      border-color: var(--color-teal-800);
+      box-shadow: var(--shadow-sm);
+    }
+    .date-pill-btn.active span {
+      color: white !important;
+    }
+    .rating-bar-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 0.75rem;
+      color: var(--color-ink-600);
+      margin-bottom: var(--space-2);
+    }
+    .rating-bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .rating-bar-fill {
+      height: 100%;
+      background: var(--color-teal-700);
+      border-radius: var(--radius-full);
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <div class="container" style="padding: var(--space-8) var(--space-4);">
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: var(--space-2); font-size: 0.8125rem; color: var(--color-ink-500); margin-bottom: var(--space-4);">
+      <a href="/" style="color: var(--color-ink-600); text-decoration: none;">Home</a>
+      <span>/</span>
+      <a href="/doctors.html" style="color: var(--color-ink-600); text-decoration: none;">Specialists</a>
+      <span>/</span>
+      <span style="color: var(--color-teal-700); font-weight: 600;" id="breadcrumb-doc-name">Doctor Profile</span>
+    </div>
+
+    <!-- Doctor Profile Header Card -->
+    <div id="doctor-hero" class="card" style="margin-bottom: var(--space-8); padding: var(--space-6);">
+      <div style="text-align: center; color: var(--color-ink-500); padding: var(--space-8);">Loading verified credentials...</div>
+    </div>
+
+    <!-- Two-Column Layout: Slots Selector & Sticky Chamber Panel -->
+    <div class="doctor-profile-grid">
+      <!-- Left: Interactive Slot Booking Calendar -->
+      <section id="schedule-section" class="card" style="padding: var(--space-6);">
+        <div style="border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-2);">
+            <div>
+              <h2 style="font-family: var(--font-display); font-size: 1.375rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">Select Consultation Slot</h2>
+              <p style="font-size: 0.875rem; color: var(--color-ink-600); margin: 0;">
+                Choose an available slot. It is held atomically for 5 minutes during checkout to guarantee your spot.
+              </p>
+            </div>
+            <span class="badge badge-success">Atomic 5-Min Hold</span>
+          </div>
+        </div>
+
+        <!-- Date Selector Pills -->
+        <div style="margin-bottom: var(--space-6);">
+          <label class="form-label" style="margin-bottom: var(--space-3); display: block; font-size: 0.8125rem;">Upcoming Chamber Dates (Next 7 Days):</label>
+          <div id="date-pills" style="display: flex; gap: var(--space-2); overflow-x: auto; padding-bottom: var(--space-2); -webkit-overflow-scrolling: touch;">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Slots Container -->
+        <div id="slots-container">
+          <div style="text-align: center; padding: var(--space-8); color: var(--color-ink-500);">
+            Select a date above to view available consultation slots.
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Sticky Doctor Chamber Info & Reviews -->
+      <aside style="position: sticky; top: 5.5rem;">
+        <!-- Chamber Info Card with Map-Style Aesthetic -->
+        <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-5);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--color-teal-50); color: var(--color-teal-700); display: flex; align-items: center; justify-content: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v4"/><path d="M14 8h-4"/><path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"/><path d="M18 14h4v8h-4"/><path d="M2 22h4v-8H2"/></svg>
+              </div>
+              <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Chamber Location</h3>
+            </div>
+            <span class="badge badge-info">Verified Clinic</span>
+          </div>
+
+          <div id="chamber-info">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Reviews & Rating Distribution Card -->
+        <div class="card" style="padding: var(--space-5);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);">
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Patient Feedback</h3>
+            <span id="review-stat-badge" class="badge badge-primary">4.9 Rating</span>
+          </div>
+
+          <!-- Rating Distribution Bars -->
+          <div id="rating-distribution" style="margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);">
+            <div class="rating-bar-row">
+              <span style="width: 44px; font-weight: 600;">5 Star</span>
+              <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 88%;"></div></div>
+              <span style="width: 32px; text-align: right; font-feature-settings: 'tnum';">88%</span>
+            </div>
+            <div class="rating-bar-row">
+              <span style="width: 44px; font-weight: 600;">4 Star</span>
+              <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 10%;"></div></div>
+              <span style="width: 32px; text-align: right; font-feature-settings: 'tnum';">10%</span>
+            </div>
+            <div class="rating-bar-row">
+              <span style="width: 44px; font-weight: 600;">3 Star</span>
+              <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 2%;"></div></div>
+              <span style="width: 32px; text-align: right; font-feature-settings: 'tnum';">2%</span>
+            </div>
+          </div>
+
+          <!-- Reviews List -->
+          <div id="reviews-list" style="display: flex; flex-direction: column; gap: var(--space-3);">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </aside>
+    </div>
+  <!-- Mobile Sticky Bottom Action Bar (Fee + Select Slot) -->
+  <div class="mobile-sticky-action-bar" id="mobile-doctor-action-bar">
+    <div>
+      <div style="font-size: 0.72rem; color: var(--color-ink-500); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Consultation Fee</div>
+      <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-teal-700); font-feature-settings: 'tnum';" id="mobile-doc-fee">৳ 0</div>
+    </div>
+    <button id="mobile-select-slot-btn" class="btn btn-primary" style="font-weight: 700; padding: 0.65rem 1.25rem;">
+      <span>Select Slot</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api, getCurrentUser } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+    import { getLang, t } from '/js/i18n.js';
+    import { showToast } from '/js/toast.js';
+    import { icons, renderDoctorAvatar } from '/js/icons.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const doctorId = urlParams.get('id');
+
+    if (!doctorId) {
+      window.location.href = '/doctors.html';
+    }
+
+    let doctorData = null;
+    let selectedDate = null;
+
+    async function loadDoctorProfile() {
+      try {
+        const res = await api.get(`/doctors/${doctorId}`);
+        doctorData = res.data;
+        const lang = getLang();
+
+        document.getElementById('breadcrumb-doc-name').textContent = doctorData.name;
+        const mobileFeeEl = document.getElementById('mobile-doc-fee');
+        if (mobileFeeEl) {
+          mobileFeeEl.textContent = '৳ ' + (doctorData.consultation_fee || '0');
+        }
+        document.getElementById('mobile-select-slot-btn')?.addEventListener('click', () => {
+          document.getElementById('slots-container')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        // Render Hero
+        const heroEl = document.getElementById('doctor-hero');
+        heroEl.innerHTML = `
+          <div class="doctor-hero-grid" style="display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-6); align-items: center;">
+            <div>
+              ${renderDoctorAvatar(doctorData.name, doctorData.id, 104, true, doctorData.avatar_url)}
+            </div>
+
+            <div>
+              <div style="display: flex; gap: var(--space-2); align-items: center; margin-bottom: var(--space-2); flex-wrap: wrap;">
+                <span class="badge badge-success">BMDC Reg: ${doctorData.bmdc_reg_no}</span>
+                <span class="badge badge-info" style="font-feature-settings: 'tnum';">${doctorData.experience_years} Years Clinical Experience</span>
+              </div>
+              <h1 style="font-family: var(--font-display); font-size: 1.875rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">${doctorData.name}</h1>
+              <div style="color: var(--color-teal-700); font-weight: 600; font-size: 1rem; margin-bottom: var(--space-1);">
+                ${lang === 'bn' ? doctorData.specialty_name_bn : doctorData.specialty_name_en}
+              </div>
+              <div style="font-size: 0.875rem; color: var(--color-ink-500); margin-bottom: var(--space-3);">
+                ${doctorData.qualifications}
+              </div>
+              <p style="font-size: 0.875rem; color: var(--color-ink-700); max-width: 720px; line-height: 1.6; margin: 0;">
+                ${doctorData.bio_en || 'Consultant Specialist committed to high standard patient-centered outpatient clinical care.'}
+              </p>
+            </div>
+
+            <div style="background: var(--color-surface-subtle); padding: var(--space-5); border-radius: var(--radius-md); text-align: center; border: 1px solid var(--color-border); min-width: 190px;">
+              <div style="font-size: 0.75rem; color: var(--color-ink-500); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem;">Consultation Fee</div>
+              <div class="doctor-fee-tag" style="font-size: 1.875rem; margin-bottom: var(--space-2); font-feature-settings: 'tnum';">৳ ${doctorData.consultation_fee}</div>
+              <div style="font-size: 0.75rem; color: var(--color-ink-500); font-feature-settings: 'tnum';">
+                Follow-up: <strong style="color: var(--color-ink-800);">৳ ${doctorData.follow_up_fee}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Render Chamber Info
+        const chamberEl = document.getElementById('chamber-info');
+        chamberEl.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: 0.875rem;">
+            <div style="display: flex; align-items: flex-start; gap: 0.4rem;">
+              <span style="color: var(--color-teal-700); margin-top: 1px;">${icons.hospital(16)}</span>
+              <div>
+                <strong style="color: var(--color-ink-950);">${lang === 'bn' ? doctorData.hospital_name_bn : doctorData.hospital_name_en}</strong>
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 0.4rem; color: var(--color-ink-600);">
+              <span style="color: var(--color-teal-700); margin-top: 1px;">${icons.mapPin(16)}</span>
+              <span>${doctorData.chamber_address}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.4rem; color: var(--color-ink-700);">
+              <span style="color: var(--color-teal-700);">${icons.phone(16)}</span>
+              <strong style="font-feature-settings: 'tnum';">${doctorData.hospital_phone || '+880 1700-000000'}</strong>
+            </div>
+            <div style="border-top: 1px solid var(--color-border); padding-top: var(--space-3); font-size: 0.75rem; color: var(--color-ink-500); display: flex; align-items: center; gap: 0.35rem;">
+              <span style="color: var(--color-teal-700);">${icons.clock(14)}</span>
+              <span>Chamber Sessions: <strong>${doctorData.schedules.length} days / week</strong></span>
+            </div>
+          </div>
+        `;
+
+        // Render Reviews
+        const reviewsEl = document.getElementById('reviews-list');
+        const badgeEl = document.getElementById('review-stat-badge');
+        badgeEl.textContent = `${doctorData.rating_avg.toFixed(1)} Rating (${doctorData.rating_count} reviews)`;
+
+        if (!doctorData.recentReviews || doctorData.recentReviews.length === 0) {
+          reviewsEl.innerHTML = '<div style="font-size: 0.8125rem; color: var(--color-ink-500); text-align: center; padding: var(--space-4);">No patient reviews published yet. Be the first to consult!</div>';
+        } else {
+          reviewsEl.innerHTML = '';
+          doctorData.recentReviews.forEach(r => {
+            const item = document.createElement('div');
+            item.style.borderBottom = '1px solid var(--color-border)';
+            item.style.paddingBottom = 'var(--space-3)';
+            item.innerHTML = `
+              <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; font-weight: 700; margin-bottom: 0.2rem;">
+                <span style="color: var(--color-ink-900);">${r.patient_name}</span>
+                <span style="color: #b45309; display: flex; align-items: center; gap: 0.2rem; font-feature-settings: 'tnum';">
+                  ${icons.starFilled(13)} ${r.rating}.0
+                </span>
+              </div>
+              <div style="font-size: 0.8125rem; color: var(--color-ink-600); line-height: 1.5;">
+                ${r.comment || 'Consultation went smoothly and on time.'}
+              </div>
+            `;
+            reviewsEl.appendChild(item);
+          });
+        }
+
+        // Render Next 7 Dates
+        renderDatePills();
+
+      } catch (err) {
+        console.error('Failed to load doctor profile:', err);
+      }
+    }
+
+    function renderDatePills() {
+      const container = document.getElementById('date-pills');
+      container.innerHTML = '';
+
+      const today = new Date();
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const dateStr = d.toISOString().slice(0, 10);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `date-pill-btn ${i === 0 ? 'active' : ''}`;
+        btn.innerHTML = `
+          <span style="font-size: 0.6875rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em; color: var(--color-ink-500);">${i === 0 ? 'Today' : (i === 1 ? 'Tmrw' : dayNames[d.getDay()])}</span>
+          <span style="font-size: 1.125rem; font-weight: 800; font-family: var(--font-display); line-height: 1.2; font-feature-settings: 'tnum';">${d.getDate()}</span>
+          <span style="font-size: 0.6875rem; color: var(--color-ink-400);">${monthNames[d.getMonth()]}</span>
+        `;
+
+        btn.addEventListener('click', () => {
+          container.querySelectorAll('.date-pill-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          loadSlotsForDate(dateStr);
+        });
+
+        container.appendChild(btn);
+      }
+
+      // Default load today's slots
+      selectedDate = today.toISOString().slice(0, 10);
+      loadSlotsForDate(selectedDate);
+    }
+
+    async function loadSlotsForDate(dateStr) {
+      selectedDate = dateStr;
+      const container = document.getElementById('slots-container');
+      container.innerHTML = '<div style="text-align: center; padding: var(--space-8); color: var(--color-ink-500);">Fetching schedule slots...</div>';
+
+      try {
+        const res = await api.get(`/doctors/${doctorId}/slots?date=${dateStr}`);
+        const { onLeave, leaveReason, noSchedule, data: slots } = res;
+
+        if (onLeave) {
+          container.innerHTML = `
+            <div style="background: var(--color-danger-subtle); color: var(--color-danger-text); border: 1px solid var(--color-danger-border); padding: var(--space-6); border-radius: var(--radius-sm); text-align: center;">
+              <strong style="font-size: 0.9375rem; display: block; margin-bottom: 0.25rem;">Doctor is on leave on this date.</strong>
+              <span style="font-size: 0.8125rem;">${leaveReason || 'Practitioner is not available for outpatient consultations.'}</span>
+            </div>
+          `;
+          return;
+        }
+
+        if (noSchedule || slots.length === 0) {
+          container.innerHTML = `
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-8); border-radius: var(--radius-sm); text-align: center; color: var(--color-ink-600);">
+              <strong style="font-size: 0.9375rem; display: block; margin-bottom: 0.25rem;">No scheduled chamber session on this day.</strong>
+              <span style="font-size: 0.8125rem; color: var(--color-ink-500);">Please select another date from the calendar pills above.</span>
+            </div>
+          `;
+          return;
+        }
+
+        // Group into morning, afternoon, evening
+        const morning = slots.filter(s => parseInt(s.start_time.split(':')[0]) < 12);
+        const afternoon = slots.filter(s => {
+          const h = parseInt(s.start_time.split(':')[0]);
+          return h >= 12 && h < 17;
+        });
+        const evening = slots.filter(s => parseInt(s.start_time.split(':')[0]) >= 17);
+        const availCount = slots.filter(s => s.effective_status === 'AVAILABLE').length;
+
+        let waitlistBanner = '';
+        if (availCount === 0 && slots.length > 0) {
+          waitlistBanner = `
+            <div style="background: var(--color-warning-subtle); border: 1px solid var(--color-warning-border); border-radius: var(--radius-sm); padding: var(--space-4); margin-bottom: var(--space-4); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
+              <div>
+                <strong style="color: var(--color-warning-text); display: block; font-size: 0.875rem;">All consultation slots for this date are reserved.</strong>
+                <span style="font-size: 0.75rem; color: var(--color-ink-600);">Join the cancellation waitlist to receive instant notification if a patient reschedules.</span>
+              </div>
+              <button id="join-waitlist-btn" class="btn btn-warning btn-sm" style="font-size: 0.75rem;">Join Waitlist</button>
+            </div>
+          `;
+        }
+
+        container.innerHTML = `
+          ${waitlistBanner}
+          <div style="display: flex; gap: var(--space-4); font-size: 0.75rem; margin-bottom: var(--space-4); align-items: center; flex-wrap: wrap;">
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-700);">
+              <span style="width: 12px; height: 12px; background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: 2px;"></span> Available
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-700);">
+              <span style="width: 12px; height: 12px; background: #fef3c7; border: 1.5px solid #d97706; border-radius: 2px;"></span> Held (5m Hold)
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-700);">
+              <span style="width: 12px; height: 12px; background: var(--color-surface-subtle); border: 1.5px solid var(--color-border); border-radius: 2px;"></span> Booked
+            </span>
+          </div>
+        `;
+
+        const renderSection = (title, iconSvg, items) => {
+          if (items.length === 0) return '';
+          let html = `
+            <div style="margin-bottom: var(--space-5);">
+              <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.8125rem; font-weight: 700; margin-bottom: var(--space-2); color: var(--color-ink-700); text-transform: uppercase; letter-spacing: 0.04em;">
+                ${iconSvg}
+                <span>${title}</span>
+              </div>
+              <div class="slots-grid">`;
+          items.forEach(slot => {
+            const isAvail = slot.effective_status === 'AVAILABLE';
+            const isHeld = slot.effective_status === 'HELD';
+            const isBooked = slot.effective_status === 'BOOKED';
+
+            let cls = 'slot-btn';
+            if (isHeld) cls += ' held';
+            if (isBooked) cls += ' booked';
+
+            html += `
+              <button 
+                class="${cls}" 
+                data-slot-id="${slot.id}"
+                data-start="${slot.start_time}"
+                style="font-feature-settings: 'tnum';"
+                ${!isAvail ? 'disabled' : ''}
+              >
+                ${slot.start_time}
+              </button>
+            `;
+          });
+          html += `</div></div>`;
+          return html;
+        };
+
+        let sectionsHtml = '';
+        sectionsHtml += renderSection('Morning Shift', icons.sun(14, 'text-teal'), morning);
+        sectionsHtml += renderSection('Afternoon Shift', icons.sun(14, 'text-teal'), afternoon);
+        sectionsHtml += renderSection('Evening Shift', icons.moon(14, 'text-teal'), evening);
+
+        container.innerHTML += sectionsHtml;
+
+        // Attach slot click listener to trigger atomic 5-minute hold!
+        container.querySelectorAll('.slot-btn:not([disabled])').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const slotId = btn.getAttribute('data-slot-id');
+            const startTime = btn.getAttribute('data-start');
+            await handleSlotHold(slotId, startTime);
+          });
+        });
+
+        // Waitlist button
+        const waitlistBtn = document.getElementById('join-waitlist-btn');
+        if (waitlistBtn) {
+          waitlistBtn.addEventListener('click', async () => {
+            const user = getCurrentUser();
+            if (!user) {
+              showToast('Please log in to join the cancellation waitlist.', 'warning');
+              setTimeout(() => {
+                window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.href)}`;
+              }, 1000);
+              return;
+            }
+
+            try {
+              const res = await api.post('/waitlist', {
+                doctorId: Number(doctorId),
+                preferredDate: selectedDate
+              });
+              showToast(res.message || 'You have joined the priority waitlist!', 'success');
+              waitlistBtn.disabled = true;
+              waitlistBtn.textContent = 'On Priority Waitlist';
+            } catch (err) {
+              showToast(err.message || 'Failed to join waitlist.', 'error');
+            }
+          });
+        }
+
+      } catch (err) {
+        console.error('Failed to load slots:', err);
+        container.innerHTML = '<div style="color: var(--color-danger); text-align: center; padding: var(--space-8);">Error loading time slots.</div>';
+      }
+    }
+
+    async function handleSlotHold(slotId, startTime) {
+      const user = getCurrentUser();
+      if (!user) {
+        showToast('Please log in or register to reserve an appointment slot.', 'info');
+        setTimeout(() => {
+          window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.href)}`;
+        }, 1200);
+        return;
+      }
+
+      try {
+        // Atomic 5-minute hold call
+        const holdRes = await api.post(`/slots/${slotId}/hold`);
+        showToast('Slot reserved! You have 5 minutes to confirm booking.', 'success');
+
+        // Redirect to booking checkout page with slot details
+        setTimeout(() => {
+          window.location.href = `/booking.html?slotId=${slotId}&doctorId=${doctorId}&date=${selectedDate}&time=${encodeURIComponent(startTime)}`;
+        }, 400);
+
+      } catch (err) {
+        showToast(err.message || 'Slot could not be reserved. Please select another slot.', 'error');
+        // Refresh slots to show updated held state
+        loadSlotsForDate(selectedDate);
+      }
+    }
+
+    loadDoctorProfile();
+  </script>
+</body>
+</html>

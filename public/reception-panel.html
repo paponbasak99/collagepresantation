@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Front Desk Reception & Walk-In Check-In — DocBook</title>
+  <meta name="description" content="Front-desk clinic management: real-time chamber queue board, cash collection, arrival registration, and walk-in ticket allocation.">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <style>
+    .doctor-status-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-top: 3px solid var(--color-teal-700);
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .doctor-status-card:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+    .serial-display {
+      font-size: 0.9375rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-teal-800);
+      background: var(--color-teal-50);
+      border: 1px solid var(--color-teal-200);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-xs);
+      display: inline-block;
+    }
+    [data-theme="dark"] .serial-display {
+      background: rgba(45, 212, 191, 0.1);
+      color: var(--color-teal-300);
+      border-color: rgba(45, 212, 191, 0.25);
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount"></div>
+
+  <div class="container" style="padding: var(--space-8) var(--space-4);">
+    <!-- Top Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-5);">
+      <div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+          <span class="status-dot-live"></span>
+          <span class="badge badge-info">FRONT DESK LIVE OPD BOARD</span>
+        </div>
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.875rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-ink-950); margin: 0 0 var(--space-1);">
+          Reception & Chamber Check-In
+        </h1>
+        <p style="color: var(--color-ink-600); margin: 0; font-size: 0.9375rem;">
+          Track live doctor chamber occupancy, register arriving patients, collect cash payments, and issue instantaneous walk-in tokens.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: var(--space-2); align-items: center;">
+        <button id="walkin-btn" class="btn btn-primary" style="height: 44px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+          <span>Walk-In Patient</span>
+        </button>
+        <button id="refresh-desk-btn" class="btn btn-secondary" title="Refresh data" style="height: 44px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Practicing Doctors Today -->
+    <div style="margin-bottom: var(--space-8);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+        <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">Practicing Specialists Today</h2>
+        <span style="font-size: 0.8125rem; color: var(--color-ink-500);">Live Chamber Occupancy</span>
+      </div>
+      <div id="doctors-today-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+        <div style="color: var(--color-ink-500); padding: var(--space-6); text-align: center;">Loading practicing doctors...</div>
+      </div>
+    </div>
+
+    <!-- Today's Patient Queue Desk -->
+    <div class="card" style="padding: var(--space-6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-4);">
+        <div>
+          <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--color-ink-950); margin: 0 0 0.15rem;">Clinic Outpatient Queue</h2>
+          <p style="color: var(--color-ink-500); font-size: 0.8125rem; margin: 0;">All appointments scheduled for today's clinical sessions.</p>
+        </div>
+
+        <!-- Filters -->
+        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+          <select id="filter-doctor-select" class="form-control" style="width: auto; font-size: 0.8125rem;">
+            <option value="">All Doctors</option>
+          </select>
+
+          <select id="filter-status-select" class="form-control" style="width: auto; font-size: 0.8125rem;">
+            <option value="">All Statuses</option>
+            <option value="CONFIRMED">Waiting / Confirmed</option>
+            <option value="ARRIVED">Arrived in Lobby</option>
+            <option value="IN_CONSULTATION">In Consultation</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Serial</th>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Slot Time</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th style="text-align: right;">Reception Actions</th>
+            </tr>
+          </thead>
+          <tbody id="queue-tbody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--color-ink-500); padding: var(--space-8);">Loading clinic queue...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WALK-IN APPOINTMENT -->
+  <div id="walkin-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-teal-700);"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+            <h3 class="modal-title" style="font-size: 1.125rem; margin: 0;">Walk-In Patient Registration</h3>
+          </div>
+          <p style="font-size: 0.8125rem; color: var(--color-ink-500); margin: 0.25rem 0 0;">Assign next sequential serial token and record front-desk payment.</p>
+        </div>
+        <button id="walkin-modal-close" class="modal-close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="walkin-form">
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="walkin-doctor-select" style="font-size: 0.8125rem;">Select Practicing Specialist *</label>
+            <select id="walkin-doctor-select" class="form-control" required>
+              <option value="">-- Choose practicing doctor --</option>
+            </select>
+            <div id="walkin-fee-display" style="font-size: 0.8125rem; color: var(--color-teal-800); font-weight: 700; margin-top: var(--space-1); font-feature-settings: 'tnum';"></div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-3); margin-bottom: var(--space-3);">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="walkin-patient-name" style="font-size: 0.8125rem;">Patient Full Name *</label>
+              <input type="text" id="walkin-patient-name" class="form-control" placeholder="e.g. Mohammad Rahim" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="walkin-patient-phone" style="font-size: 0.8125rem;">Phone Number *</label>
+              <input type="tel" id="walkin-patient-phone" class="form-control" placeholder="01712345678" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-3);">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="walkin-patient-age" style="font-size: 0.8125rem;">Age (Years) *</label>
+              <input type="number" id="walkin-patient-age" class="form-control" min="1" max="120" value="30" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="walkin-patient-gender" style="font-size: 0.8125rem;">Gender *</label>
+              <select id="walkin-patient-gender" class="form-control" required>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: var(--space-4);">
+            <label class="form-label" for="walkin-reason" style="font-size: 0.8125rem;">Chief Complaint / Reason for Visit *</label>
+            <input type="text" id="walkin-reason" class="form-control" placeholder="e.g. Severe chest pain, skin rash, asthma flare" required>
+          </div>
+
+          <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-sm); margin-bottom: var(--space-5);">
+            <label style="display: flex; align-items: center; gap: var(--space-2); font-weight: 600; cursor: pointer; font-size: 0.8125rem; color: var(--color-ink-900);">
+              <input type="checkbox" id="walkin-collect-cash" checked>
+              <span>Collect consultation cash payment right now at front desk</span>
+            </label>
+            <small style="color: var(--color-ink-500); display: block; margin-top: 0.25rem; font-size: 0.75rem;">
+              If checked, payment status will be marked as PAID and patient status will be set to ARRIVED in lobby immediately.
+            </small>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: var(--space-2);">
+            <button type="button" id="walkin-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="walkin-submit-btn">Issue Token & Print Slip</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WALK-IN TICKET CONFIRMATION -->
+  <div id="ticket-modal" class="modal-backdrop">
+    <div class="modal-box" style="max-width: 440px; text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--color-teal-50); color: var(--color-teal-700); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-3); border: 1px solid var(--color-teal-200);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+      </div>
+      <h3 class="modal-title" style="margin-bottom: 0.15rem; font-size: 1.125rem;">Walk-In Token Issued</h3>
+      <p style="color: var(--color-ink-500); font-size: 0.8125rem; margin-bottom: var(--space-4);">The patient has been assigned a sequential chamber serial.</p>
+
+      <div style="background: var(--color-surface-subtle); border: 1px dashed var(--color-teal-400); border-radius: var(--radius-sm); padding: var(--space-4); margin-bottom: var(--space-4);">
+        <div id="ticket-serial-badge" style="font-size: 2.25rem; font-weight: 800; color: var(--color-teal-800); font-family: var(--font-display); line-height: 1;">SL - 00</div>
+        <div id="ticket-apt-num" style="font-size: 0.8125rem; color: var(--color-ink-500); font-family: var(--font-mono); margin: var(--space-2) 0;">APT-0000</div>
+        <div id="ticket-doctor-name" style="font-weight: 700; font-size: 1rem; color: var(--color-ink-950);">Doctor Name</div>
+        <div id="ticket-patient-details" style="font-size: 0.8125rem; color: var(--color-ink-600); margin-top: 0.25rem;">Patient Details</div>
+        <div id="ticket-qr-box" style="margin-top: var(--space-3);">
+          <img id="ticket-qr-img" src="" alt="Verification QR Code" style="width: 120px; height: 120px; margin: 0 auto; display: block; border-radius: 4px; border: 1px solid var(--color-border); background: white; padding: 3px;">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: var(--space-2); justify-content: center;">
+        <button id="ticket-close-btn" class="btn btn-secondary">Close</button>
+        <a id="ticket-print-link" href="#" target="_blank" class="btn btn-primary">Print Full Slip</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-mount"></div>
+
+  <script type="module">
+    import { api, getCurrentUser } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+    import { showToast } from '/js/toast.js';
+    import { renderDoctorAvatar } from '/js/icons.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const user = getCurrentUser();
+    if (!user || (user.role !== 'receptionist' && user.role !== 'admin')) {
+      window.location.href = '/login.html?redirect=/reception-panel.html';
+    }
+
+    let activeDoctors = [];
+
+    async function loadDoctorsToday() {
+      const grid = document.getElementById('doctors-today-grid');
+      const select = document.getElementById('filter-doctor-select');
+      const walkinSelect = document.getElementById('walkin-doctor-select');
+
+      try {
+        const res = await api.get('/reception/doctors-today');
+        activeDoctors = res.data;
+
+        // Populate filter dropdown & walk-in dropdown
+        select.innerHTML = '<option value="">All Doctors</option>';
+        walkinSelect.innerHTML = '<option value="">-- Choose practicing doctor --</option>';
+
+        if (activeDoctors.length === 0) {
+          grid.innerHTML = '<div style="color: var(--color-ink-500); padding: var(--space-6); text-align: center; grid-column: 1 / -1;">No doctors currently scheduled for OPD today.</div>';
+          return;
+        }
+
+        grid.innerHTML = '';
+        activeDoctors.forEach(doc => {
+          // Dropdown options
+          const opt = document.createElement('option');
+          opt.value = doc.doctor_id;
+          opt.textContent = `${doc.doctor_name} (${doc.specialty})`;
+          select.appendChild(opt);
+
+          const wOpt = document.createElement('option');
+          wOpt.value = doc.doctor_id;
+          wOpt.textContent = `${doc.doctor_name} — ৳${doc.consultation_fee} (${doc.specialty})`;
+          walkinSelect.appendChild(wOpt);
+
+          // Card
+          const card = document.createElement('div');
+          card.className = 'doctor-status-card';
+          card.innerHTML = `
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3);">
+                <div style="display: flex; gap: var(--space-3); align-items: center;">
+                  ${renderDoctorAvatar(doc.doctor_name, doc.doctor_id, 48, true, doc.avatar_url)}
+                  <div>
+                    <h3 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-ink-950); margin: 0;">${doc.doctor_name}</h3>
+                    <div style="font-size: 0.75rem; color: var(--color-teal-700); font-weight: 600;">${doc.specialty}</div>
+                  </div>
+                </div>
+                <span class="badge badge-success" style="font-size: 0.6875rem;">IN CLINIC</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--color-ink-500); margin-bottom: var(--space-3);">
+                Chamber: ${doc.chamber_address} • ${doc.start_time} - ${doc.end_time}
+              </div>
+            </div>
+
+            <div style="background: var(--color-surface-subtle); border: 1px solid var(--color-border); padding: var(--space-2) var(--space-3); border-radius: var(--radius-xs); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block; text-transform: uppercase;">Lobby Waiting</span>
+                <strong style="font-size: 1rem; color: #b45309; font-feature-settings: 'tnum';">${doc.waiting_count} patient(s)</strong>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.6875rem; color: var(--color-ink-500); display: block; text-transform: uppercase;">Active Serial</span>
+                <strong style="font-size: 1rem; color: var(--color-teal-800); font-family: var(--font-mono);">
+                  ${doc.active_serial ? `SL - ${String(doc.active_serial).padStart(2, '0')}` : 'None'}
+                </strong>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+      } catch (err) {
+        grid.innerHTML = `<div style="color: var(--color-danger); padding: var(--space-6); text-align: center;">Failed to load practicing doctors.</div>`;
+      }
+    }
+
+    async function loadClinicQueue() {
+      const doctorId = document.getElementById('filter-doctor-select').value;
+      const status = document.getElementById('filter-status-select').value;
+      const tbody = document.getElementById('queue-tbody');
+
+      let url = '/reception/queue?';
+      if (doctorId) url += `doctorId=${doctorId}&`;
+      if (status) url += `status=${status}&`;
+
+      try {
+        const res = await api.get(url);
+        const list = res.data;
+
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-ink-500); padding: var(--space-8);">No appointments found matching filter criteria.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        list.forEach(apt => {
+          const tr = document.createElement('tr');
+
+          let statusBadge = `<span class="badge badge-neutral">${apt.status}</span>`;
+          if (apt.status === 'CONFIRMED') statusBadge = `<span class="badge badge-info">Waiting</span>`;
+          if (apt.status === 'ARRIVED') statusBadge = `<span class="badge badge-warning">Lobby (Arrived)</span>`;
+          if (apt.status === 'IN_CONSULTATION') statusBadge = `<span class="badge badge-primary">In Chamber</span>`;
+          if (apt.status === 'COMPLETED') statusBadge = `<span class="badge badge-success">Completed</span>`;
+          if (apt.status === 'CANCELLED') statusBadge = `<span class="badge badge-danger">Cancelled</span>`;
+
+          const isPaid = apt.payment_status === 'PAID';
+          const payBadge = isPaid
+            ? `<span class="badge badge-success">PAID (৳${apt.fee_amount})</span>`
+            : `<span class="badge badge-danger">UNPAID (৳${apt.fee_amount})</span>`;
+
+          tr.innerHTML = `
+            <td><span class="serial-display">SL - ${String(apt.serial_number).padStart(2, '0')}</span></td>
+            <td>
+              <strong style="color: var(--color-ink-900);">${apt.patient_name}</strong>
+              <div style="font-size: 0.75rem; color: var(--color-ink-500);">${apt.patient_phone} • ${apt.patient_age} yrs (${apt.patient_gender})</div>
+            </td>
+            <td>
+              <strong style="color: var(--color-ink-900);">${apt.doctor_name}</strong>
+              <div style="font-size: 0.75rem; color: var(--color-ink-500);">${apt.chamber_address}</div>
+            </td>
+            <td style="font-feature-settings: 'tnum';">${apt.time}</td>
+            <td>${statusBadge}</td>
+            <td>${payBadge}</td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: var(--space-2); justify-content: flex-end; flex-wrap: wrap;">
+                ${apt.status === 'CONFIRMED' ? `
+                  <button class="btn btn-warning btn-sm mark-arrived-btn" data-id="${apt.id}" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+                    Mark Arrived
+                  </button>
+                ` : ''}
+
+                ${!isPaid && apt.status !== 'CANCELLED' ? `
+                  <button class="btn btn-success btn-sm collect-cash-btn" data-id="${apt.id}" data-amount="${apt.fee_amount}" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+                    Collect ৳${apt.fee_amount}
+                  </button>
+                ` : ''}
+
+                <a href="/appointment-slip.html?number=${apt.appointment_number}" target="_blank" class="btn btn-secondary btn-sm" title="Print Slip" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+                  Slip
+                </a>
+              </div>
+            </td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+
+        // Attach action handlers
+        tbody.querySelectorAll('.mark-arrived-btn').forEach(b => {
+          b.addEventListener('click', async () => {
+            const id = b.getAttribute('data-id');
+            try {
+              await api.put(`/reception/queue/${id}/arrive`);
+              showToast('Patient marked as arrived in lobby', 'success');
+              refreshAll();
+            } catch (err) {
+              showToast(err.message || 'Error updating status', 'error');
+            }
+          });
+        });
+
+        tbody.querySelectorAll('.collect-cash-btn').forEach(b => {
+          b.addEventListener('click', async () => {
+            const id = b.getAttribute('data-id');
+            const amt = b.getAttribute('data-amount');
+            if (confirm(`Confirm collection of ৳${amt} cash from patient?`)) {
+              try {
+                await api.put(`/reception/queue/${id}/collect-cash`);
+                showToast(`Collected ৳${amt} in cash successfully!`, 'success');
+                refreshAll();
+              } catch (err) {
+                showToast(err.message || 'Error collecting cash', 'error');
+              }
+            }
+          });
+        });
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: var(--space-6);">Failed to load queue.</td></tr>`;
+      }
+    }
+
+    function refreshAll() {
+      loadDoctorsToday();
+      loadClinicQueue();
+    }
+
+    document.getElementById('filter-doctor-select').addEventListener('change', loadClinicQueue);
+    document.getElementById('filter-status-select').addEventListener('change', loadClinicQueue);
+    document.getElementById('refresh-desk-btn').addEventListener('click', refreshAll);
+
+    // --- WALK-IN MODAL ---
+    const walkinModal = document.getElementById('walkin-modal');
+    document.getElementById('walkin-btn').addEventListener('click', () => {
+      document.getElementById('walkin-form').reset();
+      document.getElementById('walkin-fee-display').textContent = '';
+      walkinModal.classList.add('show');
+    });
+
+    document.getElementById('walkin-modal-close').addEventListener('click', () => walkinModal.classList.remove('show'));
+    document.getElementById('walkin-cancel-btn').addEventListener('click', () => walkinModal.classList.remove('show'));
+
+    document.getElementById('walkin-doctor-select').addEventListener('change', (e) => {
+      const docId = Number(e.target.value);
+      const doc = activeDoctors.find(d => d.doctor_id === docId);
+      if (doc) {
+        document.getElementById('walkin-fee-display').textContent = `Consultation Fee: ৳ ${doc.consultation_fee}`;
+      } else {
+        document.getElementById('walkin-fee-display').textContent = '';
+      }
+    });
+
+    document.getElementById('walkin-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const doctorId = Number(document.getElementById('walkin-doctor-select').value);
+      const patientName = document.getElementById('walkin-patient-name').value.trim();
+      const patientPhone = document.getElementById('walkin-patient-phone').value.trim();
+      const patientAge = Number(document.getElementById('walkin-patient-age').value);
+      const patientGender = document.getElementById('walkin-patient-gender').value;
+      const reasonForVisit = document.getElementById('walkin-reason').value.trim();
+      const collectCashNow = document.getElementById('walkin-collect-cash').checked;
+
+      try {
+        const res = await api.post('/reception/walk-in', {
+          doctorId,
+          patientName,
+          patientPhone,
+          patientAge,
+          patientGender,
+          reasonForVisit,
+          collectCashNow
+        });
+
+        walkinModal.classList.remove('show');
+        showToast('Walk-in ticket created successfully!', 'success');
+        refreshAll();
+
+        // Show Ticket Modal
+        const apt = res.data;
+        document.getElementById('ticket-serial-badge').textContent = apt.serial_badge;
+        document.getElementById('ticket-apt-num').textContent = apt.appointment_number;
+        document.getElementById('ticket-doctor-name').textContent = activeDoctors.find(d => d.doctor_id === doctorId)?.doctor_name || 'Attending Doctor';
+        document.getElementById('ticket-patient-details').textContent = `${patientName} (${patientAge} yrs, ${patientGender}) • ${patientPhone}`;
+        document.getElementById('ticket-qr-img').src = apt.qr_code_data_url;
+        document.getElementById('ticket-print-link').href = `/appointment-slip.html?number=${apt.appointment_number}`;
+
+        document.getElementById('ticket-modal').classList.add('show');
+      } catch (err) {
+        showToast(err.message || 'Walk-in booking failed', 'error');
+      }
+    });
+
+    document.getElementById('ticket-close-btn').addEventListener('click', () => {
+      document.getElementById('ticket-modal').classList.remove('show');
+    });
+
+    // Boot
+    refreshAll();
+  </script>
+</body>
+</html>

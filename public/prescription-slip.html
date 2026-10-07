@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Official E-Prescription & Medical Record — DocBook</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>℞</text></svg>">
+  <style>
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .no-print, #navbar-mount, #footer-mount {
+        display: none !important;
+      }
+      .prescription-sheet {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+
+    .prescription-sheet {
+      background: white;
+      color: #0f172a;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 3rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    .rx-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 3px double var(--primary-700);
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .rx-vitals {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+    }
+
+    .rx-symbol {
+      font-family: Georgia, serif;
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--primary-700);
+      margin-bottom: 0.75rem;
+      display: inline-block;
+    }
+
+    .meds-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.75rem;
+    }
+
+    .meds-table th {
+      background: #f1f5f9;
+      text-align: left;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    .meds-table td {
+      padding: 0.85rem;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+    }
+
+    .rx-seal-box {
+      border: 2px dashed #0d9488;
+      background: #f0fdfa;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      text-align: center;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-mount" class="no-print"></div>
+
+  <div class="container" style="padding: 1rem;">
+    <!-- Top Action Bar -->
+    <div class="no-print" style="max-width: 800px; margin: 0 auto 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <a href="/my-appointments.html" class="btn btn-secondary btn-sm">← Back to My Appointments</a>
+      <div style="display: flex; gap: 0.5rem;">
+        <button onclick="window.print()" class="btn btn-primary btn-sm">
+          🖨️ Print / Save as PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Official Printable Sheet -->
+    <div id="rx-sheet" class="prescription-sheet">
+      <div id="rx-loading" style="text-align: center; padding: 4rem; color: #64748b;">
+        Loading official medical prescription...
+      </div>
+
+      <div id="rx-content" style="display: none;">
+        <!-- Header -->
+        <div class="rx-header">
+          <div>
+            <h1 id="rx-doc-name" style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin: 0 0 0.25rem;">Dr. Name</h1>
+            <div id="rx-doc-quals" style="font-size: 0.9rem; font-weight: 600; color: #334155; margin-bottom: 0.25rem;">MBBS, FCPS</div>
+            <div id="rx-doc-specialty" style="font-size: 0.85rem; color: #0d9488; font-weight: 700;">Specialist Department</div>
+            <div id="rx-bmdc" style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">BMDC Reg No: A-00000</div>
+          </div>
+
+          <div style="text-align: right;">
+            <div style="font-size: 1.25rem; font-weight: 800; color: #0d9488; letter-spacing: -0.02em;">🩺 DocBook Health Center</div>
+            <div id="rx-hospital" style="font-size: 0.85rem; color: #334155; margin-top: 0.25rem;">Dhaka Central Clinic</div>
+            <div id="rx-chamber" style="font-size: 0.8rem; color: #64748b; max-width: 250px;">Chamber Room 302</div>
+          </div>
+        </div>
+
+        <!-- Vitals & Patient Meta -->
+        <div class="rx-vitals">
+          <div><strong style="color: #64748b; display: block; font-size: 0.75rem;">PATIENT NAME</strong><span id="rx-patient-name" style="font-weight: 700;">Patient Name</span></div>
+          <div><strong style="color: #64748b; display: block; font-size: 0.75rem;">AGE & GENDER</strong><span id="rx-patient-meta">30 yrs • MALE</span></div>
+          <div><strong style="color: #64748b; display: block; font-size: 0.75rem;">CONSULTATION DATE</strong><span id="rx-date">2026-10-06</span></div>
+          <div><strong style="color: #64748b; display: block; font-size: 0.75rem;">APPOINTMENT REF</strong><span id="rx-apt-num" style="font-family: monospace;">APT-0000</span></div>
+        </div>
+
+        <!-- Clinical Diagnosis & Chief Complaints -->
+        <div style="background: #fdf2f8; border-left: 4px solid #db2777; padding: 0.85rem 1.25rem; border-radius: 4px; margin-bottom: 2rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <strong style="color: #9d174d; font-size: 0.8rem; text-transform: uppercase;">Clinical Diagnosis</strong>
+              <div id="rx-diagnosis" style="font-weight: 700; font-size: 1.05rem; color: #0f172a; margin-top: 0.25rem;">Diagnosis Text</div>
+            </div>
+            <div>
+              <strong style="color: #9d174d; font-size: 0.8rem; text-transform: uppercase;">Reported Symptoms / Complaints</strong>
+              <div id="rx-symptoms" style="color: #334155; font-size: 0.9rem; margin-top: 0.25rem;">Symptoms Text</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rx Prescription Section -->
+        <div>
+          <span class="rx-symbol">℞</span>
+          <table class="meds-table">
+            <thead>
+              <tr>
+                <th style="width: 40%;">Medicine (Brand / Generic)</th>
+                <th style="width: 20%;">Dosage</th>
+                <th style="width: 25%;">Instruction</th>
+                <th style="width: 15%;">Duration</th>
+              </tr>
+            </thead>
+            <tbody id="rx-medicines-tbody">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Diagnostic Tests & Lab Investigations -->
+        <div id="rx-tests-container" style="margin-bottom: 2rem;">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem;">🔬 Diagnostic Lab Investigations:</h3>
+          <ul id="rx-tests-list" style="margin: 0; padding-left: 1.25rem; font-size: 0.9rem; color: #334155;">
+            <!-- Injected dynamically -->
+          </ul>
+        </div>
+
+        <!-- Advice & Follow-Up -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 3rem;">
+          <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <strong style="font-size: 0.85rem; color: #0f172a; display: block; margin-bottom: 0.25rem;">Doctor's Advice & Diet:</strong>
+            <p id="rx-advice" style="margin: 0; font-size: 0.85rem; color: #475569; line-height: 1.5;">Advice text...</p>
+          </div>
+          <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+            <strong style="font-size: 0.85rem; color: #0f172a; display: block; margin-bottom: 0.25rem;">Next Follow-Up:</strong>
+            <span id="rx-followup" style="font-size: 1.1rem; font-weight: 800; color: #0d9488;">Within 14 Days</span>
+          </div>
+        </div>
+
+        <!-- Footer Seal, QR Code & Digital Signature -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+          <div>
+            <div class="rx-seal-box">
+              <div style="font-size: 0.75rem; font-weight: 700; color: #0f766e;">DIGITALLY CERTIFIED MEDICAL RECORD</div>
+              <div id="rx-digital-seal" style="font-family: monospace; font-size: 0.8rem; color: #0d9488; margin: 0.25rem 0;">BMDC-SIG-00000</div>
+              <div style="font-size: 0.7rem; color: #64748b;">100% Encrypted & Authenticated by DocBook</div>
+            </div>
+          </div>
+
+          <div style="text-align: center;">
+            <img id="rx-qr-code" src="" alt="Verify QR" style="width: 100px; height: 100px; border-radius: 6px; margin-bottom: 0.25rem;">
+            <div style="font-size: 0.7rem; color: #64748b;">Scan to verify authentic prescription</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-mount" class="no-print"></div>
+
+  <script type="module">
+    import { api, getCurrentUser } from '/js/api.js';
+    import { renderNavbar, renderFooter } from '/js/navbar.js';
+
+    renderNavbar();
+    renderFooter();
+
+    const user = getCurrentUser();
+    if (!user) {
+      window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const appointmentId = urlParams.get('id');
+
+    async function loadPrescription() {
+      if (!appointmentId) {
+        document.getElementById('rx-loading').textContent = 'No appointment reference provided.';
+        return;
+      }
+
+      try {
+        const [rxRes, slipRes] = await Promise.all([
+          api.get(`/prescriptions/appointment/${appointmentId}`),
+          api.get(`/appointments/${appointmentId}/slip`)
+        ]);
+
+        const rx = rxRes.data;
+        const slip = slipRes.data;
+
+        document.getElementById('rx-doc-name').textContent = rx.doctor_name;
+        document.getElementById('rx-doc-quals').textContent = rx.doctor_qualifications;
+        document.getElementById('rx-doc-specialty').textContent = rx.specialty_name_en;
+        document.getElementById('rx-bmdc').textContent = `BMDC Reg No: ${rx.bmdc_reg_no}`;
+
+        document.getElementById('rx-hospital').textContent = rx.hospital_name_en;
+        document.getElementById('rx-chamber').textContent = rx.chamber_address;
+
+        document.getElementById('rx-patient-name').textContent = rx.patient_name;
+        document.getElementById('rx-patient-meta').textContent = `${rx.patient_age} yrs • ${rx.patient_gender} • ${rx.patient_phone}`;
+        document.getElementById('rx-date').textContent = `${rx.appointment_date} at ${rx.appointment_time}`;
+        document.getElementById('rx-apt-num').textContent = rx.appointment_number;
+
+        document.getElementById('rx-diagnosis').textContent = rx.diagnosis;
+        document.getElementById('rx-symptoms').textContent = rx.symptoms || 'None recorded';
+        document.getElementById('rx-advice').textContent = rx.advice || 'Follow medication schedule and rest adequately.';
+        document.getElementById('rx-followup').textContent = rx.follow_up_date || 'As needed';
+        document.getElementById('rx-digital-seal').textContent = rx.digitalSignatureSeal || `BMDC-SIG-${rx.bmdc_reg_no}`;
+
+        // QR Code
+        document.getElementById('rx-qr-code').src = slip.qr_code_data_url;
+
+        // Medicines Table
+        const medTbody = document.getElementById('rx-medicines-tbody');
+        medTbody.innerHTML = '';
+        (rx.medicines || []).forEach(m => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong style="color: #0f172a;">${m.medicine_name}</strong></td>
+            <td><span style="font-weight: 700; color: #0d9488;">${m.dosage}</span></td>
+            <td>${m.instruction}</td>
+            <td>${m.duration}</td>
+          `;
+          medTbody.appendChild(tr);
+        });
+
+        // Diagnostic Tests
+        const testList = document.getElementById('rx-tests-list');
+        testList.innerHTML = '';
+        if (rx.tests && rx.tests.length > 0) {
+          rx.tests.forEach(t => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${t.test_name}</strong> ${t.notes ? `<span style="color: #64748b;">(${t.notes})</span>` : ''}`;
+            testList.appendChild(li);
+          });
+        } else {
+          document.getElementById('rx-tests-container').style.display = 'none';
+        }
+
+        document.getElementById('rx-loading').style.display = 'none';
+        document.getElementById('rx-content').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('rx-loading').innerHTML = `<div style="color: var(--danger); font-weight: 600;">Failed to load prescription: ${err.message || 'Access restricted'}</div>`;
+      }
+    }
+
+    loadPrescription();
+  </script>
+</body>
+</html>
