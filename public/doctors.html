@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
   <style>
     .doctors-layout-grid {
       display: grid;
@@ -692,75 +694,32 @@
         feeSlider.value = 2500;
         feeValText.textContent = '৳ 2,500';
 
+        const slugMap = {
+          'spec-cardio': 'cardiology',
+          'spec-medicine': 'internal-medicine',
+          'spec-gynae': 'gynecology-obstetrics',
+          'spec-pedia': 'pediatrics',
+          'spec-derma': 'dermatology',
+          'spec-ortho': 'orthopedics',
+          'spec-ent': 'ent',
+          'spec-neuro': 'neurology',
+          'spec-eye': 'ophthalmology',
+          'spec-dental': 'dentistry',
+          'spec-surgery': 'general-surgery',
+          'spec-diabetes': 'diabetology-endocrinology'
+        };
+
         if (filterType === 'top-rated') {
           ratingSelect.value = '4.8';
         } else if (filterType === 'budget') {
           feeSlider.value = 1000;
           feeValText.textContent = '৳ 1,000';
-        } else if (filterType === 'spec-cardio') {
+        } else if (slugMap[filterType]) {
+          const targetSlug = slugMap[filterType];
           for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('cardio') || opt.text.toLowerCase().includes('হৃদ')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-gynae') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('gynae') || opt.text.toLowerCase().includes('স্ত্রী')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-pedia') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('pediatric') || opt.text.toLowerCase().includes('শিশু')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-derma') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('derma') || opt.text.toLowerCase().includes('চর্ম')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-medicine') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('medicine') || opt.text.toLowerCase().includes('মেডিসিন')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-ent') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('ent') || opt.text.toLowerCase().includes('নাক')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-neuro') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('neuro') || opt.text.toLowerCase().includes('স্নায়ু')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-eye') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('ophthal') || opt.text.toLowerCase().includes('চক্ষু')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-dental') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('dent') || opt.text.toLowerCase().includes('দন্ত')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-surgery') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('surgery') || opt.text.toLowerCase().includes('সার্জারি')) {
-              opt.selected = true; break;
-            }
-          }
-        } else if (filterType === 'spec-diabetes') {
-          for (const opt of specialtySelect.options) {
-            if (opt.text.toLowerCase().includes('endocrin') || opt.text.toLowerCase().includes('ডায়াবেটিস')) {
-              opt.selected = true; break;
+            if (opt.dataset && opt.dataset.slug === targetSlug) {
+              opt.selected = true;
+              break;
             }
           }
         }

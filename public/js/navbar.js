@@ -484,15 +484,90 @@ export function renderFooter() {
 
         <div class="footer-bottom">
           <div>© ${new Date().getFullYear()} DocBook Healthcare Ltd. All rights reserved.</div>
-          <div style="display: flex; gap: 1.25rem;">
-            <a href="#">Terms of Care</a>
-            <a href="#">Patient Privacy</a>
-            <a href="#">Cancellation Policy</a>
+          <div style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="footer-policy-btn" data-policy="terms" style="background:none; border:none; color:inherit; font-size:inherit; cursor:pointer; text-decoration:underline;">Terms of Care</button>
+            <button type="button" class="footer-policy-btn" data-policy="privacy" style="background:none; border:none; color:inherit; font-size:inherit; cursor:pointer; text-decoration:underline;">Patient Privacy</button>
+            <button type="button" class="footer-policy-btn" data-policy="refund" style="background:none; border:none; color:inherit; font-size:inherit; cursor:pointer; text-decoration:underline;">Cancellation Policy</button>
           </div>
         </div>
       </div>
     </footer>
+
+    <!-- Global Policy Modal Mount -->
+    <div id="policy-modal" class="modal-backdrop">
+      <div class="modal-box" style="max-width: 560px;">
+        <div class="modal-header">
+          <h3 id="policy-modal-title" class="modal-title" style="font-size: 1.15rem;">Clinical Policy</h3>
+          <button id="policy-modal-close" class="modal-close" aria-label="Close modal">&times;</button>
+        </div>
+        <div id="policy-modal-body" class="modal-body" style="font-size: 0.875rem; color: var(--color-ink-700); line-height: 1.6;">
+        </div>
+        <div class="modal-footer">
+          <button id="policy-modal-dismiss" class="btn btn-primary btn-sm">I Understand</button>
+        </div>
+      </div>
+    </div>
   `;
+
+  // Attach policy dialog triggers
+  const policyModal = document.getElementById('policy-modal');
+  const policyTitle = document.getElementById('policy-modal-title');
+  const policyBody = document.getElementById('policy-modal-body');
+  const closePolicyModal = () => policyModal?.classList.remove('show');
+
+  document.getElementById('policy-modal-close')?.addEventListener('click', closePolicyModal);
+  document.getElementById('policy-modal-dismiss')?.addEventListener('click', closePolicyModal);
+  policyModal?.addEventListener('click', (e) => {
+    if (e.target === policyModal) closePolicyModal();
+  });
+
+  const policies = {
+    terms: {
+      title: 'DocBook Terms of Outpatient Care',
+      content: `
+        <p><strong>1. BMDC Certified Care:</strong> All consulting doctors are independently registered with the Bangladesh Medical & Dental Council (BMDC). DocBook verifies registration credentials annually.</p>
+        <p style="margin-top: 8px;"><strong>2. Atomic 5-Minute Slot Locks:</strong> When booking, your selected appointment window is reserved exclusively for 5 minutes to prevent double-booking across hospital desks.</p>
+        <p style="margin-top: 8px;"><strong>3. Serial Numbers & Queue:</strong> Walk-in arrivals and online bookings receive sequential serials. Emergent trauma or cardiac events may be prioritized by treating physicians.</p>
+      `
+    },
+    privacy: {
+      title: 'Patient Health Information Privacy',
+      content: `
+        <p><strong>1. Medical Confidentiality:</strong> Your symptoms, prescriptions, and medical history are encrypted and accessible exclusively by you and your authorized treating physician.</p>
+        <p style="margin-top: 8px;"><strong>2. No Data Monetization:</strong> DocBook does not sell, market, or share patient consultation records with third-party pharmaceutical or insurance agencies.</p>
+        <p style="margin-top: 8px;"><strong>3. Audit Transparency:</strong> Every access to clinical records is logged in an immutable, tamper-evident security audit trail.</p>
+      `
+    },
+    refund: {
+      title: 'Appointment Cancellation & Refund Policy',
+      content: `
+        <p><strong>1. Over 24 Hours Prior:</strong> Cancellations made more than 24 hours before the chamber session receive a <strong>90% refund</strong> credited within 24 hours.</p>
+        <p style="margin-top: 8px;"><strong>2. 6 to 24 Hours Prior:</strong> Cancellations made between 6 and 24 hours before consultation receive a <strong>50% refund</strong>.</p>
+        <p style="margin-top: 8px;"><strong>3. Under 6 Hours:</strong> Due to slot reservation commitment, cancellations under 6 hours are non-refundable. Patients may reschedule once for free up to 2 hours prior.</p>
+      `
+    }
+  };
+
+  document.querySelectorAll('.footer-policy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.getAttribute('data-policy');
+      const data = policies[type];
+      if (data && policyModal) {
+        policyTitle.textContent = data.title;
+        policyBody.innerHTML = data.content;
+        policyModal.classList.add('show');
+      }
+    });
+  });
+
+  // Highlight active link in navbar
+  const currentPath = window.location.pathname.toLowerCase();
+  document.querySelectorAll('.nav-link, .mobile-drawer-link').forEach(link => {
+    const href = (link.getAttribute('href') || '').toLowerCase();
+    if (href && (currentPath === href || (currentPath === '/' && (href === '/index.html' || href === '/')))) {
+      link.classList.add('active');
+    }
+  });
 
   applyTranslations();
 }

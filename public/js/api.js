@@ -29,7 +29,17 @@ export function clearSession() {
 }
 
 export async function request(endpoint, options = {}) {
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+  // Strip duplicate leading /api if passed
+  let cleanEndpoint = endpoint;
+  if (cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = cleanEndpoint.slice(4);
+  } else if (cleanEndpoint === '/api') {
+    cleanEndpoint = '';
+  }
+  if (!cleanEndpoint.startsWith('/') && !cleanEndpoint.startsWith('http')) {
+    cleanEndpoint = '/' + cleanEndpoint;
+  }
+  const url = cleanEndpoint.startsWith('http') ? cleanEndpoint : `${API_BASE}${cleanEndpoint}`;
   const headers = {
     'Content-Type': 'application/json',
     ...(options.headers || {})
@@ -80,5 +90,23 @@ export const api = {
   get: (endpoint, options) => request(endpoint, { method: 'GET', ...options }),
   post: (endpoint, body, options) => request(endpoint, { method: 'POST', body: JSON.stringify(body), ...options }),
   put: (endpoint, body, options) => request(endpoint, { method: 'PUT', body: JSON.stringify(body), ...options }),
-  delete: (endpoint, options) => request(endpoint, { method: 'DELETE', ...options })
+  delete: (endpoint, options) => request(endpoint, { method: 'DELETE', ...options }),
+  download: async (endpoint, filename) => {
+    let cleanEndpoint = endpoint.startsWith('/api/') ? endpoint.slice(4) : endpoint;
+    if (!cleanEndpoint.startsWith('/') && !cleanEndpoint.startsWith('http')) cleanEndpoint = '/' + cleanEndpoint;
+    const url = cleanEndpoint.startsWith('http') ? cleanEndpoint : `${API_BASE}${cleanEndpoint}`;
+    const token = getToken();
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error('Download failed');
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename || 'download.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+  }
 };

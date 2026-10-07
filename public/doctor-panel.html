@@ -7,6 +7,8 @@
   <meta name="description" content="Clinical consultation workspace: OPD queue management, digital e-prescription builder, weekly chamber scheduling, and revenue analytics.">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
   <style>
     .queue-grid {
@@ -297,6 +299,9 @@
             <div id="rx-medicines-list">
               <!-- Medicine rows -->
             </div>
+
+            <!-- Real-Time Adverse Drug Interaction & Allergy Alerts Mount -->
+            <div id="rx-safety-alerts" style="display: none; margin-top: var(--space-3);"></div>
           </div>
 
           <!-- Diagnostic Tests & Lab Investigations -->
@@ -342,6 +347,7 @@
     import { api, getCurrentUser } from '/js/api.js';
     import { renderNavbar, renderFooter } from '/js/navbar.js';
     import { showToast } from '/js/toast.js';
+    import { checkPrescriptionSafety } from '/js/drugSafety.js';
 
     renderNavbar();
     renderFooter();
@@ -608,6 +614,36 @@
       document.getElementById('prescription-modal').classList.add('show');
     }
 
+    function runSafetyAudit() {
+      const medInputs = document.querySelectorAll('#rx-medicines-list .med-name');
+      const meds = Array.from(medInputs).map(inp => ({ name: inp.value.trim() })).filter(m => m.name.length > 2);
+      const alertsMount = document.getElementById('rx-safety-alerts');
+      if (!alertsMount) return;
+
+      const alerts = checkPrescriptionSafety(meds, '');
+      if (alerts.length === 0) {
+        alertsMount.style.display = 'none';
+        alertsMount.innerHTML = '';
+        return;
+      }
+
+      alertsMount.style.display = 'block';
+      alertsMount.innerHTML = `
+        <div style="background: rgba(220, 38, 38, 0.08); border: 1.5px solid #ef4444; border-radius: var(--radius-sm); padding: var(--space-3); color: #991b1b;">
+          <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+            <span>⚠️ Clinical Drug Safety Alert (${alerts.length})</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.75rem;">
+            ${alerts.map(a => `
+              <div>
+                <strong>${a.title}:</strong> ${a.message}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     function addMedicineRow(name = '', dosage = '', instruction = 'After meal', duration = '7 days') {
       const list = document.getElementById('rx-medicines-list');
       const row = document.createElement('div');
@@ -620,15 +656,19 @@
         <button type="button" class="btn btn-secondary btn-sm remove-med-btn" style="color: var(--color-danger); padding: 0.25rem 0.5rem;">&times;</button>
       `;
 
+      row.querySelector('.med-name').addEventListener('input', runSafetyAudit);
+
       row.querySelector('.remove-med-btn').addEventListener('click', () => {
         if (list.children.length > 1) {
           row.remove();
+          runSafetyAudit();
         } else {
           showToast('At least one medicine is required.', 'warning');
         }
       });
 
       list.appendChild(row);
+      runSafetyAudit();
     }
 
     function addTestRow(testName = '', notes = '') {

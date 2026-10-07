@@ -33,11 +33,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "https://cdn.jsdelivr.net", "https://unpkg.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       imgSrc: ["'self'", "data:", "blob:", "https://images.unsplash.com", "https://via.placeholder.com"],
-      connectSrc: ["'self'"]
+      connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://unpkg.com", "wss:", "ws:"]
     }
   },
   crossOriginEmbedderPolicy: false
@@ -84,6 +84,14 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     service: 'DocBook Healthcare API'
   });
+});
+
+// 404 fallback handler
+app.use((req, res) => {
+  if (req.accepts('html')) {
+    return res.status(404).sendFile(path.join(__dirname, '../public/404.html'));
+  }
+  res.status(404).json({ success: false, message: 'Resource not found' });
 });
 
 // Centralized error handler

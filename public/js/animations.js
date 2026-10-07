@@ -1,19 +1,68 @@
 /**
- * DocBook Modern Motion & Scroll Animations Engine (animations.js)
- * Fully Vanilla ES6+, GPU-Accelerated, Bi-Directional Scroll & Micro-Interactions
+ * DocBook Modern Motion & Animation Engine (animations.js)
+ * Studio Redesign v2.0 — Powered by Framer Motion browser engine,
+ * 60fps GPU acceleration, bi-directional scroll reveals, luminous card spotlights,
+ * spring modal dialog physics, magnetic buttons, and 3D specular card tilt.
  */
 
-// 1. Bi-Directional Scroll Reveal via IntersectionObserver
-export function initScrollReveals() {
+// Dynamically load Motion from ESM CDN with fallback
+let motionEngine = null;
+export async function loadMotion() {
+  if (motionEngine) return motionEngine;
+  try {
+    const mod = await import('https://cdn.jsdelivr.net/npm/motion@11.11.17/+esm');
+    motionEngine = mod;
+    return motionEngine;
+  } catch (err) {
+    // Fallback to internal CSS / requestAnimationFrame physics if CDN is offline
+    return null;
+  }
+}
+
+// 1. Top Scroll Progress Indicator (Sleek Cyan/Teal Gradient)
+export function initScrollProgress() {
+  let bar = document.querySelector('.scroll-progress-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.className = 'scroll-progress-bar';
+    bar.style.position = 'fixed';
+    bar.style.top = '0';
+    bar.style.left = '0';
+    bar.style.width = '0%';
+    bar.style.height = '3px';
+    bar.style.background = 'linear-gradient(90deg, #0d7a71 0%, #14b8a6 50%, #38bdf8 100%)';
+    bar.style.zIndex = '99999';
+    bar.style.pointerEvents = 'none';
+    bar.style.transition = 'width 0.1s linear';
+    bar.style.boxShadow = '0 0 12px rgba(20, 184, 166, 0.75), 0 0 4px rgba(56, 189, 248, 0.5)';
+    document.body.appendChild(bar);
+  }
+
+  function updateProgress() {
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    if (total <= 0) {
+      bar.style.width = '0%';
+      return;
+    }
+    const progress = Math.min(100, Math.max(0, (window.scrollY / total) * 100));
+    bar.style.width = `${progress}%`;
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+}
+
+// 2. Bi-Directional Scroll Reveal with Framer Motion Spring Physics
+export async function initScrollReveals() {
   const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-zoom, .reveal-fade, [data-count-to]');
+
   if (isReducedMotion) {
-    document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-zoom, .reveal-fade').forEach(el => {
-      el.classList.add('is-revealed');
-    });
+    targets.forEach(el => el.classList.add('is-revealed'));
     return;
   }
 
-  // Handle stagger parent groups
+  // Handle stagger delays for child elements
   document.querySelectorAll('[data-stagger]').forEach(parent => {
     const children = parent.children;
     const baseDelay = parseInt(parent.getAttribute('data-stagger') || '80', 10);
@@ -24,21 +73,33 @@ export function initScrollReveals() {
 
   const observerOptions = {
     root: null,
-    rootMargin: '0px 0px -40px 0px',
-    threshold: 0.12
+    rootMargin: '0px 0px -30px 0px',
+    threshold: 0.08
   };
 
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('is-revealed');
+
+        // Apply Framer Motion spring entrance if loaded
+        if (motionEngine && !entry.target.dataset.motionAnimated) {
+          entry.target.dataset.motionAnimated = 'true';
+          try {
+            motionEngine.animate(
+              entry.target,
+              { opacity: [0, 1], y: [16, 0] },
+              { duration: 0.55, easing: [0.16, 1, 0.3, 1] }
+            );
+          } catch (_) {}
+        }
+
         // Trigger count-up if element has data-count-to
         if (entry.target.hasAttribute('data-count-to') && !entry.target.dataset.counted) {
           animateCountUp(entry.target);
         }
       } else {
-        // Bi-directional: re-hide softly when out of view so it replays up and down
-        // Only re-hide if scrolled past it, giving smooth cinematic flow
+        // Bi-directional re-hide when scrolled past view
         const rect = entry.boundingClientRect;
         if (rect.top > window.innerHeight || rect.bottom < 0) {
           entry.target.classList.remove('is-revealed');
@@ -47,14 +108,11 @@ export function initScrollReveals() {
     });
   }, observerOptions);
 
-  const targets = document.querySelectorAll(
-    '.reveal-up, .reveal-left, .reveal-right, .reveal-zoom, .reveal-fade, [data-count-to]'
-  );
   targets.forEach(el => revealObserver.observe(el));
 }
 
-// 2. Count-Up Animation for Stat / Trust Metrics
-function animateCountUp(element) {
+// 3. Smooth Spring Count-Up Animation
+export function animateCountUp(element) {
   element.dataset.counted = 'true';
   const targetStr = element.getAttribute('data-count-to') || '';
   const isDecimal = targetStr.includes('.');
@@ -67,7 +125,7 @@ function animateCountUp(element) {
   function updateCount(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    // Smooth ease-out cubic
+    // Framer ease-out cubic
     const easeOut = 1 - Math.pow(1 - progress, 3);
     const current = progress === 1 ? targetNum : (targetNum * easeOut);
 
@@ -83,15 +141,10 @@ function animateCountUp(element) {
   requestAnimationFrame(updateCount);
 }
 
-// 3. Smart Navbar Hide/Show
+// 4. Smart Sticky Navbar & Back-to-Top Button
 export function initSmartNavbarAndScrollProgress() {
-  // Remove scroll progress bar if it exists
-  const existingProgressBar = document.querySelector('.scroll-progress-bar');
-  if (existingProgressBar) {
-    existingProgressBar.remove();
-  }
+  initScrollProgress();
 
-  // Ensure Back-to-Top button exists
   let backToTop = document.getElementById('back-to-top');
   if (!backToTop) {
     backToTop = document.createElement('button');
@@ -114,28 +167,27 @@ export function initSmartNavbarAndScrollProgress() {
   function onScroll() {
     const currentScrollY = window.scrollY;
 
-    // 2. Back to top visibility
+    // Back to top visibility
     if (backToTop) {
-      if (currentScrollY > 320) {
+      if (currentScrollY > 280) {
         backToTop.classList.add('show');
       } else {
         backToTop.classList.remove('show');
       }
     }
 
-    // 3. Smart Navbar hide on scroll down / show on scroll up
+    // Smart Navbar hide on rapid scroll down / show on scroll up
     const navbar = document.querySelector('.navbar');
     if (navbar) {
-      if (currentScrollY > 24) {
+      if (currentScrollY > 20) {
         navbar.classList.add('navbar-scrolled');
       } else {
         navbar.classList.remove('navbar-scrolled');
       }
 
-      // Hide only after scrolling past 150px down and moving downwards rapidly
-      if (currentScrollY > 180 && currentScrollY > lastScrollY && (currentScrollY - lastScrollY > 4)) {
+      if (currentScrollY > 180 && currentScrollY > lastScrollY && (currentScrollY - lastScrollY > 6)) {
         navbar.classList.add('navbar-hidden');
-      } else if (currentScrollY < lastScrollY - 4 || currentScrollY <= 120) {
+      } else if (currentScrollY < lastScrollY - 4 || currentScrollY <= 100) {
         navbar.classList.remove('navbar-hidden');
       }
     }
@@ -154,16 +206,17 @@ export function initSmartNavbarAndScrollProgress() {
   onScroll();
 }
 
-// 4. Desktop 3D Card Tilt Effect (Doctor Cards & Feature Tiles)
+// 5. Interactive 3D Card Tilt with Specular Reflection
 export function initDesktop3DTilt() {
   const isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!isDesktopPointer || isReducedMotion) return;
 
-  const tiltCards = document.querySelectorAll('.tilt-card, .doctor-card');
+  const tiltCards = document.querySelectorAll('.tilt-card, .doctor-card, .kpi-card');
   tiltCards.forEach(card => {
     if (card.dataset.tiltInit) return;
     card.dataset.tiltInit = 'true';
+
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -171,8 +224,8 @@ export function initDesktop3DTilt() {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      const rotateX = ((y - centerY) / centerY) * -5; // max 5 deg
-      const rotateY = ((x - centerX) / centerX) * 5;
+      const rotateX = ((y - centerY) / centerY) * -5.5;
+      const rotateY = ((x - centerX) / centerX) * 5.5;
 
       card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-4px)`;
     });
@@ -183,10 +236,55 @@ export function initDesktop3DTilt() {
   });
 }
 
-// 5. Button Click Ripple Micro-Interaction
+// 6. Luminous Card Spotlight Cursor Tracking
+export function initCardSpotlight() {
+  const isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!isDesktopPointer) return;
+
+  const cards = document.querySelectorAll('.card, .doctor-card, .kpi-card, .category-card, .queue-card, .trust-metric-box');
+  cards.forEach(card => {
+    if (card.dataset.spotlightInit) return;
+    card.dataset.spotlightInit = 'true';
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+  });
+}
+
+// 7. Magnetic Buttons (Subtle Cursor Pull)
+export function initMagneticButtons() {
+  const isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!isDesktopPointer || isReducedMotion) return;
+
+  const magneticBtns = document.querySelectorAll('.btn-primary, .btn-secondary, .nav-brand');
+  magneticBtns.forEach(btn => {
+    if (btn.dataset.magneticInit) return;
+    btn.dataset.magneticInit = 'true';
+
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - (rect.left + rect.width / 2);
+      const y = e.clientY - (rect.top + rect.height / 2);
+
+      btn.style.transform = `translate3d(${(x * 0.15).toFixed(1)}px, ${(y * 0.15).toFixed(1)}px, 0)`;
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
+}
+
+// 8. Ripple Waves on Action Elements
 export function initButtonRipples() {
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn, .btn-primary, .btn-secondary, .slot-btn, .chip');
+    const btn = e.target.closest('.btn, .btn-primary, .btn-secondary, .slot-btn, .chip, .filter-chip');
     if (!btn) return;
 
     const rect = btn.getBoundingClientRect();
@@ -207,14 +305,13 @@ export function initButtonRipples() {
   });
 }
 
-// 6. Subtle Parallax for Ambient Hero Blobs & Badges
+// 9. Subtle Parallax for Ambient Hero Blobs & Badges
 export function initParallaxOrbs() {
   const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (isReducedMotion) return;
 
-  const blobs = document.querySelectorAll('.ambient-mesh-blob');
   const badges = document.querySelectorAll('.hero-floating-badge');
-  if (blobs.length === 0 && badges.length === 0) return;
+  if (badges.length === 0) return;
 
   let mouseX = 0;
   let mouseY = 0;
@@ -241,19 +338,51 @@ export function initParallaxOrbs() {
   requestAnimationFrame(renderParallax);
 }
 
+// 10. Spring Modal Open Animation
+export function initModalSpring() {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach(m => {
+      if (m.type === 'attributes' && m.attributeName === 'class') {
+        const target = m.target;
+        if (target.classList.contains('modal-backdrop') && (target.classList.contains('show') || target.classList.contains('open'))) {
+          const box = target.querySelector('.modal-box');
+          if (box) {
+            box.style.transform = 'scale(0.92) translateY(20px)';
+            box.style.opacity = '0';
+            requestAnimationFrame(() => {
+              box.style.transition = 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+              box.style.transform = 'scale(1) translateY(0)';
+              box.style.opacity = '1';
+            });
+          }
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.modal-backdrop').forEach(modal => {
+    observer.observe(modal, { attributes: true });
+  });
+}
+
 // Global Orchestrator
-export function initAllAnimations() {
+export async function initAllAnimations() {
+  await loadMotion();
   initScrollReveals();
   initSmartNavbarAndScrollProgress();
   initDesktop3DTilt();
+  initCardSpotlight();
+  initMagneticButtons();
   initButtonRipples();
   initParallaxOrbs();
+  initModalSpring();
 }
 
 if (typeof window !== 'undefined') {
   window.initAllAnimations = initAllAnimations;
   window.initScrollReveals = initScrollReveals;
   window.initDesktop3DTilt = initDesktop3DTilt;
+  window.initCardSpotlight = initCardSpotlight;
 }
 
 // Auto-boot on DOM ready

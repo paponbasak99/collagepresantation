@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
   <style>
     body {
       background: #090d16;
@@ -263,8 +265,10 @@
     const appointmentId = urlParams.get('appointment_id');
 
     if (!appointmentId) {
-      alert('No appointment ID provided.');
-      window.location.href = '/my-appointments.html';
+      showToast('No appointment ID provided.', 'warning');
+      setTimeout(() => {
+        window.location.href = '/my-appointments.html';
+      }, 1500);
     }
 
     let localStream = null;

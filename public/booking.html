@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d7a71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpolyline points='9 12 11 14 15 10'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
   <style>
     .checkout-layout-grid {
       display: grid;
@@ -435,9 +437,10 @@
         if (holdRemainingSeconds <= 0) {
           clearInterval(countdownInterval);
           timerEl.textContent = '00:00';
-          bannerEl.classList.add('critical');
-          alert('Your 5-minute reservation hold has expired. The slot has been released back to other patients.');
-          window.location.href = `/doctor-profile.html?id=${doctorId}`;
+          showToast('Your 5-minute reservation hold has expired. The slot has been released back to other patients.', 'warning');
+          setTimeout(() => {
+            window.location.href = `/doctor-profile.html?id=${doctorId}`;
+          }, 1800);
           return;
         }
 
